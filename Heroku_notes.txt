@@ -1,0 +1,13 @@
+Relies on the heroku CLI
+
+Deploy an app through: heroku create > git push heroku master?
+
+
+To view logs:
+Heroku logs --tail
+
+dynos - heroku processes running
+heroku ps:scale web= #
+
+To start:
+heroku local web -f Procfile.windows
