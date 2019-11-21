@@ -7,6 +7,7 @@ import json
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from flask import Flask, request
+import logging
 
 app = Flask(__name__)
 bot_id = "566e3b05b73cb551006cf34410"
@@ -18,7 +19,7 @@ def webhook():
 	# 'message' is an object that represents a single GroupMe message.
 	message = request.get_json()
 
-	# TODO: Your bot's logic here
+	logging.info(message["sender"])
 
 	return "ok", 200
 
