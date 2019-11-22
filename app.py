@@ -18,9 +18,8 @@ bot_id = "566e3b05b73cb551006cf34410"
 def webhook():
 	# 'message' is an object that represents a single GroupMe message.
 	message = request.get_json()
-
-	print(message)
-
+	if message['name'] == 'Scott Rossignol':
+		reply(message['text'])
 	return "ok", 200
 
 @app.route('/')
