@@ -19,9 +19,14 @@ def webhook():
 	# 'message' is an object that represents a single GroupMe message.
 	message = request.get_json()
 
-	logging.info(message["sender"])
+	print(message)
 
 	return "ok", 200
+
+@app.route('/')
+def home():
+	print("here")
+	return 'Hello World!'
 
 ################################################################################
 
@@ -70,3 +75,6 @@ def upload_image_to_groupme(imgURL):
 # Checks whether the message sender is a bot
 def sender_is_bot(message):
 	return message['sender_type'] == "bot"
+
+if __name__ == '__main__':
+	app.run()
