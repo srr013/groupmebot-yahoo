@@ -13,11 +13,10 @@ import League_Bot
 
 app = Flask(__name__)
 bot_id = "	566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"
-league_bot = ''
+league_bot = League_Bot.League_Bot()
 
 def init():
 	global league_bot
-	league_bot = League_Bot.League_Bot()
 	league_bot._login()
 	league_bot.get_data()
 	league_bot.set_transaction_total()
