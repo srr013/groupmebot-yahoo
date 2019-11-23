@@ -9,11 +9,21 @@ from urllib.request import Request, urlopen
 from flask import Flask, request
 import logging
 import random
+import League_Bot
 
 app = Flask(__name__)
-bot_id = "	70e9ad5bc50020fdb3a14dbca1"
+bot_id = "	566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"
 message_num = 0
 message_limit = 25
+league_bot = ''
+
+def init():
+	global league_bot
+	league_bot = League_Bot.League_Bot()
+	league._login()
+	league.get_data()
+	league.set_transaction_total()
+
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
@@ -25,7 +35,7 @@ def webhook():
 	global message_limit
 	message_num  += 1
 	print(message_num, message_limit)
-	if message_num >= message_limit:
+	if message_num >= message_limit and not sender_is_bot(message):
 		message_num = 0
 		message_limit = random.randint(25,40)
 		reply(get_message(message['name']))
@@ -103,4 +113,4 @@ def sender_is_bot(message):
 	return message['sender_type'] == "bot"
 
 if __name__ == '__main__':
-	app.run()
+	app.init()
