@@ -21,7 +21,7 @@ def init():
 	league_bot._login()
 	league_bot.get_data()
 	league_bot.set_transaction_total()
-	print("transaction total: " league_bot.num_transactions_past)
+	print("transaction total: " +league_bot.num_transactions_past)
 	reply("Yahoo initialization complete.")
 
 
