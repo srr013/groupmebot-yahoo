@@ -19,3 +19,5 @@ start the logs and keep testing
 
 To start:
 heroku local web -f Procfile.windows
+
+heroku local -f Procfile.windows
