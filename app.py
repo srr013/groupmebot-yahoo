@@ -43,7 +43,7 @@ def get_message(user):
 	}
 	m = random.randint(0,1)
 	message = messages[m][random.randint(0, len(messages[m]))-1]
-	lead = random.randint(0,len(lead_in))-1
+	lead = lead_in[random.randint(0,len(lead_in))-1]
 	msg = lead + message
 	return msg
 
