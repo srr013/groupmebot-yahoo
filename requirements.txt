@@ -1,2 +1,4 @@
 Flask==1.0
 gunicorn==19.6.0
+yahoo_oauth==0.1.9
+
