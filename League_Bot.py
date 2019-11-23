@@ -13,6 +13,14 @@ class League_Bot():
         if not self.oauth.token_is_valid():
             self.oauth.refresh_access_token()
 
+    def init():
+        self._login()
+        self.get_data()
+        self.set_transaction_total()
+        print("transaction total: " +str(league_bot.num_transactions_past))
+        logging.debug("transaction total: " +str(league_bot.num_transactions_past))
+        return True
+
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
         sport = 'nfl'
