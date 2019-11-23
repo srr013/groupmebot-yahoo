@@ -13,16 +13,16 @@ import League_Bot
 
 app = Flask(__name__)
 bot_id = "	566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"
-message_num = 0
-message_limit = 25
 league_bot = ''
 
 def init():
 	global league_bot
 	league_bot = League_Bot.League_Bot()
-	league._login()
-	league.get_data()
-	league.set_transaction_total()
+	league_bot._login()
+	league_bot.get_data()
+	league_bot.set_transaction_total()
+	print("transaction total: " league_bot.num_transactions_past)
+	reply("Yahoo initialization complete.")
 
 
 # Called whenever the app's callback URL receives a POST request
@@ -31,14 +31,16 @@ def init():
 def webhook():
 	# 'message' is an object that represents a single GroupMe message.
 	message = request.get_json()
-	global message_num
-	global message_limit
-	message_num  += 1
-	print(message_num, message_limit)
-	if message_num >= message_limit and not sender_is_bot(message):
-		message_num = 0
-		message_limit = random.randint(25,40)
+	global league_bot
+	league_bot.message_num  += 1
+	print(league_bot.message_num, league_bot.message_limit)
+	if league_bot.message_num >= league_bot.message_limit and not sender_is_bot(message):
+		league_bot.message_num = 0
+		league_bot.message_limit = random.randint(25,40)
 		reply(get_message(message['name']))
+
+	if "initialize bot" in message:
+		init()
 
 	return "ok", 200
 
