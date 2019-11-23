@@ -40,7 +40,7 @@ def get_message(user):
 	 "probably better than I could've done", "not dumb", "better than average", "pretty good!"]
 	}
 	m = random.randint(0,1)
-	message = messages[m][random.randint(0, len(messages[m]-1))]
+	message = messages[m][random.randint(0, len(messages[m])-1)]
 
 	msg = user + ': my calculations show that your message was '+ message
 	return msg
