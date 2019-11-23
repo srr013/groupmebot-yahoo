@@ -12,7 +12,7 @@ import random
 import League_Bot
 
 app = Flask(__name__)
-bot_id = "	566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"
+bot_id = "70e9ad5bc50020fdb3a14dbca1"#"566e3b05b73cb551006cf34410"
 league_bot = League_Bot.League_Bot()
 
 def init():
@@ -21,8 +21,13 @@ def init():
 	league_bot.get_data()
 	league_bot.set_transaction_total()
 	print("transaction total: " +league_bot.num_transactions_past)
+	logging.debug("transaction total: " +league_bot.num_transactions_past)
 	reply("Yahoo initialization complete.")
 
+def refresh():
+	transaction_list = league_bot.get_transactions()
+	# if transaction_list:
+	# 	reply(format_transaction_list(transaction_list))
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
@@ -33,12 +38,14 @@ def webhook():
 	global league_bot
 	league_bot.message_num  += 1
 	print(league_bot.message_num, league_bot.message_limit)
+	logging.debug("message: "+ message+", "+league_bot.message_num" / "+league_bot.message_limit)
 	if league_bot.message_num >= league_bot.message_limit and not sender_is_bot(message):
 		league_bot.message_num = 0
 		league_bot.message_limit = random.randint(25,40)
 		reply(get_message(message['name']))
 
 	if "initialize bot" in message:
+		loggin.debug("initializing")
 		init()
 
 	return "ok", 200

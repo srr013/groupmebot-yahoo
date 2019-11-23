@@ -7,7 +7,7 @@ class League_Bot():
         self.data = {}
         self.num_transactions_past = 0
         self.message_num = 0
-        self.message_limit = 25
+        self.message_limit = 2
 
     def _login(self):
         if not self.oauth.token_is_valid():
