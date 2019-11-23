@@ -21,6 +21,8 @@ message_limit = random.randint(2,4)
 def webhook():
 	# 'message' is an object that represents a single GroupMe message.
 	message = request.get_json()
+	global message_num
+	global message_limit
 	message_num  += 1
 	if message_num >= message_limit:
 		message_num = 0
