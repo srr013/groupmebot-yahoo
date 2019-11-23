@@ -38,14 +38,14 @@ def webhook():
 	global league_bot
 	league_bot.message_num  += 1
 	print(league_bot.message_num, league_bot.message_limit)
-	logging.debug("message: "+ message+", "+league_bot.message_num+" / "+league_bot.message_limit)
+	logging.debug("message: "+ message['text']+", "+league_bot.message_num+" / "+league_bot.message_limit)
 	if league_bot.message_num >= league_bot.message_limit and not sender_is_bot(message):
 		league_bot.message_num = 0
 		league_bot.message_limit = random.randint(25,40)
 		reply(get_message(message['name']))
 
-	if "initialize bot" in message:
-		loggin.debug("initializing")
+	if "initialize bot" in message['text']:
+		logging.debug("initializing")
 		init()
 
 	return "ok", 200
