@@ -24,6 +24,7 @@ def webhook():
 	global message_num
 	global message_limit
 	message_num  += 1
+	print(message_num, message_limit)
 	if message_num >= message_limit:
 		message_num = 0
 		reply(get_message(message['name']))
@@ -32,10 +33,10 @@ def webhook():
 
 def get_message(user):
 	messages = {
-	1 : ['idiotic', 'dumber than a sack of potatoes', 'as insightful as Jim Jordan',
+	0 : ['idiotic', 'dumber than a sack of potatoes', 'as insightful as Jim Jordan',
 	 "... well let's just say bless your heart", "as good as 3 day old egg salad", "clearly a joke", 
 	 "reminiscient of nothing memorable", "nevermind. Go f yaself", "actually a Republican talking point"],
-	2 : ["smarter than expected", "amazing", "insightful and heartwarming",
+	1 : ["smarter than expected", "amazing", "insightful and heartwarming",
 	 "probably better than I could've done", "not dumb", "better than average", "pretty good!"]
 	}
 	m = random.randint(0,1)
