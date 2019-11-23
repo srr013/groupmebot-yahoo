@@ -13,7 +13,7 @@ import random
 app = Flask(__name__)
 bot_id = "566e3b05b73cb551006cf34410"
 message_num = 0
-message_limit = random.randint(2,4)
+message_limit = 25
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
@@ -27,11 +27,13 @@ def webhook():
 	print(message_num, message_limit)
 	if message_num >= message_limit:
 		message_num = 0
+		message_limit = random.randint(25,40)
 		reply(get_message(message['name']))
 
 	return "ok", 200
 
 def get_message(user):
+	lead_in = ["Bleep bloop bleep. "+user+ " is", "Congratulations "+user+" you are ", "My calculations have revealed that "+user]
 	messages = {
 	0 : ['idiotic', 'dumber than a sack of potatoes', 'as insightful as Jim Jordan',
 	 "... well let's just say bless your heart", "as good as 3 day old egg salad", "clearly a joke", 
@@ -40,9 +42,9 @@ def get_message(user):
 	 "probably better than I could've done", "not dumb", "better than average", "pretty good!"]
 	}
 	m = random.randint(0,1)
-	message = messages[m][random.randint(0, len(messages[m])-1)]
-
-	msg = user + ': my calculations show that your message was '+ message
+	message = messages[m][random.randint(0, len(messages[m]))-1]
+	lead = random.randint(0,len(lead_in))-1
+	msg = lead + message
 	return msg
 
 @app.route('/')
