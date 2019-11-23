@@ -11,7 +11,7 @@ import logging
 import random
 
 app = Flask(__name__)
-bot_id = "566e3b05b73cb551006cf34410"
+bot_id = "	70e9ad5bc50020fdb3a14dbca1"
 message_num = 0
 message_limit = 25
 
