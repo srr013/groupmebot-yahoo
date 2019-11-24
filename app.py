@@ -32,7 +32,7 @@ def webhook():
 	message = request.get_json()
 	global league_bot
 	if not league_bot:
-		league_bot.init()
+		league_bot.initialize_bot()
 	league_bot.message_num  += 1
 	print(league_bot.message_num, league_bot.message_limit)
 	logging.debug("message: "+ message['text']+", "+str(league_bot.message_num)+" / "+str(league_bot.message_limit))
@@ -43,12 +43,12 @@ def webhook():
 	return "ok", 200
 
 @app.route('/initialize')
-def iniitialize():
+def initialize():
 	logging.debug("initializing")
 	global league_bot
 	if not league_bot:
 		league_bot = League_Bot.League_Bot()
-	league_bot.init()
+	league_bot.initializae_bot()
 
 
 @app.route('/')

@@ -13,7 +13,7 @@ class League_Bot():
         if not self.oauth.token_is_valid():
             self.oauth.refresh_access_token()
 
-    def init():
+    def initialize_bot(self):
         self._login()
         self.get_data()
         self.set_transaction_total()
