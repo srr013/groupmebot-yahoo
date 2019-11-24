@@ -13,22 +13,23 @@ class League_Bot():
         if not self.oauth.token_is_valid():
             self.oauth.refresh_access_token()
     
-    def fetch_message_data(self):
+    def fetch_data(self):
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
         cursor = db.execute_table_action(db.initialize_connection(), query)
-        league_id,message_num,message_limit, past_transaction_num = cursor.fetchone()
+        league_id,message_num,message_limit, past_transaction_num, league_data = cursor.fetchone()
         message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
                     'transaction_num': past_transaction_num}
         logging.warning("Message Data: %i, %i, %i, %s" %  (league_id,message_num,message_limit, past_transaction_num))
+        # if not league_data:
+        #     league_data = self.get_league_data()
         return message_data
 
     def initialize_bot(self):
         self._login()
-        data = self.get_league_data()
-        message_data = self.fetch_message_data()
-        trans_list = self.get_transactions_list(data, message_data['transaction_num'])
-        return data, trans_list, message_data
+        message_data = self.fetch_data()
+        #trans_list = self.get_transactions_list(league_data, message_data['transaction_num'])
+        return message_data
 
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -59,6 +60,7 @@ class League_Bot():
 
 
 #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
+        self.save_league_data(data)
         return data
 
     def get_matchup_score(self, matchup):
@@ -134,6 +136,15 @@ class League_Bot():
     
     def update_transaction_store(self, num_trans):
         query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
+        conn = db.initialize_connection()
+        cursor = db.execute_table_action(conn, query)
+        conn.close()
+
+
+    def save_league_data(self, data):
+        data = json.dumps(data)
+        data.strip("'")
+        query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
         conn.close()

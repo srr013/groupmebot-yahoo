@@ -25,7 +25,7 @@ def refresh():
 def webhook():
 	message = request.get_json()
 	global league_bot
-	data, transaction_list, message_data = initialize()
+	message_data = initialize()
 	league_bot.increment_message_num()
 	logging.warning("message: "+ message['text']+", "+str(message_data['message_num'])+" / "+str(message_data['message_limit']))
 	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
@@ -37,19 +37,19 @@ def initialize():
 	global league_bot
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
-	data, transaction_list, message_data = league_bot.initialize_bot()
-	if transaction_list:
-		s = "Recent transactions: \n"
-		for t in transaction_list:
-			s += t 
-		m.reply(s, bot_id)
-	return data, transaction_list, message_data
+	message_data = league_bot.initialize_bot()
+	# if transaction_list:
+	# 	s = "Recent transactions: \n"
+	# 	for t in transaction_list:
+	# 		s += t 
+	# 	m.reply(s, bot_id)
+	return message_data
 
 @app.route('/initialize')
 def initialize_to_window():
 	logging.debug("initializing")
-	data, transaction_list, message_data = initialize()
-	return json.dumps(data)
+	message_data = initialize()
+	return json.dumps(message_data)
 
 
 @app.route('/')
