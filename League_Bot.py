@@ -7,7 +7,6 @@ import random
 class League_Bot():
     def __init__(self, league_id):
         self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-        self.db = db.initialize_connection()
         self.league_id = league_id
 
     def _login(self):
@@ -17,7 +16,7 @@ class League_Bot():
     def fetch_message_data(self):
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
-        cursor = db.execute_table_action(self.db, query)
+        cursor = db.execute_table_action(db.initialize_connection(), query)
         league_id,message_num,message_limit, past_transaction_num = cursor.fetchone()
         message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
                     'transaction_num': past_transaction_num}
@@ -121,14 +120,20 @@ class League_Bot():
     def increment_message_num(self):
         logging.warning("Updating DB")
         query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1;"
-        cursor = db.execute_table_action(self.db, query)
+        conn = db.initialize_connection()
+        cursor = db.execute_table_action(conn, query)
+        conn.close()
     
     def reset_message_data(self):
         logging.warning("Reseting Message Data in DB")
         lim = random.randint(15,25)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
-        cursor = db.execute_table_action(self.db, query)
+        conn = db.initialize_connection()
+        cursor = db.execute_table_action(conn, query)
+        conn.close()
     
     def update_transaction_store(self, num_trans):
         query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
-        cursor = db.execute_table_action(self.db, query)
+        conn = db.initialize_connection()
+        cursor = db.execute_table_action(conn, query)
+        conn.close()
