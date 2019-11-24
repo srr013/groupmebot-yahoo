@@ -1,25 +1,37 @@
 from yahoo_oauth import OAuth2
 import json
+import logging
+import db
+import random
 
-class League_Bot():
-    def __init__(self):
-        self.oauth = OAuth2(None, None, from_file='oauth2yahoo.json')
-        self.data = {}
-        self.num_transactions_past = 0
-        self.message_num = 0
-        self.message_limit = 2
+class League_Bot(league_id):
+    def __init__(self, league_id):
+        self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
+        self.db = db.initialize_connection()
+        self.league_id = league_id
 
     def _login(self):
         if not self.oauth.token_is_valid():
             self.oauth.refresh_access_token()
+    
+    def fetch_message_data(self):
+        logging.debug("Fetching league data from DB")
+        query = "SELECT * FROM groupme_yahoo WHERE session = 1"
+        cursor = db.execute_table_action(self.db, query)
+        league_id,message_num,message_limit, past_transaction_num = cursor.fetchone()
+        message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
+                    'transaction_num': past_transaction_num}
+        logging.warning("Message num, limit %i %i " % (self.message_num, self.message_limit))
+        return message_data
 
     def initialize_bot(self):
         self._login()
-        self.get_data()
-        self.set_transaction_total()
-        print("transaction total: " +str(league_bot.num_transactions_past))
-        logging.debug("transaction total: " +str(league_bot.num_transactions_past))
-        return
+        data = self.get_data()
+        message_data = self.fetch_message_data()
+        trans_total = message_data['transaction_num']
+        trans_list = self.get_transactions_list(data, trans_total)
+        logging.debug("Logging transaction total: " +str(self.num_transactions_past))
+        return data, trans_list, message_data
 
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -29,7 +41,7 @@ class League_Bot():
         league_key = sport + '.l.'+ league_id 
         return str(base_url + league_key + request)
     
-    def get_data(self):
+    def get_league_data(self):
         league = 12
         weeks = 10
         data = {}
@@ -50,10 +62,7 @@ class League_Bot():
 
 
 #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
-
-        self.data = data
-
-        return
+        return data
 
     def get_matchup_score(self, matchup):
         team_0 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
@@ -62,19 +71,19 @@ class League_Bot():
         t0_name = team_0['team'][0][0].get(['team_name'])
         t0_current_score = team_0['team'][1]['team_points']['total']
 
-    def set_transaction_total(self):
-        self.num_transactions_past = self.data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
+    def get_transaction_total(self, data):
+        return data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
 
-    def get_transactions(self):
+    def get_transactions(self, data, trans_total):
         response = self.oauth.session.get(self.build_url('transactions;types=add'), params={'format': 'json'})
-        self.data['transactions'] = json.loads(response.text)
-        self.num_transactions = self.data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
-        transaction_diff = self.num_transactions - self.num_transactions_past
+        data['transactions'] = json.loads(response.text)
+        num_transactions = data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
+        transaction_diff = num_transactions - trans_total
+        trans_list = []
         if transaction_diff > 0:
             i = 1
-            trans_list = []
             while i <= transaction_diff:
-                transaction = self.data['transactions']['fantasy_content']['league'][1]['transactions'][str(self.num_transactions_past+i)]
+                transaction = data['transactions']['fantasy_content']['league'][1]['transactions'][str(self.num_transactions_past+i)]
                 player_name = transaction['0']['transaction'][1]['players'][0]['player'][0][2]['name']['full']
                 team_name = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['destination_team_name']
                 trans_type = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['type']
@@ -82,3 +91,14 @@ class League_Bot():
                 trans_list.append(string)
                 i += 1
         return trans_list
+
+    def increment_message_num(self):
+        logging.warning("Updating DB")
+        query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1"
+        cursor = db.execute_table_action(self.db, query)
+    
+    def reset_message_data(self):
+        logging.warning("Reseting Message Data in DB")
+        lim = random.random(15,25)
+        query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1"        
+        cursor = db.execute_table_action(self.db, query)

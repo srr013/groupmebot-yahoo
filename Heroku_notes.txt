@@ -21,3 +21,8 @@ To start:
 heroku local web -f Procfile.windows
 
 heroku local -f Procfile.windows
+
+
+Database:
+to run from CLI: heroku pg:psql
+pull data from remote to local: heroku pg:pull HEROKU_POSTGRESQL_MAGENTA mylocaldb --app sushi
