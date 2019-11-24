@@ -25,8 +25,7 @@ def refresh():
 def webhook():
 	message = request.get_json()
 	global league_bot
-	if not league_bot:
-		data, transaction_list, message_data = initialize()
+	data, transaction_list, message_data = initialize()
 	league_bot.increment_message_num()
 	logging.warning("message: "+ message['text']+", "+str(message_data['message_num'])+" / "+str(message_data['message_limit']))
 	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):

@@ -94,11 +94,11 @@ class League_Bot():
 
     def increment_message_num(self):
         logging.warning("Updating DB")
-        query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1"
+        query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1;"
         cursor = db.execute_table_action(self.db, query)
     
     def reset_message_data(self):
         logging.warning("Reseting Message Data in DB")
         lim = random.random(15,25)
-        query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1"        
+        query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
         cursor = db.execute_table_action(self.db, query)
