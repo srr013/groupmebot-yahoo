@@ -133,7 +133,7 @@ class League_Bot():
     
     def reset_message_data(self):
         logging.warning("Reseting Message Data in DB")
-        lim = random.randint(8,15)
+        lim = random.randint(4,7)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)

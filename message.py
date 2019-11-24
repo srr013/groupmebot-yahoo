@@ -19,7 +19,7 @@ def get_message(user):
 	 "reminiscent of nothing memorable", "...nevermind. Go f yaself", "as factually inaccurate as a Republican talking point",
 	 "not worth the time it took to write this. Dumbass.", "fishier than Hillary Clinton's underpants on a hot day"],
 	1 : ["smarter than expected", "amazing", "insightful and heartwarming", "attractive",
-	 "probably better than I could've done", "not dumb", "better than average", "a pro",
+	 "probably better than I could've done", "actually not that dumb", "a bit better than average", "a pro",
 	 "as beautiful and talented as Tom Brady", "the Gordon Ramsey of Fantasy Footballers"]
 	}
 	m = random.randint(0,1)
