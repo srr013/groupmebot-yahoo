@@ -51,6 +51,21 @@ def initialize_to_window():
 	message_data = initialize()
 	return json.dumps(message_data)
 
+@app.route('/transactions')
+def transactions():
+	global league_bot
+	if not league_bot:
+		league_bot = League_Bot.League_Bot(1)
+	message_data = initialize()
+	data = league_bot.get_league_data()
+	trans_list = league_bot.get_transactions_list(data, message_data['transaction_num'])
+	s='None'
+	if trans_list:
+		s = "Recent transactions: \n"
+		for t in trans_list:
+			s += t 
+		m.reply(s, bot_id)
+	return s
 
 @app.route('/')
 def home():

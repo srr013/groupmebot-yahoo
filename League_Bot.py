@@ -31,6 +31,7 @@ class League_Bot():
     def initialize_bot(self):
         self._login()
         message_data = self.fetch_data()
+        #league_data = self.get_league_data()
         #trans_list = self.get_transactions_list(league_data, message_data['transaction_num'])
         return message_data
 
@@ -63,7 +64,7 @@ class League_Bot():
 
 
 #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
-        self.save_league_data(data)
+        #self.save_league_data(data)
         return data
 
     def get_matchup_score(self, matchup):
@@ -132,7 +133,7 @@ class League_Bot():
     
     def reset_message_data(self):
         logging.warning("Reseting Message Data in DB")
-        lim = random.randint(15,25)
+        lim = random.randint(8,15)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)

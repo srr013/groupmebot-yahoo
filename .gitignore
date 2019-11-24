@@ -3,5 +3,7 @@ venv
 staticfiles
 .env
 db.sqlite3
-secrets/*
 __pycache__/app.cpython-38.pyc
+__pycache__/app.cpython-38.pyc
+__pycache__/app.cpython-38.pyc
+helpers/*
