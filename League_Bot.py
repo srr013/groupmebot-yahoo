@@ -115,8 +115,8 @@ class League_Bot():
                             trans_list.append(string)
                         i += 1
             logging.warning(trans_list)
-            # if trans_list:
-            #     self.update_transaction_store(num_transactions)
+            if trans_list:
+                self.update_transaction_store(num_transactions)
         return trans_list
 
     def increment_message_num(self):

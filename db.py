@@ -41,7 +41,6 @@ UPDATE groupme_yahoo SET num_past_transactions=393 WHERE session=1;
 """
 
 def execute_table_action(conn, sql_string):
-    logging.warning("Executing db action")
     cursor = conn.cursor()
     cursor.execute(sql_string)
     return cursor
