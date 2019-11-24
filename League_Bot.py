@@ -24,6 +24,7 @@ class League_Bot():
         logging.warning("Message Data: %i, %i, %i, %s" %  (league_id,message_num,message_limit, past_transaction_num))
         # if not league_data:
         #     league_data = self.get_league_data()
+        conn.commit()
         conn.close()
         return message_data
 
@@ -126,6 +127,7 @@ class League_Bot():
         query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
+        conn.commit()
         conn.close()
     
     def reset_message_data(self):
@@ -134,12 +136,14 @@ class League_Bot():
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
+        conn.commit()
         conn.close()
     
     def update_transaction_store(self, num_trans):
         query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
+        conn.commit()
         conn.close()
 
 
@@ -149,4 +153,5 @@ class League_Bot():
         query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
+        conn.commit()
         conn.close()
