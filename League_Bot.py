@@ -16,13 +16,15 @@ class League_Bot():
     def fetch_data(self):
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
-        cursor = db.execute_table_action(db.initialize_connection(), query)
+        conn = db.initialize_connection()
+        cursor = db.execute_table_action(conn, query)
         league_id,message_num,message_limit, past_transaction_num, league_data = cursor.fetchone()
         message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
                     'transaction_num': past_transaction_num}
         logging.warning("Message Data: %i, %i, %i, %s" %  (league_id,message_num,message_limit, past_transaction_num))
         # if not league_data:
         #     league_data = self.get_league_data()
+        conn.close()
         return message_data
 
     def initialize_bot(self):
