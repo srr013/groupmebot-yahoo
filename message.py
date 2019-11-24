@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+import random
 
 def ad_hoc_message(msg):
     if isinstance(msg,str):

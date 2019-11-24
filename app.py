@@ -39,7 +39,7 @@ def initialize():
 		league_bot = League_Bot.League_Bot(1)
 	data, transaction_list, message_data = league_bot.initialize_bot()
 	if transaction_list:
-		s = "Today's transactions: \n"
+		s = "Recent transactions: \n"
 		for t in transaction_list:
 			s += t 
 		m.reply(s, bot_id)
