@@ -94,7 +94,7 @@ class League_Bot():
                         for player in players.keys():
                             if player == 'count':
                                 continue
-                            logging.warning("Player %s" % json.dumps(players[player]))
+                            #logging.warning("Player %s" % json.dumps(players[player]))
                             player_name = players[player]['player'][0][2]['name']['full']
                             if isinstance(players[player]['player'][1]['transaction_data'], list):
                                 trans_type = players[player]['player'][1]['transaction_data'][0]['type']
