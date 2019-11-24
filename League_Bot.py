@@ -19,7 +19,7 @@ class League_Bot():
         self.set_transaction_total()
         print("transaction total: " +str(league_bot.num_transactions_past))
         logging.debug("transaction total: " +str(league_bot.num_transactions_past))
-        return True
+        return
 
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -33,10 +33,6 @@ class League_Bot():
         league = 12
         weeks = 10
         data = {}
-
-        # for team in range(league):
-        #     data[team] = {}
-        #     for week in range(weeks):
         url_list = ['standings',
         'scoreboard', #;week='+str(week),
         'teams',
