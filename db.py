@@ -37,7 +37,7 @@ ALTER TABLE groupme_yahoo ADD COLUMN num_past_transactions INTEGER;
 #works from CLI, not debug
 
 update = """
-UPDATE groupme_yahoo SET num_past_transactions=335 WHERE session=1;
+UPDATE groupme_yahoo SET num_past_transactions=393 WHERE session=1;
 """
 
 def execute_table_action(conn, sql_string):

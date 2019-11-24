@@ -71,25 +71,52 @@ class League_Bot():
         t0_current_score = team_0['team'][1]['team_points']['total']
 
     def get_transaction_total(self, data):
-        return data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
+        return data['transactions']['fantasy_content']['league'][1]['transactions']["0"]['transaction'][0]['transaction_id']
 
-    def get_transactions_list(self, data, trans_total):
+    def get_transactions_list(self, data, past_trans_total):
         response = self.oauth.session.get(self.build_url('transactions;types=add'), params={'format': 'json'})
         data['transactions'] = json.loads(response.text)
-        num_transactions = data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()-1
-        transaction_diff = num_transactions - trans_total
-        logging.warning("Num transactions found: %i" % num_transactions)
+        # with open('data.json', 'w') as d:
+        #     d.write(json.dumps(data['transactions']))
+        num_transactions = self.get_transaction_total(data)
+        transaction_diff = int(num_transactions) - int(past_trans_total)
+        logging.warning("Num transactions found: %s" % num_transactions)
         trans_list = []
         if transaction_diff > 0:
             i = 1
             while i <= transaction_diff:
-                transaction = data['transactions']['fantasy_content']['league'][1]['transactions'][str(trans_total+i)]
-                player_name = transaction['0']['transaction'][1]['players'][0]['player'][0][2]['name']['full']
-                team_name = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['destination_team_name']
-                trans_type = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['type']
-                string = team_name + " "+ trans_type +"s "+player_name
-                trans_list.append(string)
-                i += 1
+                trans = data['transactions']['fantasy_content']['league'][1]['transactions']
+                for t in trans.keys():
+                    if t == 'count':
+                        continue
+                    if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
+                        players = trans[t]['transaction'][1]['players']
+                        string = ''
+                        for player in players.keys():
+                            if player == 'count':
+                                continue
+                            logging.warning("Player %s" % json.dumps(players[player]))
+                            player_name = players[player]['player'][0][2]['name']['full']
+                            if isinstance(players[player]['player'][1]['transaction_data'], list):
+                                trans_type = players[player]['player'][1]['transaction_data'][0]['type']
+                                if trans_type == 'drop':
+                                    team_name = players[player]['player'][1]['transaction_data'][0]['source_team_name']
+                                else:
+                                    team_name = players[player]['player'][1]['transaction_data'][0]['destination_team_name']
+                                string += team_name + " "+ trans_type +"s "+player_name+"\n"
+                            else:
+                                trans_type = players[player]['player'][1]['transaction_data']['type']
+                                if trans_type == 'drop':
+                                    team_name = players[player]['player'][1]['transaction_data']['source_team_name']
+                                else:
+                                    team_name = players[player]['player'][1]['transaction_data']['destination_team_name']                                                    
+                                string += team_name + " "+ trans_type +"s "+player_name+"\n"
+                        if string:
+                            trans_list.append(string)
+                        i += 1
+            logging.warning(trans_list)
+            # if trans_list:
+            #     self.update_transaction_store(num_transactions)
         return trans_list
 
     def increment_message_num(self):
@@ -101,4 +128,8 @@ class League_Bot():
         logging.warning("Reseting Message Data in DB")
         lim = random.random(15,25)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
+        cursor = db.execute_table_action(self.db, query)
+    
+    def update_transaction_store(self, num_trans):
+        query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
         cursor = db.execute_table_action(self.db, query)

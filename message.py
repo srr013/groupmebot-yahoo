@@ -28,7 +28,7 @@ def get_message(user):
 	return msg
 
 # Send a message in the groupchat
-def reply(msg):
+def reply(msg, bot_id):
 	url = 'https://api.groupme.com/v3/bots/post'
 	data = {
 		'bot_id'		: bot_id,

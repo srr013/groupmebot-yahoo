@@ -30,7 +30,7 @@ def webhook():
 	logging.warning("message: "+ message['text']+", "+str(message_data['message_num'])+" / "+str(message_data['message_limit']))
 	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
 		league_bot.reset_message_data()
-		m.reply(m.get_message(message['name']))
+		m.reply(m.get_message(message['name']), bot_id)
 	return "ok", 200
 
 def initialize():
@@ -38,6 +38,11 @@ def initialize():
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
 	data, transaction_list, message_data = league_bot.initialize_bot()
+	if transaction_list:
+		s = "Today's transactions: \n"
+		for t in transaction_list:
+			s += t 
+		m.reply(s, bot_id)
 	return data, transaction_list, message_data
 
 @app.route('/initialize')
