@@ -4,7 +4,7 @@ import logging
 import db
 import random
 
-class League_Bot(league_id):
+class League_Bot():
     def __init__(self, league_id):
         self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
         self.db = db.initialize_connection()
@@ -21,16 +21,15 @@ class League_Bot(league_id):
         league_id,message_num,message_limit, past_transaction_num = cursor.fetchone()
         message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
                     'transaction_num': past_transaction_num}
-        logging.warning("Message num, limit %i %i " % (self.message_num, self.message_limit))
+        logging.warning("Message Data: %i, %i, %i, %s" %  (league_id,message_num,message_limit, past_transaction_num))
         return message_data
 
     def initialize_bot(self):
         self._login()
-        data = self.get_data()
+        data = self.get_league_data()
         message_data = self.fetch_message_data()
         trans_total = message_data['transaction_num']
         trans_list = self.get_transactions_list(data, trans_total)
-        logging.debug("Logging transaction total: " +str(self.num_transactions_past))
         return data, trans_list, message_data
 
     def build_url(self, req):
@@ -74,16 +73,17 @@ class League_Bot(league_id):
     def get_transaction_total(self, data):
         return data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
 
-    def get_transactions(self, data, trans_total):
+    def get_transactions_list(self, data, trans_total):
         response = self.oauth.session.get(self.build_url('transactions;types=add'), params={'format': 'json'})
         data['transactions'] = json.loads(response.text)
-        num_transactions = data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()
+        num_transactions = data['transactions']['fantasy_content']['league'][1]['transactions'].__len__()-1
         transaction_diff = num_transactions - trans_total
+        logging.warning("Num transactions found: %i" % num_transactions)
         trans_list = []
         if transaction_diff > 0:
             i = 1
             while i <= transaction_diff:
-                transaction = data['transactions']['fantasy_content']['league'][1]['transactions'][str(self.num_transactions_past+i)]
+                transaction = data['transactions']['fantasy_content']['league'][1]['transactions'][str(trans_total+i)]
                 player_name = transaction['0']['transaction'][1]['players'][0]['player'][0][2]['name']['full']
                 team_name = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['destination_team_name']
                 trans_type = transaction['0']['transaction'][1]['players'][0]['player'][1]['transaction_data'][0]['type']

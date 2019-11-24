@@ -44,7 +44,4 @@ def execute_table_action(conn, sql_string):
     logging.warning("Executing db action")
     cursor = conn.cursor()
     cursor.execute(sql_string)
-    conn.close()
     return cursor
-
-res = execute_table_action(initialize_connection(), update)
