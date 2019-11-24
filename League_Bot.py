@@ -28,8 +28,7 @@ class League_Bot():
         self._login()
         data = self.get_league_data()
         message_data = self.fetch_message_data()
-        trans_total = message_data['transaction_num']
-        trans_list = self.get_transactions_list(data, trans_total)
+        trans_list = self.get_transactions_list(data, message_data['transaction_num'])
         return data, trans_list, message_data
 
     def build_url(self, req):
@@ -80,7 +79,7 @@ class League_Bot():
         #     d.write(json.dumps(data['transactions']))
         num_transactions = self.get_transaction_total(data)
         transaction_diff = int(num_transactions) - int(past_trans_total)
-        logging.warning("Num transactions found: %s" % num_transactions)
+        logging.warning("Num transactions found: %s new / %s old" % (num_transactions, past_trans_total))
         trans_list = []
         if transaction_diff > 0:
             i = 1
