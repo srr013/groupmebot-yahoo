@@ -32,7 +32,6 @@ def webhook():
 	message = request.get_json()
 	global league_bot
 	if not league_bot:
-		league_bot = League_Bot.League_Bot()
 		league_bot.init()
 	league_bot.message_num  += 1
 	print(league_bot.message_num, league_bot.message_limit)
@@ -47,6 +46,8 @@ def webhook():
 def iniitialize():
 	logging.debug("initializing")
 	global league_bot
+	if not league_bot:
+		league_bot = League_Bot.League_Bot()
 	league_bot.init()
 
 
