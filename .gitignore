@@ -4,6 +4,4 @@ staticfiles
 .env
 db.sqlite3
 __pycache__/app.cpython-38.pyc
-__pycache__/app.cpython-38.pyc
-__pycache__/app.cpython-38.pyc
-helpers/*
+helpers/

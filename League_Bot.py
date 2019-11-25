@@ -19,9 +19,11 @@ class League_Bot():
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
         league_id,message_num,message_limit, past_transaction_num, league_data = cursor.fetchone()
-        message_data = {'id': league_id, 'message_num':message_num, 'message_limit': message_limit,
+        message_data = {'id': league_id, 'message_num':message_num, 
+                    'message_limit': message_limit,
                     'transaction_num': past_transaction_num}
-        logging.warning("Message Data: %i, %i, %i, %s" %  (league_id,message_num,message_limit, past_transaction_num))
+        logging.warning("Message Data: %i, %i, %i, %s" %  
+        (league_id,message_num,message_limit, past_transaction_num))
         # if not league_data:
         #     league_data = self.get_league_data()
         conn.commit()
@@ -32,7 +34,6 @@ class League_Bot():
         self._login()
         message_data = self.fetch_data()
         #league_data = self.get_league_data()
-        #trans_list = self.get_transactions_list(league_data, message_data['transaction_num'])
         return message_data
 
     def build_url(self, req):
@@ -47,11 +48,9 @@ class League_Bot():
         league = 12
         weeks = 10
         data = {}
-        url_list = ['standings',
-        'scoreboard', #;week='+str(week),
-        'teams',
-        'players',
-        'transactions;types=add']
+        url_list = ['transactions;types=add']
+                #'standings','scoreboard',
+                # ;week='+str(week),'teams','players',
                 #'.t.'+str(team)+'/roster;week='+str(week) ]
 
         for url in url_list:
@@ -67,12 +66,12 @@ class League_Bot():
         #self.save_league_data(data)
         return data
 
-    def get_matchup_score(self, matchup):
-        team_0 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
-        team_1 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][1]
-        t0_id = team_0['team'][0][0].get(['team_key'])
-        t0_name = team_0['team'][0][0].get(['team_name'])
-        t0_current_score = team_0['team'][1]['team_points']['total']
+    # def get_matchup_score(self, matchup):
+    #     team_0 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
+    #     team_1 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][1]
+    #     t0_id = team_0['team'][0][0].get(['team_key'])
+    #     t0_name = team_0['team'][0][0].get(['team_name'])
+    #     t0_current_score = team_0['team'][1]['team_points']['total']
 
     def get_transaction_total(self, data):
         return data['transactions']['fantasy_content']['league'][1]['transactions']["0"]['transaction'][0]['transaction_id']
