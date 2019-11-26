@@ -3,9 +3,9 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import random
 
-def ad_hoc_message(msg):
+def ad_hoc_message(msg,id):
     if isinstance(msg,str):
-        d ={"text" : msg, "bot_id" : "70e9ad5bc50020fdb3a14dbca1"}
+        d ={"text" : msg, "bot_id" : id}
     res = requests.post("https://api.groupme.com/v3/bots/post", data=d)
 
     return res
