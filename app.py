@@ -33,7 +33,8 @@ def webhook():
 
 	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
 		league_bot.reset_message_data()
-		m.reply(m.get_message(message['name']), bot_id)
+		m.reply_with_mention(m.get_message(message['name']),
+		message['name'], message['sender_id'], bot_id)
 	return "ok", 200
 
 def initialize():

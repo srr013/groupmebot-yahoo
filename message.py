@@ -2,16 +2,33 @@ import requests
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import random
+import logging
 
 def ad_hoc_message(msg,id):
-    if isinstance(msg,str):
-        d ={"text" : msg, "bot_id" : id,
-		# "attachments": 
-		# "loci": [[0,16]],
-		# "type": "mention"}
-    res = requests.post("https://api.groupme.com/v3/bots/post", data=d)
+	if isinstance(msg,str):
+		d ={"text" : msg, "bot_id" : id}
+		res = requests.post("https://api.groupme.com/v3/bots/post", data=d)
+	return res
 
-    return res
+def get_message_loci(msg, user, user_id):
+	start = msg.index(user)
+	if start:
+		end = start + len(user)
+	logging.warning("Loci are: %i, %i"%[start,end])
+	return [start, end]
+
+def reply_with_mention(msg, user, user_id, bot_id):
+	loci = get_message_loci(msg, user, user_id)
+	d = {'bot_id': bot_id,
+    		'text': msg,
+	    	'attachments': [
+                {"type": "mentions",
+                "loci": [loci],
+                "user_ids": [user]}
+            ]
+	    }
+	url = "https://api.groupme.com/v3/bots/post"
+	resp = requests.post(url, data=d)
 
 def get_message(user):
 	lead_in = ["Bleep bloop bleep. "+user+ " is ", "Congratulations "+user+" you are ", 
