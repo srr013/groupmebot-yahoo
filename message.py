@@ -5,7 +5,10 @@ import random
 
 def ad_hoc_message(msg,id):
     if isinstance(msg,str):
-        d ={"text" : msg, "bot_id" : id}
+        d ={"text" : msg, "bot_id" : id,
+		# "attachments": 
+		# "loci": [[0,16]],
+		# "type": "mention"}
     res = requests.post("https://api.groupme.com/v3/bots/post", data=d)
 
     return res
@@ -73,3 +76,5 @@ def upload_image_to_groupme(imgURL):
 # Checks whether the message sender is a bot
 def sender_is_bot(message):
 	return message['sender_type'] == "bot"
+
+

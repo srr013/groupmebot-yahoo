@@ -10,3 +10,21 @@
 'system': False, 
 'text': 'Test', 
 'user_id': '9406803'}
+
+#With attachments
+"""
+{"attachments": 
+[{"loci": [[0, 16]], 
+"type": "mentions", 
+"user_ids": ["9406803"]}], 
+"avatar_url": null, 
+"created_at": 1574807991, 
+"group_id": "55536872", 
+"id": "157480799156742792", 
+"name": "Scott Rossignol 2", 
+"sender_id": "80588783", 
+"sender_type": "user", 
+"source_guid": "0365ed7e306450cc303664d23132dc23",
+ "system": false, 
+ "text": "@Scott Rossignol  is testing his groupme app. Love you!", "user_id": "80588783"}
+"""
