@@ -93,9 +93,11 @@ class League_Bot():
                     if t == 'count':
                         continue
                     if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
+                        logging.warn("Key located")
                         players = trans[t]['transaction'][1]['players']
                         string = ''
                         for player in players.keys():
+                            logging.warn("player located")
                             if player == 'count':
                                 continue
                             logging.warning("Player %s" % json.dumps(players[player]))
@@ -114,6 +116,7 @@ class League_Bot():
                                 else:
                                     team_name = players[player]['player'][1]['transaction_data']['destination_team_name']                                                    
                                 string += team_name + " "+ trans_type +"s "+player_name+"\n"
+                            logging.warn(string)
                         if string:
                             trans_list.append(string)
                     i += 1
