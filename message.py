@@ -14,7 +14,7 @@ def get_message_loci(msg, user, user_id):
 	start = msg.index(user)
 	if start:
 		end = start + len(user)
-	logging.warning("Loci are: " + start +" " +end])
+	#logging.warning("Loci are: " + start +" " +end])
 	return [start, end]
 
 def reply_with_mention(msg, user, user_id, bot_id):
