@@ -66,6 +66,7 @@ class League_Bot():
 
 #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
         #self.save_league_data(data)
+        logging.warn("Data: %s"% data['transactions'])
         return data
 
     # def get_matchup_score(self, matchup):
@@ -125,36 +126,26 @@ class League_Bot():
         return trans_list
 
     def increment_message_num(self):
-        logging.warning("Updating DB")
         query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1;"
-        conn = db.initialize_connection()
-        cursor = db.execute_table_action(conn, query)
-        conn.commit()
-        conn.close()
+        db.execute_table_action(query)
     
     def reset_message_data(self):
-        global high, low
         logging.warning("Reseting Message Data in DB")
         lim = random.randint(self.low, self.high)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
-        conn = db.initialize_connection()
-        cursor = db.execute_table_action(conn, query)
-        conn.commit()
-        conn.close()
+        db.execute_table_action(query)
+    
     
     def update_transaction_store(self, num_trans):
         query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
-        conn = db.initialize_connection()
-        cursor = db.execute_table_action(conn, query)
-        conn.commit()
-        conn.close()
+        db.execute_table_action(conn, query)
+    
 
 
     def save_league_data(self, data):
         data = json.dumps(data)
         data.strip("'")
         query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE session = 1;"
-        conn = db.initialize_connection()
-        cursor = db.execute_table_action(conn, query)
-        conn.commit()
-        conn.close()
+        db.execute_table_action(conn, query)
+    
+

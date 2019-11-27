@@ -14,6 +14,14 @@ def initialize_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
+def execute_table_action(query):
+    conn = initialize_connection()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    conn.commit()
+    conn.close()
+
+
 create_table = """
 CREATE TABLE groupme_yahoo(
 session INTEGER,
@@ -40,7 +48,3 @@ update = """
 UPDATE groupme_yahoo SET num_past_transactions=393 WHERE session=1;
 """
 
-def execute_table_action(conn, sql_string):
-    cursor = conn.cursor()
-    cursor.execute(sql_string)
-    return cursor
