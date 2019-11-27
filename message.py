@@ -48,12 +48,15 @@ def get_message(user):
 	# }
 	insult_list = insults.insults
 	m = insult_list[random.randint(0,len(insult_list)-1)]
+	a = 'a'
+	if m[0].lower() in ['a','e','i','o','u']:
+		a = 'an'
 	if " " not in m:
 		m+= " " + insult_list[random.randint(0,len(insult_list)-1)]
 	# message = messages[m][random.randint(0, len(messages[m]))-1]
 	# lead = lead_in[random.randint(0,len(lead_in))-1]
 	# msg = lead + message
-	msg = user + " is a "+ m
+	msg = user + " is "+a+" "+ m
 	return msg
 
 # Send a message in the groupchat

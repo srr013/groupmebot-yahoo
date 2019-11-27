@@ -8,7 +8,7 @@ from helpers.secrets import secrets
 
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
-bot_id = "70e9ad5bc50020fdb3a14dbca1"#"566e3b05b73cb551006cf34410"#
+bot_id = "566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"#
 #566 - test chat
 league_bot = None
 
