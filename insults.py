@@ -173,7 +173,6 @@ insults = [
 "Egotist",
 "Envirotard",
 "Eunuch",
-"Faggot",
 "Fagtard",
 "Fagtits",
 "Farmer",
