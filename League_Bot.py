@@ -88,6 +88,7 @@ class League_Bot():
             i = 1
             while i <= transaction_diff:
                 logging.warn(i)
+                logging.warn(data['transactions']['fantasy_content']['league'][1]['transactions'])
                 trans = data['transactions']['fantasy_content']['league'][1]['transactions']
                 for t in trans.keys():
                     if t == 'count':
