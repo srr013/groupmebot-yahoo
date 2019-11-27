@@ -27,8 +27,9 @@ def reply_with_mention(msg, user, user_id, bot_id):
                 "user_ids": [user_id]}
             ]
 	    }
+	logging.warn(json.dumps(d))
 	url = "https://api.groupme.com/v3/bots/post"
-	resp = requests.post(url, data=d)
+	resp = requests.post(url, json=d)
 
 def get_message(user):
 	user = "@"+user
