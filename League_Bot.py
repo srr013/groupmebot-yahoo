@@ -8,8 +8,8 @@ class League_Bot():
     def __init__(self, league_id):
         self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
         self.league_id = league_id
-        self.high = 2
-        self.low = 1
+        self.high = 13
+        self.low = 11
 
     def _login(self):
         if not self.oauth.token_is_valid():

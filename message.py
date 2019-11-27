@@ -53,7 +53,7 @@ def get_message(user):
 	# message = messages[m][random.randint(0, len(messages[m]))-1]
 	# lead = lead_in[random.randint(0,len(lead_in))-1]
 	# msg = lead + message
-	msg = user + "is a "+ m
+	msg = user + " is a "+ m
 	return msg
 
 # Send a message in the groupchat
