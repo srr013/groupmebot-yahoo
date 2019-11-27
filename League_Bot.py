@@ -83,7 +83,7 @@ class League_Bot():
         #     d.write(json.dumps(data['transactions']))
         num_transactions = self.get_transaction_total(data)
         transaction_diff = int(num_transactions) - int(past_trans_total)
-        logging.warning("Num transactions found: %s new / %s old" % (num_transactions, past_trans_total))
+        logging.warning("Num transactions found: %s new / %s old, Diff: %i" % (num_transactions, past_trans_total,transaction_diff))
         trans_list = []
         if transaction_diff > 0:
             i = 1
