@@ -30,7 +30,8 @@ def webhook():
 	logging.warning("message: "+ message['text']+", "+
 	str(message_data['message_num'])+" / "+str(message_data['message_limit'])+
 					"message_full: " +str(json.dumps(message)))
-
+	m.reply_with_mention(m.get_message(message['name']),
+		message['name'], message['sender_id'], bot_id)
 	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
 		league_bot.reset_message_data()
 		m.reply_with_mention(m.get_message(message['name']),
