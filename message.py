@@ -24,7 +24,7 @@ def reply_with_mention(msg, user, user_id, bot_id):
 	    	'attachments': [
                 {"type": "mentions",
                 "loci": [loci],
-                "user_ids": [user]}
+                "user_ids": [user_id]}
             ]
 	    }
 	url = "https://api.groupme.com/v3/bots/post"

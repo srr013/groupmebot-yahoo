@@ -8,6 +8,8 @@ class League_Bot():
     def __init__(self, league_id):
         self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
         self.league_id = league_id
+        self.high = 2
+        self.low = 1
 
     def _login(self):
         if not self.oauth.token_is_valid():
@@ -131,8 +133,9 @@ class League_Bot():
         conn.close()
     
     def reset_message_data(self):
+        global high, low
         logging.warning("Reseting Message Data in DB")
-        lim = random.randint(4,7)
+        lim = random.randint(self.low, self.high)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
         conn = db.initialize_connection()
         cursor = db.execute_table_action(conn, query)
