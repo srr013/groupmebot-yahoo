@@ -87,12 +87,12 @@ class League_Bot():
         if transaction_diff > 0:
             i = 1
             while i <= transaction_diff:
-                logging.warn(i)
-                logging.warn(data['transactions']['fantasy_content']['league'][1]['transactions'])
+                logging.warn("i is: %i" % i)
                 trans = data['transactions']['fantasy_content']['league'][1]['transactions']
                 for t in trans.keys():
                     if t == 'count':
                         continue
+                    logging.warn("t is: %s"% t)
                     if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
                         logging.warn("Key located")
                         players = trans[t]['transaction'][1]['players']
