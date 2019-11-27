@@ -31,6 +31,7 @@ def reply_with_mention(msg, user, user_id, bot_id):
 	resp = requests.post(url, data=d)
 
 def get_message(user):
+	user = "@"+user
 	lead_in = ["Bleep bloop bleep. "+user+ " is ", "Congratulations "+user+" you are ", 
 	"My calculations have revealed that "+user+" is ", "I heard that "+user+" is "]
 	messages = {
