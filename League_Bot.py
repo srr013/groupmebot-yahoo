@@ -63,7 +63,6 @@ class League_Bot():
 
 #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
         #self.save_league_data(data)
-        logging.warn("Data: %s"% data['transactions'])
         return data
 
     # def get_matchup_score(self, matchup):
@@ -88,6 +87,7 @@ class League_Bot():
         if transaction_diff > 0:
             i = 1
             while i <= transaction_diff:
+                logging.warn(i)
                 trans = data['transactions']['fantasy_content']['league'][1]['transactions']
                 for t in trans.keys():
                     if t == 'count':
