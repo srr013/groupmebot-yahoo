@@ -117,7 +117,6 @@ class League_Bot():
                                     team_name = players[player]['player'][1]['transaction_data']['destination_team_name']                                                    
                                 string += team_name + " "+ trans_type +"s "+player_name+"\n"
                         if string:
-                            logging.warn(string)
                             trans_list.append(string)
                     i += 1
             logging.warning(trans_list)
