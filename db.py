@@ -14,10 +14,12 @@ def initialize_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
-def execute_table_action(query):
+def execute_table_action(query, cur=False):
     conn = initialize_connection()
     cursor = conn.cursor()
     cursor.execute(query)
+    if cur:
+        return cursor
     conn.commit()
     conn.close()
 

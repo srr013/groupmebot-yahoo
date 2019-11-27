@@ -18,7 +18,7 @@ class League_Bot():
     def fetch_data(self):
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
-        cursor = db.execute_table_action(query)
+        cursor = db.execute_table_action(query, cur=True)
         league_id,message_num,message_limit, past_transaction_num, league_data = cursor.fetchone()
         message_data = {'id': league_id, 'message_num':message_num, 
                     'message_limit': message_limit,
@@ -27,8 +27,6 @@ class League_Bot():
         (league_id,message_num,message_limit, past_transaction_num))
         # if not league_data:
         #     league_data = self.get_league_data()
-        conn.commit()
-        conn.close()
         return message_data
 
     def initialize_bot(self):
