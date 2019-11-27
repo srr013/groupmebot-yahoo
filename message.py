@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import random
 import logging
+import json
 
 def ad_hoc_message(msg,id):
 	if isinstance(msg,str):
