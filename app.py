@@ -39,7 +39,7 @@ def webhook():
 			league_bot.reset_message_data()
 			m.reply_with_mention(m.get_message(message['name']),
 			message['name'], message['sender_id'], bot_id)
-		post_trans_list(league_bot)
+		post_trans_list(league_bot, message_data)
 		return "ok", 200
 	return "Bot status is off", 200
 
@@ -78,7 +78,7 @@ def swap_bots():
 	message_data = initialize()
 	s = 0
 	status = 'Test'
-	if message_data['bot_status']:
+	if not message_data['bot_status']:
 		s = 1
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
@@ -93,7 +93,7 @@ def transactions():
 		league_bot = League_Bot.League_Bot(1)
 	message_data = initialize()
 	if message_data['status'] > 0:
-		return (post_trans_list(message_data))
+		return (post_trans_list(league_bot, message_data))
 	else:
 		return league_bot.get_transactions_list(data, message_data['transaction_num'])
 
