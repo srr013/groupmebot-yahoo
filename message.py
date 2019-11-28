@@ -6,9 +6,9 @@ import logging
 import json
 import insults
 
-def ad_hoc_message(msg,id):
+def ad_hoc_message(msg, bot_id):
 	if isinstance(msg,str):
-		d ={"text" : msg, "bot_id" : id}
+		d ={"text" : msg, "bot_id" : bot_id}
 		res = requests.post("https://api.groupme.com/v3/bots/post", data=d)
 	return res
 

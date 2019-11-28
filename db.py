@@ -35,18 +35,20 @@ drop_table = """
 DROP TABLE 
 """
 insert_into = """
-INSERT INTO groupme_yahoo (session, message_num, message_limit, num_past_transactions)
+INSERT INTO groupme_yahoo (session, message_num, message_limit, 
+num_past_transactions, status, bot_status)
 VALUES (1,0,30);
 """
 select = """
 SELECT * FROM groupme_yahoo
 """
 add = """
-ALTER TABLE groupme_yahoo ADD COLUMN num_past_transactions INTEGER;
+ALTER TABLE groupme_yahoo ADD COLUMN status INTEGER, 
+bot_status INTEGER, prd_bot VARCHAR(100), test_bot VARCHAR(200);
 """
 #works from CLI, not debug
 
 update = """
-UPDATE groupme_yahoo SET num_past_transactions=393 WHERE session=1;
+UPDATE groupme_yahoo SET status, bot_status, WHERE session=1;
 """
 

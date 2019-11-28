@@ -5,12 +5,14 @@ import logging
 import League_Bot
 import message as m
 from helpers.secrets import secrets
+import db
 
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
-bot_id = "566e3b05b73cb551006cf34410"#"70e9ad5bc50020fdb3a14dbca1"#
-#566 - test chat
+test_bot_id = "566e3b05b73cb551006cf34410"
+prd_bot_id = "70e9ad5bc50020fdb3a14dbca1"
 league_bot = None
+bot_id = ''
 
 @app.route('/refresh')
 def refresh():
@@ -24,7 +26,7 @@ def refresh():
 @app.route('/', methods=['POST'])
 def webhook():
 	message = request.get_json()
-	global league_bot
+	global league_bot, bot_id
 	message_data = initialize()
 	league_bot.increment_message_num()
 	logging.warning("message: "+ message['text']+", "+
@@ -54,9 +56,30 @@ def initialize_to_window():
 	message_data = initialize()
 	return json.dumps(message_data)
 
+@app.route('/toggle')
+def toggle_status():
+	message_data = initialize()
+	s = 0
+	if not message_data['status']:
+		s = 1
+	query = 'UPDATE groupme_yahoo SET status='+s+' WHERE session=1'
+	db.execute_table_action(query)
+	return json.dumps(message_data)
+
+@app.route('/toggle')
+def swap_bots():
+	message_data = initialize()
+	s = 0
+	if not message_data['bot_status']:
+		s = 1
+	query = 'UPDATE groupme_yahoo SET bot_status='+s+' WHERE session=1'
+	db.execute_table_action(query)
+	get_bot_status(message_data['bot_status'])
+	return json.dumps(message_data)
+
 @app.route('/transactions')
 def transactions():
-	global league_bot
+	global league_bot, bot_id
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
 	message_data = initialize()
@@ -73,6 +96,15 @@ def transactions():
 @app.route('/')
 def home():
 	return 'Hello'
+
+def get_bot_status(message_bot_status):
+	global test_bot_id, prd_bot_id, bot_id
+	if message_bot_status > 0:
+		bot_id = prd_bot_id
+	else:
+		bot_id = test_bot_id
+		
+
 
 
 
