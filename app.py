@@ -26,7 +26,7 @@ def refresh():
 @app.route('/', methods=['GET','POST'])
 def webhook():
 	message_data = initialize()
-	if Flask.request.method == 'GET':
+	if request.method == 'GET':
 		return json.dumps(message_data)
 	if message_data['status']:
 		message = request.get_json()
@@ -64,22 +64,26 @@ def initialize_to_window():
 def toggle_status():
 	message_data = initialize()
 	s = 0
+	status = 'Off'
 	if not message_data['status']:
 		s = 1
+		status = 'On'
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	return json.dumps(message_data)
+	return json.dumps(status)
 
-@app.route('/toggle')
+@app.route('/swap')
 def swap_bots():
 	message_data = initialize()
 	s = 0
+	status = 'Test'
 	if not message_data['bot_status']:
 		s = 1
+		status = 'Prd'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	get_bot_status(message_data['bot_status'])
-	return json.dumps(message_data)
+	status = get_bot_status(message_data['bot_status'])
+	return json.dumps(status)
 
 @app.route('/transactions')
 def transactions():
@@ -98,14 +102,13 @@ def transactions():
 			m.reply(s, bot_id)
 		return s
 
-def get_bot_status(message_bot_status):
+def get_bot(message_bot_status):
 	global test_bot_id, prd_bot_id, bot_id
+	status = ''
 	if message_bot_status > 0:
 		bot_id = prd_bot_id
+		status = 'PRD'
 	else:
 		bot_id = test_bot_id
-		
-
-
-
-
+		status = 'TEST'
+	return status
