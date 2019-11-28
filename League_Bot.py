@@ -121,7 +121,7 @@ class League_Bot():
                             logging.warn(string)
                         if string:
                             trans_list.append(string)
-                    i += 1
+                i += 1
             logging.warning(trans_list)
             if trans_list:
                 self.update_transaction_store(num_transactions)
