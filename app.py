@@ -28,7 +28,7 @@ def webhook():
 	message_data = initialize()
 	if request.method == 'GET':
 		return json.dumps(message_data)
-	if message_data['status']:
+	elif message_data['status']:
 		message = request.get_json()
 		global league_bot, bot_id
 		league_bot.increment_message_num()
@@ -79,10 +79,10 @@ def swap_bots():
 	status = 'Test'
 	if not message_data['bot_status']:
 		s = 1
-		status = 'Prd'
+		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	status = get_bot_status(message_data['bot_status'])
+	status = get_bot(message_data['bot_status'])
 	return json.dumps(status)
 
 @app.route('/transactions')
