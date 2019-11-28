@@ -25,18 +25,22 @@ def refresh():
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['POST'])
 def webhook():
-	message = request.get_json()
-	global league_bot, bot_id
 	message_data = initialize()
-	league_bot.increment_message_num()
-	logging.warning("message: "+ message['text']+", "+
-	str(message_data['message_num'])+" / "+str(message_data['message_limit'])+
-					"message_full: " +str(json.dumps(message)))
-	if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
-		league_bot.reset_message_data()
-		m.reply_with_mention(m.get_message(message['name']),
-		message['name'], message['sender_id'], bot_id)
-	return "ok", 200
+	if flask.request.method == 'GET':
+		return json.dumps(message_data)
+	if message_data['status']:
+		message = request.get_json()
+		global league_bot, bot_id
+		league_bot.increment_message_num()
+		logging.warning("message: "+ message['text']+", "+
+		str(message_data['message_num'])+" / "+str(message_data['message_limit'])+
+						"message_full: " +str(json.dumps(message)))
+		if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
+			league_bot.reset_message_data()
+			m.reply_with_mention(m.get_message(message['name']),
+			message['name'], message['sender_id'], bot_id)
+		return "ok", 200
+	return "Bot status is off", 200
 
 def initialize():
 	global league_bot
@@ -83,15 +87,16 @@ def transactions():
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
 	message_data = initialize()
-	data = league_bot.get_league_data()
-	trans_list = league_bot.get_transactions_list(data, message_data['transaction_num'])
-	s='None'
-	if trans_list:
-		s = "Recent transactions: \n"
-		for t in trans_list:
-			s += t 
-		m.reply(s, bot_id)
-	return s
+	if message_data['status']:
+		data = league_bot.get_league_data()
+		trans_list = league_bot.get_transactions_list(data, message_data['transaction_num'])
+		s='None'
+		if trans_list:
+			s = "Recent transactions: \n"
+			for t in trans_list:
+				s += t 
+			m.reply(s, bot_id)
+		return s
 
 @app.route('/')
 def home():
