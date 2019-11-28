@@ -23,10 +23,10 @@ def refresh():
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET','POST'])
 def webhook():
 	message_data = initialize()
-	if flask.request.method == 'GET':
+	if Flask.request.method == 'GET':
 		return json.dumps(message_data)
 	if message_data['status']:
 		message = request.get_json()
@@ -66,7 +66,7 @@ def toggle_status():
 	s = 0
 	if not message_data['status']:
 		s = 1
-	query = 'UPDATE groupme_yahoo SET status='+s+' WHERE session=1'
+	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
 	return json.dumps(message_data)
 
@@ -76,7 +76,7 @@ def swap_bots():
 	s = 0
 	if not message_data['bot_status']:
 		s = 1
-	query = 'UPDATE groupme_yahoo SET bot_status='+s+' WHERE session=1'
+	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
 	get_bot_status(message_data['bot_status'])
 	return json.dumps(message_data)
@@ -97,10 +97,6 @@ def transactions():
 				s += t 
 			m.reply(s, bot_id)
 		return s
-
-@app.route('/')
-def home():
-	return 'Hello'
 
 def get_bot_status(message_bot_status):
 	global test_bot_id, prd_bot_id, bot_id
