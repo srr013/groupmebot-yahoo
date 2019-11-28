@@ -140,7 +140,7 @@ class League_Bot():
     
     def update_transaction_store(self, num_trans):
         query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE session = 1;"
-        db.execute_table_action(conn, query)
+        db.execute_table_action(query)
     
 
 
@@ -148,6 +148,6 @@ class League_Bot():
         data = json.dumps(data)
         data.strip("'")
         query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE session = 1;"
-        db.execute_table_action(conn, query)
+        db.execute_table_action(query)
     
 

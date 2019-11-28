@@ -77,13 +77,13 @@ def swap_bots():
 	message_data = initialize()
 	s = 0
 	status = 'Test'
-	if not message_data['bot_status']:
+	if message_data['bot_status']:
 		s = 1
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	status = get_bot(message_data['bot_status'])
-	return json.dumps(status)
+	status, bot_id = get_bot(message_data['bot_status'])
+	return json.dumps(status +" "+ bot_id)
 
 @app.route('/transactions')
 def transactions():
@@ -111,4 +111,4 @@ def get_bot(message_bot_status):
 	else:
 		bot_id = test_bot_id
 		status = 'TEST'
-	return status
+	return (status, bot_id)
