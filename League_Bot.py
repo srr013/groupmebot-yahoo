@@ -25,8 +25,8 @@ class League_Bot():
                     'transaction_num': past_transaction_num,
                     'status': int(status), 'bot_status': int(bot_status),
                     'prd_bot_id': prd_bot_id, 'test_bot_id': test_bot_id}
-        logging.warning("Message Data: %i, %i, Bot status: %i (1 is PRD)" %  
-        (message_num,message_limit,bot_status))
+        logging.warning("Client Data: %i / %i messages, Bot group: %i (1 is PRD), Active status: %i (1 is active)"%
+        (message_num,message_limit,bot_status, status))
         # if not league_data:
         #     league_data = self.get_league_data()
         return client_data
