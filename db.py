@@ -36,7 +36,7 @@ DROP TABLE
 """
 insert_into = """
 INSERT INTO groupme_yahoo (session, message_num, message_limit, 
-num_past_transactions, status, bot_status)
+num_past_transactions, status, bot_status, prd_bot_id, test_bot_id)
 VALUES (1,0,30);
 """
 select = """

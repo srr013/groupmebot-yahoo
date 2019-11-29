@@ -9,8 +9,6 @@ import db
 
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
-test_bot_id = "566e3b05b73cb551006cf34410"
-prd_bot_id = "70e9ad5bc50020fdb3a14dbca1"
 league_bot = None
 
 @app.route('/refresh')
@@ -24,23 +22,23 @@ def refresh():
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
-	message_data = initialize()
+	client_data = initialize()
 	if request.method == 'GET':
-		return json.dumps(message_data)
-	elif int(message_data['status']) > 0:
+		return json.dumps(client_data)
+	elif int(client_data['status']) > 0:
 		message = request.get_json()
-		global league_bot, bot_id
+		global league_bot
 		if not bot_id:
-			get_bot(message_data['bot_status'])
+			stauts, bot_id = get_bot(client_data['bot_status'])
 		league_bot.increment_message_num()
-		if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
+		if client_data['message_num'] >= client_data['message_limit'] and not m.sender_is_bot(message):
 			logging.warning("message: "+ message['text']+", "+
-				str(message_data['message_num'])+" / "+str(message_data['message_limit'])+
+				str(client_data['message_num'])+" / "+str(client_data['message_limit'])+
 				"message_full: " +str(json.dumps(message))+", Chat: "+bot_id)
-			league_bot.reset_message_data()
+			league_bot.reset_client_data()
 			m.reply_with_mention(m.get_message(message['name']),
 			message['name'], message['sender_id'], bot_id)
-		post_trans_list(league_bot, message_data)
+		post_trans_list(league_bot, client_data)
 		return "ok", 200
 	return "Bot status is off", 200
 
@@ -48,26 +46,26 @@ def initialize():
 	global league_bot
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
-	message_data = league_bot.initialize_bot()
+	client_data = league_bot.initialize_bot()
 	# if transaction_list:
 	# 	s = "Recent transactions: \n"
 	# 	for t in transaction_list:
 	# 		s += t 
 	# 	m.reply(s, bot_id)
-	return message_data
+	return client_data
 
 @app.route('/initialize')
 def initialize_to_window():
 	logging.debug("initializing")
-	message_data = initialize()
-	return json.dumps(message_data)
+	client_data = initialize()
+	return json.dumps(client_data)
 
 @app.route('/toggle')
 def toggle_status():
-	message_data = initialize()
+	client_data = initialize()
 	s = 0
 	status = 'Off'
-	if not message_data['status']:
+	if not client_data['status']:
 		s = 1
 		status = 'On'
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
@@ -76,15 +74,15 @@ def toggle_status():
 
 @app.route('/swap')
 def swap_bots():
-	message_data = initialize()
+	client_data = initialize()
 	s = 0
 	status = 'Test'
-	if not message_data['bot_status']:
+	if not client_data['bot_status']:
 		s = 1
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	status, bot_id = get_bot(message_data['bot_status'])
+	status, bot_id = get_bot(client_data['bot_status'])
 	return json.dumps(status +" "+ bot_id)
 
 @app.route('/transactions')
@@ -92,16 +90,16 @@ def transactions():
 	global league_bot
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
-	message_data = initialize()
-	if message_data['status'] > 0:
-		return (post_trans_list(league_bot, message_data))
+	client_data = initialize()
+	if client_data['status'] > 0:
+		return (post_trans_list(league_bot, client_data))
 	else:
-		return league_bot.get_transactions_list(data, message_data['transaction_num'])
+		return league_bot.get_transactions_list(data, client_data['transaction_num'])
 
-def post_trans_list(league_bot, message_data):
+def post_trans_list(league_bot, client_data):
 	global bot_id
 	data = league_bot.get_league_data()
-	trans_list = league_bot.get_transactions_list(data, message_data['transaction_num'])
+	trans_list = league_bot.get_transactions_list(data, client_data['transaction_num'])
 	s='None'
 	if trans_list:
 		s = "Recent transactions: \n"
@@ -110,13 +108,12 @@ def post_trans_list(league_bot, message_data):
 		m.reply(s, bot_id)
 	return s
 
-def get_bot(message_bot_status):
-	global test_bot_id, prd_bot_id, bot_id
+def get_bot(client_data):
 	status = ''
-	if message_bot_status > 0:
-		bot_id = prd_bot_id
+	if client_data['bot_status'] > 0:
+		bot_id = client_data['prd_bot_id']
 		status = 'PRD'
 	else:
-		bot_id = test_bot_id
+		bot_id = client_data['test_bot_id']
 		status = 'TEST'
 	return (status, bot_id)

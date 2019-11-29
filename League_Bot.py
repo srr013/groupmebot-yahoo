@@ -19,8 +19,8 @@ class League_Bot():
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
         cursor = db.execute_table_action(query, cur=True)
-        league_id,message_num,message_limit, past_transaction_num, league_data, status, bot_status = cursor.fetchone()
-        message_data = {'id': league_id, 'message_num':message_num, 
+        league_id,message_num,message_limit, past_transaction_num, league_data, status, bot_status, prd_bot_id, test_bot_id = cursor.fetchone()
+        client_data = {'id': league_id, 'message_num':message_num, 
                     'message_limit': message_limit,
                     'transaction_num': past_transaction_num,
                     'status': status, 'bot_status': bot_status}
@@ -28,13 +28,13 @@ class League_Bot():
         (league_id,message_num,message_limit, past_transaction_num))
         # if not league_data:
         #     league_data = self.get_league_data()
-        return message_data
+        return client_data
 
     def initialize_bot(self):
         self._login()
-        message_data = self.fetch_data()
+        client_data = self.fetch_data()
         #league_data = self.get_league_data()
-        return message_data
+        return client_data
 
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -131,7 +131,7 @@ class League_Bot():
         query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE session = 1;"
         db.execute_table_action(query)
     
-    def reset_message_data(self):
+    def reset_client_data(self):
         logging.warning("Reseting Message Data in DB")
         lim = random.randint(self.low, self.high)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE session = 1;"
