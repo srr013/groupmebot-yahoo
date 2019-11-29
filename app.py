@@ -111,9 +111,9 @@ def post_trans_list(league_bot, client_data):
 def get_bot(client_data):
 	status = ''
 	if client_data['bot_status'] > 0:
-		bot_id = client_data['prd_bot_id']
+		bot_id = client_data['prd_bot']
 		status = 'PRD'
 	else:
-		bot_id = client_data['test_bot_id']
+		bot_id = client_data['test_bot']
 		status = 'TEST'
 	return (status, bot_id)
