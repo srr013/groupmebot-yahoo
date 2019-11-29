@@ -12,7 +12,6 @@ app.secret_key = secrets["secret_key"]
 test_bot_id = "566e3b05b73cb551006cf34410"
 prd_bot_id = "70e9ad5bc50020fdb3a14dbca1"
 league_bot = None
-bot_id = ''
 
 @app.route('/refresh')
 def refresh():
@@ -31,6 +30,8 @@ def webhook():
 	elif int(message_data['status']) > 0:
 		message = request.get_json()
 		global league_bot, bot_id
+		if not bot_id:
+			get_bot(message_data['bot_status'])
 		league_bot.increment_message_num()
 		if message_data['message_num'] >= message_data['message_limit'] and not m.sender_is_bot(message):
 			logging.warning("message: "+ message['text']+", "+
@@ -88,7 +89,7 @@ def swap_bots():
 
 @app.route('/transactions')
 def transactions():
-	global league_bot, bot_id
+	global league_bot
 	if not league_bot:
 		league_bot = League_Bot.League_Bot(1)
 	message_data = initialize()
