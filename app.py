@@ -62,10 +62,10 @@ def initialize_to_window():
 def toggle_status():
 	client_data = initialize()
 	s = 0
-	status = 'Off'
+	status = 'Inactive'
 	if not client_data['status']:
 		s = 1
-		status = 'On'
+		status = 'Active'
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
 	return json.dumps("Bot is now "+status)
@@ -80,7 +80,7 @@ def swap_bots():
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	active_status = "Active" if s == 1 else "Inactive"
+	active_status = "Active" if client_data['status'] > 0 else "Inactive"
 	return json.dumps("Bot is currently "+ active_status +" and in chat "+status)
 
 @app.route('/transactions')
