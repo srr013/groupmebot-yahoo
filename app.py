@@ -29,7 +29,7 @@ def webhook():
 		message = request.get_json()
 		global league_bot
 		if not bot_id:
-			stauts, bot_id = get_bot(client_data['bot_status'])
+			stauts, bot_id = get_bot(client_data)
 		league_bot.increment_message_num()
 		if client_data['message_num'] >= client_data['message_limit'] and not m.sender_is_bot(message):
 			logging.warning("message: "+ message['text']+", "+
@@ -82,7 +82,7 @@ def swap_bots():
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	status, bot_id = get_bot(client_data['bot_status'])
+	status, bot_id = get_bot(client_data)
 	return json.dumps(status +" "+ bot_id)
 
 @app.route('/transactions')
