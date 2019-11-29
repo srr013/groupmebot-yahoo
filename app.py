@@ -28,7 +28,7 @@ def webhook():
 	message_data = initialize()
 	if request.method == 'GET':
 		return json.dumps(message_data)
-	elif message_data['status'] > 0:
+	elif int(message_data['status']) > 0:
 		message = request.get_json()
 		global league_bot, bot_id
 		league_bot.increment_message_num()
