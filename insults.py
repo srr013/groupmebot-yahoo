@@ -427,5 +427,6 @@ insults = [
 "Yes-man",
 "Zitface",
 "Zoophile",
-"Zounderkite"
+"Zounderkite",
+"Mielke lover"
 ]

@@ -19,12 +19,13 @@ class League_Bot():
         logging.debug("Fetching league data from DB")
         query = "SELECT * FROM groupme_yahoo WHERE session = 1"
         cursor = db.execute_table_action(query, cur=True)
-        league_id,message_num,message_limit, past_transaction_num, league_data, status, bot_status, prd_bot_id, test_bot_id = cursor.fetchone()
+        league_id,message_num,message_limit, past_transaction_num, league_data, status, bot_status, prd_bot_id, test_bot_id, members = cursor.fetchone()
         client_data = {'id': league_id, 'message_num':message_num, 
                     'message_limit': message_limit,
                     'transaction_num': past_transaction_num,
                     'status': int(status), 'bot_status': int(bot_status),
-                    'prd_bot_id': prd_bot_id, 'test_bot_id': test_bot_id}
+                    'prd_bot_id': prd_bot_id, 'test_bot_id': test_bot_id,
+                    'members': members}
         logging.warning("Client Data: %i / %i messages, Bot group: %i (1 is PRD), Active status: %i (1 is active)"%
         (message_num,message_limit,bot_status, status))
         # if not league_data:
@@ -49,7 +50,7 @@ class League_Bot():
         league = 12
         weeks = 10
         data = {}
-        url_list = ['transactions;types=add']
+        url_list = ['teams','transactions;types=add']
                 #'standings','scoreboard',
                 # ;week='+str(week),'teams','players',
                 #'.t.'+str(team)+'/roster;week='+str(week) ]

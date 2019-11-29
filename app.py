@@ -6,6 +6,7 @@ import League_Bot
 import message as m
 from helpers.secrets import secrets
 import db
+import groupme
 
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
@@ -93,6 +94,15 @@ def transactions():
 		return (post_trans_list(league_bot, client_data))
 	else:
 		return league_bot.get_transactions_list(data, client_data['transaction_num'])
+
+@app.route('/name-changes')
+def name_changes():
+	global league_bot
+	if not league_bot:
+		league_bot = League_Bot.League_Bot(1)
+	client_data = initialize()
+	return (groupme.update_group_membership(client_data))
+
 
 def post_trans_list(league_bot, client_data):
 	global bot_id

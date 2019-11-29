@@ -13,9 +13,9 @@ def get_league_data(oauth):
     league = 12
     weeks = 10
     data = {}
-    url_list = ['transactions;types=add']
+    url_list = ['teams','transactions;types=add']
             #'standings','scoreboard',
-            # ;week='+str(week),'teams','players',
+            # ;week='+str(week),,'players',
             #'.t.'+str(team)+'/roster;week='+str(week) ]
 
     for url in url_list:
@@ -25,6 +25,30 @@ def get_league_data(oauth):
     return data
 
 
-oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-data = get_league_data(oauth)
-print(data)
+# oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
+# data = get_league_data(oauth)
+# print(data)
+
+def get_team_data(teams):
+    team_data = {}
+    for t, val in teams.items():
+        if t == 'count':
+            continue
+        for k, v in val.items():
+            if k == 'count':
+                continue
+            team_id = ''
+            name = ''
+            num_moves = 0
+            num_trades = 0
+            if k == 'name':
+                name = v
+            elif k == 'number_of_moves':
+                num_moves = v
+            elif k == 'number_of_trades':
+                num_trades = v
+            elif k == 'team_key':
+                team_id = v
+        if team_id:
+            team_data[team_id] = {'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
+    return team_data
