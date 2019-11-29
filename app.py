@@ -82,7 +82,7 @@ def swap_bots():
 	db.execute_table_action(query)
 	bot_name, bot_id = get_bot(client_data)
 	status = "on" if client_data['status'] > 0 else "off"
-	return json.dumps("Bot is currently "+ +" Name: "bot_name +": "+ bot_id)
+	return json.dumps("Bot is currently "+ status +" Name: "+bot_name +": "+ bot_id)
 
 @app.route('/transactions')
 def transactions():
