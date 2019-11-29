@@ -23,13 +23,11 @@ def refresh():
 @app.route('/', methods=['GET','POST'])
 def webhook():
 	client_data = initialize()
+	bot_name, bot_id = get_bot(client_data)
 	if request.method == 'GET':
 		return json.dumps(client_data)
-	elif int(client_data['status']) > 0:
+	elif client_data['status'] > 0:
 		message = request.get_json()
-		global league_bot
-		if not bot_id:
-			stauts, bot_id = get_bot(client_data)
 		league_bot.increment_message_num()
 		if client_data['message_num'] >= client_data['message_limit'] and not m.sender_is_bot(message):
 			logging.warning("message: "+ message['text']+", "+
@@ -70,7 +68,7 @@ def toggle_status():
 		status = 'On'
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	return json.dumps(status)
+	return json.dumps("Bot is now "+status)
 
 @app.route('/swap')
 def swap_bots():
@@ -82,8 +80,9 @@ def swap_bots():
 		status = 'PRD'
 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	status, bot_id = get_bot(client_data)
-	return json.dumps(status +" "+ bot_id)
+	bot_name, bot_id = get_bot(client_data)
+	status = "on" if client_data['status'] > 0 else "off"
+	return json.dumps("Bot is currently "+ +" Name: "bot_name +": "+ bot_id)
 
 @app.route('/transactions')
 def transactions():

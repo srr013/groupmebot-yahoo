@@ -23,7 +23,7 @@ class League_Bot():
         client_data = {'id': league_id, 'message_num':message_num, 
                     'message_limit': message_limit,
                     'transaction_num': past_transaction_num,
-                    'status': status, 'bot_status': bot_status,
+                    'status': int(status), 'bot_status': int(bot_status),
                     'prd_bot_id': prd_bot_id, 'test_bot_id': test_bot_id}
         logging.warning("Message Data: %i, %i, Bot status: %i (1 is PRD)" %  
         (message_num,message_limit,bot_status))
