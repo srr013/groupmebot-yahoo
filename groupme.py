@@ -28,7 +28,7 @@ def update_group_membership(client_data):
         teams = data['teams']['fantasy_content']['league'][1]['teams']
         team_data = fantasy.get_team_data(teams)
         for k, v in client_data['members'].items():
-            logging.warn("K, V from client data: %s %s" % (k, v))
+            logging.warn("K, V from client data: %s %s %s" % (k, v, json.dumps(team_data)))
             if team_data.get(v['team_id']):
                 if client_data['members'][k]['team_data']['name'] is not team_data[v['team_id']]['name']:
                     string += client_data['members'][k]['name'] + 'changes team name to '+ team_data[v['team_id']]['name'] + "\n"
