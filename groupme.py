@@ -25,7 +25,9 @@ def update_group_membership(client_data):
     if client_data['members']:
         league_bot = League_Bot.League_Bot(1)
         data = league_bot.get_league_data()
+        logging.warn("data: %s" % utilities.dict_to_json(data))
         teams = data['teams']['fantasy_content']['league'][1]['teams']
+        logging.warn("data: %s" % utilities.dict_to_json(teams))
         team_data = fantasy.get_team_data(teams)
         for k, v in client_data['members'].items():
             logging.warn("K, V from client data: %s %s %s" % (k, v, json.dumps(team_data)))
