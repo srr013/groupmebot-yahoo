@@ -1,5 +1,6 @@
 import json
 from yahoo_oauth import OAuth2
+import utilities
 
 def build_url(req):
     base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -34,7 +35,9 @@ def get_team_data(teams):
     for t, val in teams.items():
         if t == 'count':
             continue
+        logging.warn("Val from get_team_data: %s"% utilities.dict_to_json(val))
         for k, v in val.items():
+            logging.warn("k,v from get_team_data: %s, %s"% (k,v))
             if k == 'count':
                 continue
             team_id = ''
