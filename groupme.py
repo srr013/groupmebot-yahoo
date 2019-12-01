@@ -14,6 +14,8 @@ def get_group_membership():
     members = {}
     for member in data["response"]["members"]:
         members[member['user_id']] = member
+
+
     league_bot = League_Bot.League_Bot(1)
     db.execute_table_action(query)
     return members
@@ -30,4 +32,7 @@ def update_group_membership(client_data):
             if team_data.get(v['team_id']):
                 if client_data['members'][k]['team_data']['name'] is not team_data[v['team_id']]['name']:
                     string += client_data['members'][k]['name'] + 'changes team name to '+ team_data[v['team_id']]['name'] + "\n"
+            client_data['members'][k]['team_data'] = team_data[v['team_id']]
+    query = "UPDATE groupme_yahoo SET members="+utilities.dict_to_json(client_data['members'])+"WHERE session=1;"
+    db.execute_table_action(query)
     return string
