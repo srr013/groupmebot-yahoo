@@ -40,26 +40,28 @@ def get_team_data(teams):
             continue
         logging.warn("Val from get_team_data: %s" %
                      utilities.dict_to_json(val))
-        team_data = val[0]
-        for k, v in team_data.items():
-            logging.warn("k,v from get_team_data: %s, %s" % (k, v))
-            if k == 'count':
-                continue
-            team_id = ''
-            name = ''
-            num_moves = 0
-            num_trades = 0
-            if k == 'name':
-                name = v
-            elif k == 'number_of_moves':
-                num_moves = v
-            elif k == 'number_of_trades':
-                num_trades = v
-            elif k == 'team_key':
-                team_id = v
+        td = val['team'][0]
+        for entry in td:
+            if isinstance(entry, dict):
+                for k, v in entry.items():
+                    team_id = ''
+                    name = ''
+                    num_moves = 0
+                    num_trades = 0
+                    if k == 'count':
+                        continue
+                    elif k == 'name':
+                        name = v
+                    elif k == 'number_of_moves':
+                        num_moves = v
+                    elif k == 'number_of_trades':
+                        num_trades = v
+                    elif k == 'team_key':
+                        team_id = v
         if team_id:
             team_data[team_id] = {
                 'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
+    logging.warn("Team Data output: %s"% utilities.dict_to_json(team_data))
     return team_data
 
 
