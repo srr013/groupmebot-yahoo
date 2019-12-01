@@ -38,18 +38,18 @@ def get_team_data(teams):
     for t, val in teams.items():
         if t == 'count':
             continue
-        logging.warn("Val from get_team_data: %s" %
-                     utilities.dict_to_json(val))
+        # logging.warn("Val from get_team_data: %s" %
+        #              utilities.dict_to_json(val))
         td = val['team'][0]
         team_id = ''
         name = ''
         num_moves = 0
         num_trades = 0
         for entry in td:
-            try:
-                logging.warn("Entry: %s"%(utilities.dict_to_json(entry)))
-            except:
-                pass
+            # try:
+            #     logging.warn("Entry: %s"%(utilities.dict_to_json(entry)))
+            # except:
+            #     pass
             if isinstance(entry, dict):
                 for k, v in entry.items():
                     if k == 'count':
