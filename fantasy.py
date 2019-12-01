@@ -41,6 +41,10 @@ def get_team_data(teams):
         logging.warn("Val from get_team_data: %s" %
                      utilities.dict_to_json(val))
         td = val['team'][0]
+        team_id = ''
+        name = ''
+        num_moves = 0
+        num_trades = 0
         for entry in td:
             try:
                 logging.warn("Entry: %s"%(utilities.dict_to_json(entry)))
@@ -48,10 +52,6 @@ def get_team_data(teams):
                 pass
             if isinstance(entry, dict):
                 for k, v in entry.items():
-                    team_id = ''
-                    name = ''
-                    num_moves = 0
-                    num_trades = 0
                     if k == 'count':
                         continue
                     elif k == 'name':
@@ -62,9 +62,9 @@ def get_team_data(teams):
                         num_trades = v
                     elif k == 'team_key':
                         team_id = v
-                if team_id:
-                    team_data[team_id] = {
-                        'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
+        if team_id:
+            team_data[team_id] = {
+                'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
     logging.warn("Team Data output: %s"% utilities.dict_to_json(team_data))
     return team_data
 
