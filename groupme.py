@@ -14,7 +14,7 @@ def get_group_membership():
     members = {}
     for member in data["response"]["members"]:
         members[member['user_id']] = member
-    league_bot = League_Bot.League_Bot(1)jhg
+    league_bot = League_Bot.League_Bot(1)
     db.execute_table_action(query)
     return members
 
