@@ -3,22 +3,24 @@ from yahoo_oauth import OAuth2
 import utilities
 import logging
 
+
 def build_url(req):
     base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
     sport = 'nfl'
     league_id = '186306'
     request = "/"+str(req)
-    league_key = sport + '.l.'+ league_id 
+    league_key = sport + '.l.' + league_id
     return str(base_url + league_key + request)
+
 
 def get_league_data(oauth):
     league = 12
     weeks = 10
     data = {}
-    url_list = ['teams','transactions;types=add']
-            #'standings','scoreboard',
-            # ;week='+str(week),,'players',
-            #'.t.'+str(team)+'/roster;week='+str(week) ]
+    url_list = ['teams', 'transactions;types=add']
+    # 'standings','scoreboard',
+    # ;week='+str(week),,'players',
+    # '.t.'+str(team)+'/roster;week='+str(week) ]
 
     for url in url_list:
         response = oauth.session.get(build_url(url), params={'format': 'json'})
@@ -36,9 +38,11 @@ def get_team_data(teams):
     for t, val in teams.items():
         if t == 'count':
             continue
-        logging.warn("Val from get_team_data: %s"% utilities.dict_to_json(val))
-        for k, v in val.items():
-            logging.warn("k,v from get_team_data: %s, %s"% (k,v))
+        logging.warn("Val from get_team_data: %s" %
+                     utilities.dict_to_json(val))
+        team_data = val[0]
+        for k, v in team_data.items():
+            logging.warn("k,v from get_team_data: %s, %s" % (k, v))
             if k == 'count':
                 continue
             team_id = ''
@@ -54,5 +58,20 @@ def get_team_data(teams):
             elif k == 'team_key':
                 team_id = v
         if team_id:
-            team_data[team_id] = {'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
+            team_data[team_id] = {
+                'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
     return team_data
+
+
+{'team': 
+[
+    [{'team_key': '390.l.186306.t.12'}, {'team_id': '12'}, {'name': 'FFB Fournography'}, [], 
+    {'url': 'https://football.fantasysports.yahoo.com/f1/186306/12'}, 
+    {'team_logos': [{'team_logo': {'size': 'large', 'url': 'https://s.yimg.com/cv/apiv2/default/nfl/nfl_12.png'}}]}, 
+    [], 
+    {'waiver_priority': 6}, [], {'number_of_moves': '36'}, {'number_of_trades': '1'}, 
+    {'roster_adds': {'coverage_type': 'week', 'coverage_value': 13,'value': '3'}}, 
+    {'clinched_playoffs': 1}, {'league_scoring_type': 'head'}, [], [], 
+    {'has_draft_grade': 1, 'draft_grade': 'B+', 'draft_recap_url': 'https://football.fantasysports.yahoo.com/f1/186306/12/draftrecap'}, 
+    [], [], {'managers': [{'manager': {'manager_id': '12', 'nickname': 'Steve', 'guid': 'NX5WSOP6KRPWEGJ44JJJ3KLYBI', 
+    'image_url': 'https://s.yimg.com/ag/images/default_user_profile_pic_64sq.jpg'}}]}]]}
