@@ -62,9 +62,9 @@ def get_team_data(teams):
                         num_trades = v
                     elif k == 'team_key':
                         team_id = v
-        if team_id:
-            team_data[team_id] = {
-                'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
+                if team_id:
+                    team_data[team_id] = {
+                        'name': name, 'num_moves': num_moves, 'num_trades': num_trades}
     logging.warn("Team Data output: %s"% utilities.dict_to_json(team_data))
     return team_data
 
