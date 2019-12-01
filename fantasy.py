@@ -42,6 +42,8 @@ def get_team_data(teams):
                      utilities.dict_to_json(val))
         td = val['team'][0]
         for entry in td:
+            try:
+                logging.warn("Entry: %s"%(utilities.dict_to_json(entry)))
             if isinstance(entry, dict):
                 for k, v in entry.items():
                     team_id = ''
