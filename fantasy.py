@@ -1,6 +1,7 @@
 import json
 from yahoo_oauth import OAuth2
 import utilities
+import logging
 
 def build_url(req):
     base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
