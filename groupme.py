@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 from helpers.secrets import secrets
 import db
 import utilities
@@ -13,17 +14,7 @@ def get_group_membership():
     members = {}
     for member in data["response"]["members"]:
         members[member['user_id']] = member
-    league_bot = League_Bot.League_Bot(1)
-    data = league_bot.get_league_data()
-    teams = data['teams']['fantasy_content']['league'][1]['teams']
-    team_data = fantasy.get_team_data(teams)
-    for key, val in t.items():
-        for k,v in members.items():
-            if val == k:
-                members[k]['team_id'] = key
-                members[k]['team_data'] = team_data[key]
-    members = utilities.dict_to_json(members)
-    query = "UPDATE groupme_yahoo SET members='"+json.dumps(members)+"' WHERE session=1;"
+    league_bot = League_Bot.League_Bot(1)jhg
     db.execute_table_action(query)
     return members
 
