@@ -2,126 +2,106 @@ import os
 import json
 from flask import Flask, request, session
 import logging
-import League_Bot
+import GroupMe_Bot
 import message as m
+import fantasy as f
 from helpers.secrets import secrets
 import db
 import groupme
 
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
-league_bot = None
 
-@app.route('/refresh')
-def refresh():
-	transaction_list = league_bot.get_transactions()
-	# if transaction_list:
-	# 	m.reply(format_transaction_list(transaction_list))
-	return "ok", 200
-
-# Called whenever the app's callback URL receives a POST request
-# That'll happen every time a message is sent in the group
-@app.route('/', methods=['GET','POST'])
-def webhook():
-	client_data = initialize()
-	bot_name, bot_id = get_bot(client_data)
-	if request.method == 'GET':
-		return json.dumps(client_data)
-	elif int(client_data['status']) > 0:
-		message = request.get_json()
-		league_bot.increment_message_num()
-		if client_data['message_num'] >= client_data['message_limit'] and not m.sender_is_bot(message):
-			logging.warning("message: "+ message['text']+", "+
-				str(client_data['message_num'])+" / "+str(client_data['message_limit'])+
-				"message_full: " +str(json.dumps(message))+", Chat: "+bot_id)
-			league_bot.reset_client_data()
-			m.reply_with_mention(m.get_message(message['name']),
-			message['name'], message['sender_id'], bot_id)
-		post_trans_list(league_bot, client_data)
-		return "ok", 200
-	return "Bot status is off", 200
-
-def initialize():
-	global league_bot
-	if not league_bot:
-		league_bot = League_Bot.League_Bot(1)
-	client_data = league_bot.initialize_bot()
+def initialize(group_id):
+	groupme_bot = GroupMe_Bot.GroupMe_Bot(group_id)
+	group_id = get_group_id()
+	logging.warn("initializing: ", group_id)
+	group_data = groupme_bot.initialize_bot(group_id)
 	# if transaction_list:
 	# 	s = "Recent transactions: \n"
 	# 	for t in transaction_list:
 	# 		s += t 
 	# 	m.reply(s, bot_id)
-	return client_data
+	return groupme_bot, group_data
 
-@app.route('/initialize')
+
+# Called whenever the app's callback URL receives a POST request
+# That'll happen every time a message is sent in the group
+@app.route('/', methods=['GET','POST'])
+def webhook():
+	if request.method == 'GET':
+		return display_status()
+	else:
+		message = request.get_json()
+		groupme_bot, group_data = initialize(message['group_id'])
+		if int(group_data['status']) > 0:
+			groupme_bot.increment_message_num(group_data['id'])
+			if group_data['message_num'] >= group_data['message_limit'] and not m.sender_is_bot(message):
+				logging.warning("message: "+ message['text']+", "+
+					str(group_data['message_num'])+" / "+str(group_data['message_limit'])+
+					"message_full: " +str(json.dumps(message))+", Chat: "+bot_id)
+				groupme_bot.reset_message_data(group_data['id'])
+				m.reply_with_mention(m.get_message(message['name']),
+				message['name'], message['sender_id'], bot_id)
+			f.post_trans_list(groupme_bot, group_data, bot_id)
+			return "ok", 200
+	return "not found", 404
+
+def display_status():
+	groupme_bot = GroupMe_Bot.GroupMe_Bot()
+	groupme_bot.display_status()
+
+def get_group_id():
+	return request.base_url.split("/")[-1]
+
+
+@app.route('/initialize/*')
 def initialize_to_window():
-	logging.debug("initializing")
-	client_data = initialize()
-	return json.dumps(client_data)
+	return display_status()
 
-@app.route('/toggle')
+@app.route('/toggle/*')
 def toggle_status():
-	client_data = initialize()
+	group_id = get_group_id()
+	group_data = initialize(group_id)
 	s = 0
 	status = 'Inactive'
-	if not client_data['status']:
+	if not group_data['status']:
 		s = 1
 		status = 'Active'
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
 	db.execute_table_action(query)
-	return json.dumps("Bot is now "+status)
+	return display_status()
 
-@app.route('/swap')
-def swap_bots():
-	client_data = initialize()
-	s = 0
-	status = 'Test'
-	if not client_data['bot_status']:
-		s = 1
-		status = 'PRD'
-	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
-	db.execute_table_action(query)
-	active_status = "Active" if client_data['status'] > 0 else "Inactive"
-	return json.dumps("Bot is currently "+ active_status +" and in chat "+status)
+# @app.route('/refresh')
+# def refresh():
+# 	transaction_list = groupme_bot.get_transactions_list()
+# 	# if transaction_list:
+# 	# 	m.reply(format_transaction_list(transaction_list))
+# 	return "ok", 200
 
-@app.route('/transactions')
+# @app.route('/swap')
+# def swap_bots():
+#	group_id = get_group_id()
+# 	group_data = initialize(group_id)
+# 	s = 0
+# 	status = 'Test'
+# 	if not group_data['bot_status']:
+# 		s = 1
+# 		status = 'PRD'
+# 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
+# 	db.execute_table_action(query)
+# 	active_status = "Active" if group_data['status'] > 0 else "Inactive"
+# 	return json.dumps("Bot is currently "+ active_status +" and in chat "+status)
+
+@app.route('/transactions/*')
 def transactions():
-	global league_bot
-	if not league_bot:
-		league_bot = League_Bot.League_Bot(1)
-	client_data = initialize()
-	if client_data['status'] > 0:
-		return (post_trans_list(league_bot, client_data))
+	groupme_bot, group_data = initialize()
+	if group_data['status'] > 0:
+		return (f.post_trans_list(groupme_bot, group_data), 200)
 	else:
-		return league_bot.get_transactions_list(data, client_data['transaction_num'])
+		return (display_status(), 200)
 
-@app.route('/name-changes')
+@app.route('/name-changes/*')
 def name_changes():
-	global league_bot
-	if not league_bot:
-		league_bot = League_Bot.League_Bot(1)
-	client_data = initialize()
-	return (groupme.update_group_membership(client_data))
-
-
-def post_trans_list(league_bot, client_data):
-	global bot_id
-	data = league_bot.get_league_data()
-	trans_list = league_bot.get_transactions_list(data, client_data['transaction_num'])
-	s='None'
-	if trans_list:
-		s = "Recent transactions: \n"
-		for t in trans_list:
-			s += t 
-		m.reply(s, bot_id)
-	return s
-
-def get_bot(client_data):
-	status = ''
-	if client_data['bot_status'] > 0:
-		bot_id = client_data['prd_bot_id']
-		status = 'PRD'
-	else:
-		bot_id = client_data['test_bot_id']
-		status = 'TEST'
-	return (status, bot_id)
+	groupme_bot, group_data = initialize()
+	return (groupme.update_group_membership(group_data))

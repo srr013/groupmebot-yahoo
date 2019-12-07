@@ -14,10 +14,13 @@ def initialize_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
-def execute_table_action(query, cur=False):
+def execute_table_action(query, values = (), cur=False):
     conn = initialize_connection()
     cursor = conn.cursor()
-    cursor.execute(query)
+    if not values:
+        cursor.execute(query)
+    else:
+        cursor.execute(query, values)
     if cur:
         return cursor
     conn.commit()
@@ -25,19 +28,16 @@ def execute_table_action(query, cur=False):
 
 
 create_table = """
-CREATE TABLE groupme_yahoo(
-session INTEGER,
-message_num INTEGER,
-message_limit INTEGER
-);
+CREATE TABLE groupme_yahoo(group_id, message_num, message_limit, 
+num_past_transactions, status, messaging_status, bot_id, members);
 """
 drop_table = """
 DROP TABLE 
 """
 insert_into = """
-INSERT INTO groupme_yahoo (session, message_num, message_limit, 
-num_past_transactions, status, bot_status, prd_bot_id, test_bot_id, members)
-VALUES (1,0,30);
+INSERT INTO groupme_yahoo (group_id, message_num, message_limit, 
+num_past_transactions, league_data, status, messaging_status, bot_id)
+VALUES (?, 0, 1, 0, '{}' ,1, 1,'566e3b05b73cb551006cf34410');
 """
 select = """
 SELECT * FROM groupme_yahoo
@@ -49,6 +49,7 @@ bot_status INTEGER, prd_bot VARCHAR(100), test_bot VARCHAR(200);
 #works from CLI, not debug
 
 update = """
-UPDATE groupme_yahoo SET status, bot_status, WHERE session=1;
+UPDATE groupme_yahoo SET status, bot_status, WHERE group_id=1;
 """
 
+execute_table_action(insert_into)

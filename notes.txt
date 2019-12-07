@@ -1,0 +1,24 @@
+Bot status should be:
+On/off - monitoring the port
+messaging on/off - ability to send messages
+
+This should be set every time a message comes in:
+group - monitoring for inbound traffic and sending outbound messages to this group
+    Some new monitoring of inbound traffic is required
+database row - access data based on the group inbound - monitor and respond to 
+multiple groups at once and independently
+    Web-interface to control the bot?
+        + login and user database to website...
+
+
+toggle and swap - the function of this has changed. Need to pass in the group ID now.
+transactions, name changes, etc - need the bot ID in the query string
+
+It's not really a League Bot. It's more of a GroupMe Bot
+    change "league_id" variable to group_id?
+    Name?
+
+Configure a global status toggle and global control over all bot actions. Separate
+ global admin from read-only access on the Heroku site
+
+There's no link in the database yet to the fantasy league
