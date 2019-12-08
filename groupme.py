@@ -9,12 +9,15 @@ import GroupMe_Bot
 from team_map import team_map as t
 
 def get_group_membership(group_id):
-    res =requests.get('https://api.groupme.com/v3/groups/'+group_id+'?token='+secrets['access_token'])
-    data = json.loads(res.text)
-    members = {}
-    for member in data["response"]["members"]:
-        members[member['user_id']] = member
-    return members
+    res =requests.get('https://api.groupme.com/v3/groups/'+str(group_id)+'?token='+secrets['access_token'])
+    if res.status == 200:
+        data = json.loads(res.text)
+        members = {}
+        for member in data["response"]["members"]:
+            members[member['user_id']] = member
+        return members
+    else:
+        return {}
 
 def update_and_post_group_membership(group_data):
     string = 'None'
