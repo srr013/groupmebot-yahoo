@@ -27,32 +27,32 @@ class GroupMe_Bot():
             status, messaging_status, bot_id, members) 
             VALUES (%s,%i,%i,%i,%s,%i,%i,%s,%s);"""
         members = groupme.get_group_membership(group_id)
-        values = (str(group_id),0,1,0,"{}",1,1,str(bot_id),utilities.dict_to_json(members))
+        league_data = {}
+        values = (str(group_id),0,1,0,json.loads(league_data),1,1,str(bot_id),utilities.dict_to_json(members))
         db.execute_table_action(query, values)
 
     
     def fetch_group_data(self, group_id):
         #groups: 32836424, 55536872
         logging.debug("Fetching league data from DB")
-        if not group_id:
-            group_id=1
-        query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
-        cursor = db.execute_table_action(query, cur=True)
-        results = cursor.fetchone()
-        if results:
-            message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index = results
-            group_data = {'index': index, 'message_num':message_num, 
-                        'message_limit': message_limit,
-                        'transaction_num': past_transaction_num,
-                        'status': int(status), 'messaging_status': int(messaging_status),
-                        'bot_id': prd_bot_id,
-                        'groupme_group_id': groupme_group_id, 
-                        'members': members}
-            logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
-            (message_num,message_limit,messaging_status, status))
-            # if not league_data:
-            #     league_data = self.get_league_data()
-            return group_data
+        if group_id:
+            query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
+            cursor = db.execute_table_action(query, cur=True)
+            results = cursor.fetchone()
+            if results:
+                message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index = results
+                group_data = {'index': index, 'message_num':message_num, 
+                            'message_limit': message_limit,
+                            'transaction_num': past_transaction_num,
+                            'status': int(status), 'messaging_status': int(messaging_status),
+                            'bot_id': prd_bot_id,
+                            'groupme_group_id': groupme_group_id, 
+                            'members': members}
+                logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
+                (message_num,message_limit,messaging_status, status))
+                # if not league_data:
+                #     league_data = self.get_league_data()
+                return group_data
         return False
 
     def get_group_data(self, group_id, bot_id):
