@@ -1,9 +1,10 @@
 from yahoo_oauth import OAuth2
 import json
 import logging
+import random
 import db
 import groupme
-import random
+import utilities
 
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 
@@ -26,7 +27,7 @@ class GroupMe_Bot():
             status, messaging_status, bot_id, members) 
             VALUES (%s,%i,%i,%i,%s,%i,%i,%s,%s);"""
         members = groupme.get_group_membership(group_id)
-        values = (str(group_id),0,1,0,"{}",1,1,str(bot_id),json.loads(members))
+        values = (str(group_id),0,1,0,"{}",1,1,str(bot_id),utilities.dict_to_json(members))
         db.execute_table_action(query, values)
 
     
