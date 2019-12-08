@@ -42,8 +42,8 @@ def webhook():
 					"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
 				groupme_bot.reset_message_data(group_data['index'])
 				m.reply_with_mention(m.get_message(message['name']),
-				message['name'], message['sender_id'], bot_id)
-			#f.post_trans_list(groupme_bot, group_data, bot_id)
+				message['name'], message['sender_id'], group_data['bot_id'])
+			#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
 			return "ok", 200
 	return "not found", 404
 
