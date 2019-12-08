@@ -10,7 +10,7 @@ from team_map import team_map as t
 
 def get_group_membership(group_id):
     res =requests.get('https://api.groupme.com/v3/groups/'+str(group_id)+'?token='+secrets['access_token'])
-    if res.status == 200:
+    if res.status_code == 200:
         data = json.loads(res.text)
         members = {}
         for member in data["response"]["members"]:
