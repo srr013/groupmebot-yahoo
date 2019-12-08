@@ -15,7 +15,10 @@ app.secret_key = secrets["secret_key"]
 def initialize_group(group_id):
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
 	#logging.warn("initializing: %i"% (group_id))
-	group_data = groupme_bot.get_group_data(group_id)
+	bot_id = ''
+	if request.args.get("bot_id"):
+		bot_id = request.args['bot_id']
+	group_data = groupme_bot.get_group_data(group_id, bot_id)
 	# if transaction_list:
 	# 	s = "Recent transactions: \n"
 	# 	for t in transaction_list:
