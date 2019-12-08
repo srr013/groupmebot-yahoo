@@ -24,9 +24,9 @@ class GroupMe_Bot():
         (groupme_group_id, message_num, message_limit,
             num_past_transactions, league_data, 
             status, messaging_status, bot_id, members) 
-            VALUES (?,?,?,?,?,?,?,?,?);"""
+            VALUES (%s,%i,%i,%i,%s,%i,%i,%s,%s);"""
         members = groupme.get_group_membership(group_id)
-        values = (group_id, 0,1,0,'{}',1,1,bot_id,members)
+        values = (str(group_id),0,1,0,"{}",1,1,str(bot_id),json.loads(members))
         db.execute_table_action(query, values)
 
     
