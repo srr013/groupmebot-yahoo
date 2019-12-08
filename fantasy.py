@@ -94,7 +94,7 @@ def post_trans_list(league_bot, group_data, bot_id):
     trans_list = get_transaction_list(data, group_data['transaction_num'])
     s = 'None'
     if trans_list:
-        league_bot.update_transaction_store(group_data['transaction_num'])
+        league_bot.update_transaction_store(group_data['index'],group_data['transaction_num'])
         s = "Recent transactions: /n"
         for t in trans_list:
                 s += t
