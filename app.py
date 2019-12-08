@@ -12,10 +12,8 @@ import groupme
 app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
 
-def initialize(group_id):
+def initialize_group(group_id):
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
-	if not group_id:
-		group_id = get_group_id()
 	logging.warn("initializing: ", group_id)
 	group_data = groupme_bot.get_group_data(group_id)
 	# if transaction_list:
@@ -35,7 +33,7 @@ def webhook():
 	else:
 		message = request.get_json()
 		logging.warn(message)
-		groupme_bot, group_data = initialize(message['group_id'])
+		groupme_bot, group_data = initialize_group(message['group_id'])
 		if int(group_data['status']) > 0:
 			groupme_bot.increment_message_num(group_data['id'])
 			if group_data['message_num'] >= group_data['message_limit'] and not m.sender_is_bot(message):
@@ -53,13 +51,9 @@ def display_status():
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
 	return groupme_bot.display_status()
 
-def get_group_id():
-	return request.base_url.split("/")[-1]
-
-
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
-	groupme_bot, group_data = initialize(groupme_id)
+	groupme_bot, group_data = initialize_group(groupme_id)
 	s = 0
 	if not group_data['status']:
 		s = 1
@@ -76,8 +70,7 @@ def toggle_status(groupme_id):
 
 # @app.route('/swap')
 # def swap_bots():
-#	group_id = get_group_id()
-# 	group_data = initialize(group_id)
+# 	group_data = initialize_group(group_id)
 # 	s = 0
 # 	status = 'Test'
 # 	if not group_data['bot_status']:
@@ -90,7 +83,7 @@ def toggle_status(groupme_id):
 
 @app.route('/transactions/<int:groupme_id>')
 def transactions(groupme_id):
-	groupme_bot, group_data = initialize(groupme_id)
+	groupme_bot, group_data = initialize_group(groupme_id)
 	if group_data['status'] > 0:
 		return (f.post_trans_list(groupme_bot, group_data), 200)
 	else:
@@ -98,8 +91,7 @@ def transactions(groupme_id):
 
 # @app.route('/name-changes/*')
 # def name_changes():	
-# 	group_id = get_group_id()
-# 	groupme_bot, group_data = initialize(group_id)
+# 	groupme_bot, group_data = initialize_group(group_id)
 # 	return (groupme.update_group_membership(group_data))
 
 # @app.errorhandler(404)
