@@ -13,10 +13,11 @@ app = Flask(__name__)
 app.secret_key = secrets["secret_key"]
 
 def initialize(group_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(group_id)
-	group_id = get_group_id()
+	groupme_bot = GroupMe_Bot.GroupMe_Bot()
+	if not group_id:
+		group_id = get_group_id()
 	logging.warn("initializing: ", group_id)
-	group_data = groupme_bot.initialize_bot(group_id)
+	group_data = groupme_bot.get_group_data(group_id)
 	# if transaction_list:
 	# 	s = "Recent transactions: \n"
 	# 	for t in transaction_list:
@@ -33,6 +34,7 @@ def webhook():
 		return display_status()
 	else:
 		message = request.get_json()
+		logging.warn(message)
 		groupme_bot, group_data = initialize(message['group_id'])
 		if int(group_data['status']) > 0:
 			groupme_bot.increment_message_num(group_data['id'])
@@ -43,32 +45,25 @@ def webhook():
 				groupme_bot.reset_message_data(group_data['id'])
 				m.reply_with_mention(m.get_message(message['name']),
 				message['name'], message['sender_id'], bot_id)
-			f.post_trans_list(groupme_bot, group_data, bot_id)
+			#f.post_trans_list(groupme_bot, group_data, bot_id)
 			return "ok", 200
 	return "not found", 404
 
 def display_status():
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
-	groupme_bot.display_status()
+	return groupme_bot.display_status()
 
 def get_group_id():
 	return request.base_url.split("/")[-1]
 
 
-@app.route('/initialize/*')
-def initialize_to_window():
-	return display_status()
-
-@app.route('/toggle/*')
-def toggle_status():
-	group_id = get_group_id()
-	group_data = initialize(group_id)
+@app.route('/toggle/<int:groupme_id>')
+def toggle_status(groupme_id):
+	groupme_bot, group_data = initialize(groupme_id)
 	s = 0
-	status = 'Inactive'
 	if not group_data['status']:
 		s = 1
-		status = 'Active'
-	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE session=1;'
+	query = 'UPDATE groupme_yahoo SET status='+str(s)+' WHERE groupme_group_id='+str(groupme_id)+';'
 	db.execute_table_action(query)
 	return display_status()
 
@@ -93,15 +88,20 @@ def toggle_status():
 # 	active_status = "Active" if group_data['status'] > 0 else "Inactive"
 # 	return json.dumps("Bot is currently "+ active_status +" and in chat "+status)
 
-@app.route('/transactions/*')
-def transactions():
-	groupme_bot, group_data = initialize()
+@app.route('/transactions/<int:groupme_id>')
+def transactions(groupme_id):
+	groupme_bot, group_data = initialize(groupme_id)
 	if group_data['status'] > 0:
 		return (f.post_trans_list(groupme_bot, group_data), 200)
 	else:
 		return (display_status(), 200)
 
-@app.route('/name-changes/*')
-def name_changes():
-	groupme_bot, group_data = initialize()
-	return (groupme.update_group_membership(group_data))
+# @app.route('/name-changes/*')
+# def name_changes():	
+# 	group_id = get_group_id()
+# 	groupme_bot, group_data = initialize(group_id)
+# 	return (groupme.update_group_membership(group_data))
+
+# @app.errorhandler(404)
+# def not_found(error):
+#     return render_template('error.html'), 404

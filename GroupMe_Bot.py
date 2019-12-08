@@ -8,9 +8,8 @@ import random
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 
 class GroupMe_Bot():
-    def __init__(self, league_id):
+    def __init__(self):
         self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-        self.league_id = league_id
         self.high = 13
         self.low = 6
         self._login()
@@ -21,44 +20,50 @@ class GroupMe_Bot():
     
     def create_group(self, group_id):
         #does not set the bot_id for the group - manuually set this in order to post messages
-        query = """INSERT INTO groupme_yahoo (group_id, message_num, message_limit,
-            num_past_transactions, league_data, status, messaging_status, bot_id, members) 
-            VALUES (?,0,2,0,'{}',1,0,'0');"""
+        query = """INSERT INTO groupme_yahoo 
+        (groupme_group_id, message_num, message_limit,
+            num_past_transactions, league_data, 
+            status, messaging_status, bot_id, members) 
+            VALUES (?,?,?,?,?,?,?,?,?);"""
         members = groupme.get_group_membership(group_id)
-        values = (group_id, members)
+        values = (group_id, 0,1,0,'{}',1,1,"",members)
         db.execute_table_action(query, values)
 
     
-    def fetch_data(self, group):
+    def fetch_group_data(self, group_id):
         logging.debug("Fetching league data from DB")
-        query = "SELECT * FROM groupme_yahoo WHERE group_id = "+group
+        if not group_id:
+            group_id=1
+        query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
         cursor = db.execute_table_action(query, cur=True)
-        league_id,message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, test_bot_id, members = cursor.fetchone()
-        group_data = {'id': league_id, 'message_num':message_num, 
+        message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index = cursor.fetchone()
+        group_data = {'index': index, 'message_num':message_num, 
                     'message_limit': message_limit,
                     'transaction_num': past_transaction_num,
                     'status': int(status), 'messaging_status': int(messaging_status),
-                    'bot_id': prd_bot_id, 
+                    'bot_id': prd_bot_id,
+                    'groupme_group_id': groupme_group_id, 
                     'members': members}
-        logging.warning("Client Data: %i / %i messages, Bot group: %i (1 is PRD), Active status: %i (1 is active)"%
+        logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
         (message_num,message_limit,messaging_status, status))
         # if not league_data:
         #     league_data = self.get_league_data()
         return group_data
 
     def get_group_data(self, group_id):
-        group_data = self.fetch_data(group_id)
+        logging.warn("Getting Group Data for group %s"%(group_id))
+        group_data = self.fetch_group_data(group_id)
         if not group_data:
             logging.warn("Creating new group: %s /n" %(group_data['id']))
             self.create_group(group_id)
-            group_data = self.fetch_data(group_id)
+            group_data = self.fetch_group_data(group_id)
         #league_data = self.get_league_data()
         return group_data
 
     def build_url(self, req):
         base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
         sport = 'nfl'
-        league_id = '186306'
+        league_id = '186306' #TODO: Manage multiple leagues 
         request = "/"+str(req)
         league_key = sport + '.l.'+ league_id 
         return str(base_url + league_key + request)
@@ -67,24 +72,29 @@ class GroupMe_Bot():
         query = "SELECT * FROM groupme_yahoo"
         cursor = db.execute_table_action(query, cur=True)
         groups = cursor.fetchall()
-        n = "/n"
-        ID = ""
+        n = "___________"
+        ID = "0"
         status = "" #need to configure a global status toggle
         init = "Global monitoring status: fake on" + status + n
-        display = ""
+        display = init
+        new_display = ""
         for group in groups:
-            if isinstance(group[6], str):
-                ID = group[6][0:4]
-            else:
-                ID = ""
+            g = self.get_group_data(group[8])
+            ID = ""
+            if isinstance(g['bot_id'], str):
+                if len(g['bot_id'])>4:
+                    ID = g['bot_id'][0:4]
             message = (
             "ID: ",ID,n,
-            "Group Name: ", group[0],n,
-            "Bot Monitoring Status: ", group[4],#status
-            n,"Bot Messaging Status: ",n,group[5],n) #bot_status
-            for m in n:
+            #"Group Name: ", g[''],n,
+            "Bot Monitoring Status: ", "On" if g['status'] else "Off",#status
+            n,"Bot Messaging Status: ","On" if g['messaging_status'] else "Off") #messaging_status
+            for m in message:
                 display += str(m)
-        return display
+            for k,v in g.items():
+                new_display += str(k) + ": "
+                new_display += str(v)
+        return new_display
 
     def get_league_data(self):
         league = 12

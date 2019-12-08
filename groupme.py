@@ -19,7 +19,7 @@ def get_group_membership(group_id):
 def update_and_post_group_membership(group_data):
     string = 'None'
     if group_data['members']:
-        groupme_bot = GroupMe_Bot.GroupMe_Bot(group_data['group_id'])
+        groupme_bot = GroupMe_Bot.GroupMe_Bot()
         data = groupme_bot.get_league_data()
         teams = data['teams']['fantasy_content']['league'][1]['teams']
         team_data = fantasy.get_team_data(teams)

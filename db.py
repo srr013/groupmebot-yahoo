@@ -28,17 +28,20 @@ def execute_table_action(query, values = (), cur=False):
 
 
 create_table = """
-CREATE TABLE groupme_yahoo(group_id, message_num, message_limit, 
-num_past_transactions, status, messaging_status, bot_id, members);
+CREATE TABLE groupme_yahoo(message_num, message_limit, 
+num_past_transactions, status, messaging_status, bot_id, members, groupme_group_id, index);
 """
 drop_table = """
 DROP TABLE 
 """
 insert_into = """
-INSERT INTO groupme_yahoo (group_id, message_num, message_limit, 
-num_past_transactions, league_data, status, messaging_status, bot_id)
-VALUES (?, 0, 1, 0, '{}' ,1, 1,'566e3b05b73cb551006cf34410');
+INSERT INTO groupme_yahoo(group_id, message_num, message_limit, 
+num_past_transactions, league_data, status, messaging_status, bot_id) 
+VALUES
+    ();
 """
+serial = """ALTER TABLE groupme_yahoo ADD COLUMN index SERIAL PRIMARY KEY;"""
+
 select = """
 SELECT * FROM groupme_yahoo
 """
@@ -51,5 +54,3 @@ bot_status INTEGER, prd_bot VARCHAR(100), test_bot VARCHAR(200);
 update = """
 UPDATE groupme_yahoo SET status, bot_status, WHERE group_id=1;
 """
-
-execute_table_action(insert_into)

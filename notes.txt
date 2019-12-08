@@ -22,3 +22,4 @@ Configure a global status toggle and global control over all bot actions. Separa
  global admin from read-only access on the Heroku site
 
 There's no link in the database yet to the fantasy league
+No way to manage multiple Yahoo leagues currently
