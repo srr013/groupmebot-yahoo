@@ -18,7 +18,7 @@ class GroupMe_Bot():
         if not self.oauth.token_is_valid():
             self.oauth.refresh_access_token()
     
-    def create_group(self, group_id):
+    def create_group(self, group_id, bot_id):
         #does not set the bot_id for the group - manuually set this in order to post messages
         query = """INSERT INTO groupme_yahoo 
         (groupme_group_id, message_num, message_limit,
@@ -26,7 +26,7 @@ class GroupMe_Bot():
             status, messaging_status, bot_id, members) 
             VALUES (?,?,?,?,?,?,?,?,?);"""
         members = groupme.get_group_membership(group_id)
-        values = (group_id, 0,1,0,'{}',1,1,"",members)
+        values = (group_id, 0,1,0,'{}',1,1,bot_id,members)
         db.execute_table_action(query, values)
 
     
@@ -54,12 +54,12 @@ class GroupMe_Bot():
             return group_data
         return False
 
-    def get_group_data(self, group_id):
+    def get_group_data(self, group_id, bot_id):
         logging.warn("Getting Group Data for group %s"%(group_id))
         group_data = self.fetch_group_data(group_id)
-        if not group_data:
-            logging.warn("Creating new group: %s /n" %(group_data['id']))
-            self.create_group(group_id)
+        if not group_data and bot_id:
+            logging.warn("Creating new group: %s /n" %(bot_id))
+            self.create_group(group_id, bot_id)
             group_data = self.fetch_group_data(group_id)
         #league_data = self.get_league_data()
         return group_data
@@ -83,7 +83,7 @@ class GroupMe_Bot():
         display = init
         new_display = ""
         for group in groups:
-            g = self.get_group_data(group[8])
+            g = self.get_group_data(group[8],'')
             ID = ""
             if isinstance(g['bot_id'], str):
                 if len(g['bot_id'])>4:

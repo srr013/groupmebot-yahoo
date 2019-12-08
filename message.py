@@ -103,6 +103,5 @@ def upload_image_to_groupme(imgURL):
 
 # Checks whether the message sender is a bot
 def sender_is_bot(message):
-	return message['sender_type'] == "bot"
-
-
+	val = True if (message['sender_type'] == "bot" or message['system']) else False
+	return val
