@@ -131,17 +131,17 @@ class GroupMe_Bot():
 
 
     def increment_message_num(self, group):
-        query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+int(group)+";"
+        query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"
         db.execute_table_action(query)
     
     def reset_message_data(self, group):
         lim = random.randint(self.low, self.high)
-        query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE index = "+int(group)+";"
+        query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE index = "+str(group)+";"
         db.execute_table_action(query)
     
     
     def update_transaction_store(self, group, num_trans):
-        query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE index = "+int(group)+";"
+        query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE index = "+str(group)+";"
         db.execute_table_action(query)
     
 
@@ -149,7 +149,7 @@ class GroupMe_Bot():
     def save_league_data(self, group, data):
         data = json.dumps(data)
         data.strip("'")
-        query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE index = "+int(group)+";"
+        query = "UPDATE groupme_yahoo SET league_data = '"+data+"' WHERE index = "+str(group)+";"
         db.execute_table_action(query)
     
 
