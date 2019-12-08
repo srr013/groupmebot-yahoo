@@ -35,12 +35,12 @@ def webhook():
 		logging.warn(message)
 		groupme_bot, group_data = initialize_group(message['group_id'])
 		if int(group_data['status']) > 0:
-			groupme_bot.increment_message_num(group_data['id'])
+			groupme_bot.increment_message_num(group_data['index'])
 			if group_data['message_num'] >= group_data['message_limit'] and not m.sender_is_bot(message):
 				logging.warning("message: "+ message['text']+", "+
 					str(group_data['message_num'])+" / "+str(group_data['message_limit'])+
 					"message_full: " +str(json.dumps(message))+", Chat: "+bot_id)
-				groupme_bot.reset_message_data(group_data['id'])
+				groupme_bot.reset_message_data(group_data['index'])
 				m.reply_with_mention(m.get_message(message['name']),
 				message['name'], message['sender_id'], bot_id)
 			#f.post_trans_list(groupme_bot, group_data, bot_id)
