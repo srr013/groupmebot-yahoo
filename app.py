@@ -54,6 +54,11 @@ def display_status():
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
 	return groupme_bot.display_status()
 
+@app.route('/create_group/<int:groupme_id>')
+def create_group(groupme_id):
+	groupme_bot, groupme_data = initialize_group(groupme_id)
+	return display_status()
+
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
 	groupme_bot, group_data = initialize_group(groupme_id)
