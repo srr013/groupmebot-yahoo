@@ -1,0 +1,24 @@
+{# templates/index.html #}
+
+{% extends "layout.html" %}
+{% block title %}Database Contents{% endblock %}
+{% block body %}
+    {{ super() }}
+    {% for d in global_data %}
+    <p>{{d}}</p>
+    {% endfor %}
+    <table>
+        <tr>
+        {% for t in groupme_headers %}
+            <th>{{t}}</th>
+        {% endfor %}
+        </tr>
+        {% for group in groupme_groups %}
+        <tr>
+            {% for g in group %}
+            <td>{{g}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

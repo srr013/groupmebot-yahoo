@@ -1,3 +1,4 @@
+import json
 
 def dict_to_json(d):
     for k, v in d.items():
@@ -17,4 +18,4 @@ def dict_to_json(d):
             d[k] = v
         elif isinstance(v, dict):
             d[k] = dict_to_json(v)
-    return d
+    return json.dumps(d)

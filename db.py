@@ -31,6 +31,8 @@ create_table = """
 CREATE TABLE groupme_yahoo(message_num, message_limit, 
 num_past_transactions, status, messaging_status, bot_id, members, groupme_group_id, index);
 """
+app_status = """CREATE TABLE application_data(monitoring_status BOOLEAN, messaging_status BOOLEAN);"""
+
 drop_table = """
 DROP TABLE 
 """
