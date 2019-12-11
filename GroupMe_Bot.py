@@ -173,12 +173,12 @@ class GroupMe_Bot():
         periods = []
         days = []
         for k, v in req_dict.items():
-			if k == 'type':
-				trigger_type = v
-			elif k == 'days':
-				days = v
-			elif k == 'periods':
-				periods = v
+            if k == 'type':
+                trigger_type = v
+            elif k == 'days':
+                days = v
+            elif k == 'periods':
+                periods = v
         query = "SELECT * FROM groupme_yahoo where index="+group_data['index']+";"
         cursor = db.execute_table_action(query,cur=True)
         triggers = json.loads(cursor.fetchall()[11])

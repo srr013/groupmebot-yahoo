@@ -43,7 +43,7 @@ def webhook():
 			groupme_bot.increment_message_num(group_data['index'])
 			if group_data['message_num'] >= group_data['message_limit'] and not m.sender_is_bot(message):
 				logging.warning("message: "+ message['text']+", "+
-					str(group_data['message_num'])+" / "+str(group_data['message_limit'])+
+					str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
 					"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
 				groupme_bot.reset_message_data(group_data['index'])
 				m.reply_with_mention(m.get_message(message['name']),
@@ -75,34 +75,24 @@ def toggle_status(groupme_id):
 	db.execute_table_action(query)
 	return display_status(groupme_bot=groupme_bot)
 
-# @app.route('/refresh')
-# def refresh():
-# 	transaction_list = groupme_bot.get_transactions_list()
-# 	# if transaction_list:
-# 	# 	m.reply(format_transaction_list(transaction_list))
-# 	return "ok", 200
-
-# @app.route('/swap')
-# def swap_bots():
-# 	group_data = initialize_group(group_id)
-# 	s = 0
-# 	status = 'Test'
-# 	if not group_data['bot_status']:
-# 		s = 1
-# 		status = 'PRD'
-# 	query = 'UPDATE groupme_yahoo SET bot_status='+str(s)+' WHERE session=1;'
-# 	db.execute_table_action(query)
-# 	active_status = "Active" if group_data['status'] > 0 else "Inactive"
-# 	return json.dumps("Bot is currently "+ active_status +" and in chat "+status)
-
 @app.route('/transactions/<int:groupme_id>')
 def transactions(groupme_id):
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
 	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
 	if group_data['status'] > 0:
-		return (f.post_trans_list(groupme_bot, group_data), 200)
+		return (groupme_bot.post_trans_list(group_data), 200)
 	else:
 		return (display_status(groupme_bot=groupme_bot), 200)
+
+@app.route('/checkTriggers/<int:groupme_id>')
+def check_triggers(groupme_id):
+	groupme_bot = GroupMe_Bot.GroupMe_Bot()
+	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+	if request.values:
+		groupme_bot.create_trigger()
+	if groupme_bot.check_triggers(group_data):
+		return "Trigger found", 200
+	return "No trigger found", 404
 
 # @app.route('/name-changes/*')
 # def name_changes():	
