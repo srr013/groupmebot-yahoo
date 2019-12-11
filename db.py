@@ -27,6 +27,21 @@ def execute_table_action(query, values = (), cur=False):
     conn.close()
 
 
+table_model = """
+groupme_group_id INTEGER, 
+message_num INTEGER, 
+message_limit INTEGER,
+num_past_transactions INTEGER,
+status BOOLEAN,
+messaging_status BOOLEAN,
+bot_id VARCHAR(200),
+members VARCHAR(MAX),
+index PRIMARY KEY,
+anchor_datetime TIMESTAMP,
+trigger BOOLEAN
+
+"""
+
 create_table = """
 CREATE TABLE groupme_yahoo(message_num, message_limit, 
 num_past_transactions, status, messaging_status, bot_id, members, groupme_group_id, index);

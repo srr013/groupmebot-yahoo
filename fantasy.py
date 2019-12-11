@@ -89,73 +89,50 @@ def get_team_data(teams):
 """
 
 
-def post_trans_list(league_bot, group_data, bot_id):
-    data = league_bot.get_league_data()
-    trans_list = get_transaction_list(data, group_data['transaction_num'])
-    s = 'None'
-    if trans_list:
-        league_bot.update_transaction_store(group_data['index'],group_data['transaction_num'])
-        s = "Recent transactions: /n"
-        for t in trans_list:
-                s += t
-        if group_data['']:
-            m.reply(s, bot_id)
-        return str(s)
-
-
 def get_transaction_total(data):
     return data['transactions']['fantasy_content']['league'][1]['transactions']["0"]['transaction'][0]['transaction_id']
 
 
-def get_transaction_list(league_bot, past_trans_total):
-    data = league_bot.get_league_data()
-    response = league_bot.oauth.session.get(league_bot.build_url(
-        'transactions;types=add'), params={'format': 'json'})
-    data['transactions'] = json.loads(response.text)
-    # with open('data.json', 'w') as d:
-    #     d.write(json.dumps(data['transactions']))
+def get_transaction_list(data, past_trans_total):
     num_transactions = get_transaction_total(data)
     transaction_diff = int(num_transactions) - int(past_trans_total)
-    logging.warning("Num transactions found: %s new / %s old, Diff: %i" %
-                    (num_transactions, past_trans_total, transaction_diff))
     trans_list = []
-    if transaction_diff > 0:
-        i = 1
-        while i <= transaction_diff:
-            #logging.warn("i is: %i" % i)
-            trans = data['transactions']['fantasy_content']['league'][1]['transactions']
-            for t in trans.keys():
-                if t == 'count':
-                    continue
-                logging.warn("t is: %s" % t)
-                if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
-                    #logging.warn("Key located")
-                    players = trans[t]['transaction'][1]['players']
-                    string = ''
-                    for player in players.keys():
-                        #logging.warn("player located")
-                        if player == 'count':
-                            continue
-                        #logging.warning("Player %s" % json.dumps(players[player]))
-                        player_name = players[player]['player'][0][2]['name']['full']
-                        if isinstance(players[player]['player'][1]['transaction_data'], list):
-                            trans_type = players[player]['player'][1]['transaction_data'][0]['type']
-                            if trans_type == 'drop':
-                                team_name = players[player]['player'][1]['transaction_data'][0]['source_team_name']
-                            else:
-                                team_name = players[player]['player'][1]['transaction_data'][0]['destination_team_name']
-                            string += team_name + " " + trans_type + "s "+player_name+"\n"
-                        else:
-                            trans_type = players[player]['player'][1]['transaction_data']['type']
-                            if trans_type == 'drop':
-                                team_name = players[player]['player'][1]['transaction_data']['source_team_name']
-                            else:
-                                team_name = players[player]['player'][1]['transaction_data']['destination_team_name']
-                            string += team_name + " " + trans_type + "s "+player_name+"\n"
-                        # logging.warn(string)
-                    if string:
-                        trans_list.append(string)
-            i += 1
-        if trans_list:
-            logging.warning("Full transaction list: %s" % (trans_list))
+    trans = data['transactions']['fantasy_content']['league'][1]['transactions']
+    tl = [t for t in trans.keys()]
+    i=0
+    for t in tl[0:transaction_diff]:
+        i+=1
+        if t == 'count':
+            continue
+            #if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
+            #logging.warn("Key located")
+        players = trans[t]['transaction'][1]['players']
+        string = str(i)+'. '
+        count = 0
+        for player in players.keys():
+            #logging.warn("player located")
+            if player == 'count':
+                continue
+            #logging.warning("Player %s" % json.dumps(players[player]))
+            count += 1
+            player_name = players[player]['player'][0][2]['name']['full']
+            if isinstance(players[player]['player'][1]['transaction_data'], list):
+                trans_type = players[player]['player'][1]['transaction_data'][0]['type']
+                if trans_type == 'drop':
+                    team_name = players[player]['player'][1]['transaction_data'][0]['source_team_name']
+                else:
+                    team_name = players[player]['player'][1]['transaction_data'][0]['destination_team_name']
+                string += team_name + " " + trans_type + "s "+player_name+"\n"
+            else:
+                trans_type = players[player]['player'][1]['transaction_data']['type']
+                if trans_type == 'drop':
+                    team_name = players[player]['player'][1]['transaction_data']['source_team_name']
+                else:
+                    team_name = players[player]['player'][1]['transaction_data']['destination_team_name']
+                if count == 1:
+                    string += team_name + " " + trans_type + "s "+player_name+"\n"
+                else:
+                    string += "and " + trans_type + "s "+player_name+"\n"
+        if string:
+                trans_list.append(string)
     return trans_list
