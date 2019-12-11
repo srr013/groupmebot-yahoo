@@ -40,16 +40,17 @@ class GroupMe_Bot():
         db.execute_table_action(query, values)
 
     
-    def check_triggers(self, group_data):
-        query = "SELECT * FROM groupme_yahoo where index="+group_data['index']+";"
-        cursor = db.execute_table_action(query,cur=True)
-        triggers = json.loads(cursor.fetchall()[11])
-        trigger_types = ["Test"]
-        for trigger_type in trigger_types:
-            for t in triggers:
-                if Triggers.check_trigger(t, trigger_type, datetime.now()):
-                    return True
-        return False
+	def check_triggers(self, group_data):
+		query = "SELECT * FROM groupme_yahoo where index="+group_data['index']+";"
+		cursor = db.execute_table_action(query,cur=True)
+		triggers = json.loads(cursor.fetchall()[11])
+		trigger_types = ["Test"]
+		active_triggers = []
+		for trigger_type in trigger_types:
+			for t in triggers:
+				if Triggers.check_trigger(t, trigger_type, datetime.now()):
+					active_triggers.append(t)
+		return active_triggers
 
     def post_trans_list(self, group_data):
         league_data = self.get_league_data()
