@@ -2,9 +2,13 @@ from yahoo_oauth import OAuth2
 import json
 import logging
 import random
+from datetime import datetime
 import db
 import groupme
 import utilities
+import fantasy as f
+import message as m
+import Triggers
 
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 
@@ -36,15 +40,48 @@ class GroupMe_Bot():
         db.execute_table_action(query, values)
 
     
+    def check_triggers(self, group_data):
+        query = "SELECT * FROM groupme_yahoo where index="+group_data['index']+";"
+        cursor = db.execute_table_action(query,cur=True)
+        triggers = json.loads(cursor.fetchall()[11])
+        trigger_types = ["Test"]
+        for trigger_type in trigger_types:
+            for t in triggers:
+                if Triggers.check_trigger(t, trigger_type, datetime.now()):
+                    return True
+        return False
+
+    def post_trans_list(self, group_data):
+        league_data = self.get_league_data()
+        trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
+        s = 'None'
+        if trans_list:
+            new_trans_num = f.get_transaction_total(league_data)
+            query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
+            logging.warn("Setting new transaction figure %s"%str(new_trans_num))
+            db.execute_table_action(query)
+            s = "Recent transactions: \n"
+            for t in trans_list:
+                    s += t
+            if group_data['status']:
+                logging.warn("id %s" %str(group_data['bot_id']))
+                m.reply(s, group_data['bot_id'])
+                with open("transaction_list.txt", "w+") as o:
+                    for l in trans_list:
+                        o.write(str(l))
+            return str(s)
+        return "No transactions found"
+    
     def fetch_group_data(self, group_id):
-        #groups: 32836424, 55536872
+        #groups: TEST:32836424, PRD:55536872
         logging.debug("Fetching league data from DB")
         if group_id:
             query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
             cursor = db.execute_table_action(query, cur=True)
             results = cursor.fetchone()
             if results:
-                message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index = results
+                message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index, anchor_datetime, trigger = results
+                #anchor date, trigger
                 group_data = {'index': index, 'message_num':message_num, 
                             'message_limit': message_limit,
                             'transaction_num': past_transaction_num,
@@ -100,6 +137,7 @@ class GroupMe_Bot():
         return display
 
     def get_league_data(self):
+        #TODO: pass in league through here
         league = 12
         weeks = 10
         data = {}
@@ -117,7 +155,7 @@ class GroupMe_Bot():
             #data[url]['fantasy_content']['league'][1][url] - url-related data fo
 
 
-#'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
+        #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
         #self.save_league_data(group_data['index'], data)
         return data
 
@@ -128,6 +166,29 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 
+    def create_trigger(self, group_data, req_dict):
+        # trigger_type = "Test"
+        # days = ["mon"]
+        # periods = ["evening"]
+        periods = []
+        days = []
+        for k, v in req_dict.items():
+			if k == 'type':
+				trigger_type = v
+			elif k == 'days':
+				days = v
+			elif k == 'periods':
+				periods = v
+        query = "SELECT * FROM groupme_yahoo where index="+group_data['index']+";"
+        cursor = db.execute_table_action(query,cur=True)
+        triggers = json.loads(cursor.fetchall()[11])
+        new_trigger = triggers.create_trigger(trigger_type, days, periods)
+        if triggers:
+            triggers.append(new_trigger)
+            return json.dumps(triggers)
+        else:
+            return new_trigger
+
 
     def increment_message_num(self, group):
         query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"
@@ -137,11 +198,7 @@ class GroupMe_Bot():
         lim = random.randint(self.low, self.high)
         query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE index = "+str(group)+";"
         db.execute_table_action(query)
-    
-    
-    def update_transaction_store(self, group, num_trans):
-        query = "UPDATE groupme_yahoo SET num_past_transactions = "+num_trans+" WHERE index = "+str(group)+";"
-        db.execute_table_action(query)
+
     
 
 
