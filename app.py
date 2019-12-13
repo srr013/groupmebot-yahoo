@@ -37,8 +37,8 @@ def webhook():
 		return display_status(groupme_bot=groupme_bot)
 	elif request.method == 'POST' and groupme_bot.monitoring_status:
 		message = request.get_json()
-		groupme_bot.save_message(message)
 		logging.warn(message)
+		groupme_bot.save_message(message)
 		group_data = initialize_group(message['group_id'], groupme_bot=groupme_bot)
 		if int(group_data['status']) > 0:
 			groupme_bot.increment_message_num(group_data['index'])
