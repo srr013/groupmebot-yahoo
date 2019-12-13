@@ -75,12 +75,9 @@ class GroupMe_Bot():
                             'status': int(status), 'messaging_status': int(messaging_status),
                             'bot_id': prd_bot_id,
                             'groupme_group_id': groupme_group_id, 
-							'messages': json.loads(messages),
+							'messages': [] if not messages else json.loads(messages),
+							'trigger': [] if not trigger else json.loads(trigger),
                             'members': members}
-				if trigger:
-					group_data['trigger'] = json.loads(trigger)
-				else:
-					group_data['trigger'] = []
 				logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
 				(message_num,message_limit,messaging_status, status))
                 # if not league_data:
