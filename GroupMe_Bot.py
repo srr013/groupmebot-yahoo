@@ -220,8 +220,8 @@ class GroupMe_Bot():
 	
 	def save_message(self, message):
 		if message:
-			query = "INSERT INTO messages(message=%s, groupme_group_id=%s);"
-			values = (message, str(message['group_id']))
+			query = "INSERT INTO messages(message, groupme_group_id) VALUES (%s, %s);"
+			values = (json.dumps(message), str(message['group_id']))
 			db.execute_table_action(query, values)
 		else:
 			logging.warn("Attempted save on null message")
