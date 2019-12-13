@@ -205,13 +205,12 @@ class GroupMe_Bot():
 		db.execute_table_action(query, values)
 
 	def save_message(self, message):
-		select = "SELECT messages FROM groupme_yahoo WHERE groupme_group_id = %s;"
-		select_values = (message['group_id'])
+		select = "SELECT messages FROM groupme_yahoo WHERE groupme_group_id = %d;"
+		select_values = (message['group_id'],)
 		cursor = db.execute_table_action(select, values=select_values, cur=True)
 		messages = [m for m in json.loads(cursor.fetchall())]
 		messages.insert(0,message)
 		query = "UPDATE groupme_yahoo SET messages= %s WHERE groupme_group_id = %s;"
-		logging.warn("messages %s"% json.dumps(messages))
 		values = (json.dumps(messages), str(message['group_id']))
 		db.execute_table_action(query, values)
 
