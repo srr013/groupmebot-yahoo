@@ -220,7 +220,7 @@ class GroupMe_Bot():
 	
 	def save_message(self, message):
 		if message:
-			query = "INSERT INTO messages SET message=%s, groupme_group_id=%s;"
+			query = "INSERT INTO messages(message=%s, groupme_group_id=%s);"
 			values = (json.dumps(message), str(message['group_id']))
 			db.execute_table_action(query, values)
 		else:
