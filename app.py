@@ -37,6 +37,7 @@ def webhook():
 		return display_status(groupme_bot=groupme_bot)
 	elif request.method == 'POST' and groupme_bot.monitoring_status:
 		message = request.get_json()
+		groupme_bot.save_message(message)
 		logging.warn(message)
 		group_data = initialize_group(message['group_id'], groupme_bot=groupme_bot)
 		if int(group_data['status']) > 0:
@@ -89,7 +90,7 @@ def check_triggers(groupme_id):
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
 	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
 	if request.values:
-		groupme_bot.create_trigger()
+		groupme_bot.create_trigger(group_data, request.values)
 	triggers = groupme_bot.check_triggers(group_data)
 	if triggers:
 		for trigger in triggers:

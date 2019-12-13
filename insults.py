@@ -428,5 +428,9 @@ insults = [
 "Zitface",
 "Zoophile",
 "Zounderkite",
-"Mielke lover"
+"Mielke lover",
+"Pissface",
+"Cock gobbling muffin snatcher",
+"Pussface McGarbagePants",
+"Lumberjack"
 ]
