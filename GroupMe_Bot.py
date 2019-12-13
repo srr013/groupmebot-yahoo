@@ -204,15 +204,27 @@ class GroupMe_Bot():
 		values = (data, str(group))
 		db.execute_table_action(query, values)
 
+	def load_messages(self, groupme_group_id, message=None):
+		if groupme_group_id:
+			select = "SELECT message FROM messages WHERE groupme_group_id = %s;"
+			select_values = (groupme_group_id,)
+			cursor = db.execute_table_action(select, values=select_values, cur=True)
+			messages = cursor.fetchall()
+			if message:
+				messages.append(message)
+			return messages
+		else:
+			logging.warn("Attempted save on null message")
+		return []
+			
+	
 	def save_message(self, message):
-		select = "SELECT messages FROM groupme_yahoo WHERE groupme_group_id = %s;"
-		select_values = (message['group_id'],)
-		cursor = db.execute_table_action(select, values=select_values, cur=True)
-		messages = cursor.fetchall()
-		messages.insert(0,message)
-		query = "UPDATE groupme_yahoo SET messages= %s WHERE groupme_group_id = %s;"
-		values = (json.dumps(messages), str(message['group_id']))
-		db.execute_table_action(query, values)
+		if message:
+			query = "INSERT INTO messages SET message=%s, groupme_group_id=%s;"
+			values = (json.dumps(message), str(message['group_id']))
+			db.execute_table_action(query, values)
+		else:
+			logging.warn("Attempted save on null message")
 
     
 	def update_triggers(self, group, triggers):

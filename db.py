@@ -36,7 +36,7 @@ status BOOLEAN,
 messaging_status BOOLEAN,
 bot_id VARCHAR(200),
 members VARCHAR(MAX),
-index PRIMARY KEY,
+index SERIAL PRIMARY KEY, 
 anchor_datetime TIMESTAMP,
 trigger BOOLEAN
 

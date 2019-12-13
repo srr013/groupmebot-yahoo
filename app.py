@@ -98,6 +98,12 @@ def check_triggers(groupme_id):
 				return trigger,200
 	return "No trigger found", 404
 
+# @app.route('/messages/<int:groupme_id>')
+# def get_messages(groupme_id):
+# 	groupme_bot = GroupMe_Bot.GroupMe_Bot()
+# 	messages = groupme_bot.load_messages()
+# 	return (groupme_bot.)
+
 # @app.route('/name-changes/*')
 # def name_changes():	
 # 	groupme_bot, group_data = initialize_group(group_id)
