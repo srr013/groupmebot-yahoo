@@ -41,7 +41,7 @@ def talking_to_self(messages, lim=4):
 	user = []
 	first = ''
 	for message in messages[len(messages)-4:len(messages)][0]:
-		logging.warn(message)
+		logging.warn("%s, %s"%(message, first))
 		if isinstance(message, dict):
 			user.append(message['sender_id'])
 		if not first:
