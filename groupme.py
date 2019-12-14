@@ -39,7 +39,9 @@ def update_and_post_group_membership(group_data):
     db.execute_table_action(query)
     return string
 
-def talking_to_self(messages, lim=3):
+def talking_to_self(messages, lim=4):
+	randomizer = random.randint(lim-1,lim+1) - lim
+	lim += randomizer
 	user = []
 	first = ''
 	for message in messages[len(messages)-lim:len(messages)]:
