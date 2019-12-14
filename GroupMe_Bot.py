@@ -227,7 +227,7 @@ class GroupMe_Bot():
 		return triggers
 	
 	def update_trigger_status(self, trigger):
-		query = """UPDATE triggers SET status=%s WHERE index=%s""" 
+		query = """UPDATE triggers SET status=%s WHERE i=%s""" 
 		values = (trigger['status'], trigger['index'])
 		db.execute_table_action(query, values)
 
