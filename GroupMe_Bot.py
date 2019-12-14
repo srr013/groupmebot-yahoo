@@ -15,8 +15,8 @@ import Triggers
 class GroupMe_Bot():
 	def __init__(self):
 		self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-		self.high = 13
-		self.low = 9
+		self.high = 16
+		self.low = 4
 		self.monitoring_status = False
 		self.messaging_status = True
 		self._login()
