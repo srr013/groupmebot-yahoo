@@ -189,7 +189,10 @@ class GroupMe_Bot():
 			self.update_triggers(group_data['index'], json.dumps([new_trigger]))
 
 	def check_messages(self, group_data):
-		messages = self.load_messages(group_data['groupme_group_id']).sort(key=lambda t: t[2])
+		messages = self.load_messages(group_data['groupme_group_id'])
+		logging.warn("Messages: %s"%json.dumps(messages))
+		messages = messages.sort(key=lambda t: t[2])
+		logging.warn("Messages: %s"%json.dumps(messages))
 		if len(messages) > 100:
 			self.delete_messages(messages)
 		user = groupme.talking_to_self(messages)
@@ -225,7 +228,6 @@ class GroupMe_Bot():
 			logging.warn("Attempted save on null message")
 		return []
 			
-	
 	def save_message(self, message):
 		if message:
 			query = "INSERT INTO messages(message, groupme_group_id) VALUES (%s, %s);"
