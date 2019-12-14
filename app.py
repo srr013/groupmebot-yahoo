@@ -20,6 +20,8 @@ def initialize_group(group_id, groupme_bot = None):
 	if request.args.get("bot_id"):
 		bot_id = request.args['bot_id']
 	group_data = groupme_bot.get_group_data(group_id, bot_id)
+	if not group_data:
+		logging.warn("Group data not found for group %s"%group_id)
 	# if transaction_list:
 	# 	s = "Recent transactions: \n"
 	# 	for t in transaction_list:
@@ -98,6 +100,7 @@ def check_triggers(groupme_id):
 	if request.values:
 		groupme_bot.create_trigger(group_data, request.values)
 	triggers = groupme_bot.check_triggers(group_data)
+	logging.warn("t %s"%json.dumps(triggers))
 	if triggers:
 		m = ''
 		for t in triggers:

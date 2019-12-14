@@ -7,9 +7,7 @@ def initialize_connection():
         DATABASE_URL = os.environ['DATABASE_URL']
     else:
         DATABASE_URL = "postgres://rswaqrlbkxjsfa:0c3ee7e18e714bf25194dc29a01eee1ba01dcfe658f2e670adbdd0ce12119984@ec2-23-21-115-109.compute-1.amazonaws.com:5432/d3dp6ua6pc73gn"
-
         logging.error("No DB URL set in environment. (Local) Run set DATABASE_URL=postgres://$(whoami)")
-
     # conn = psycopg2.connect("dbname='template1' user='dbuser' host='localhost' password='dbpass'")
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
@@ -61,6 +59,11 @@ index SERIAL PRIMARY KEY,
 anchor_datetime TIMESTAMP,
 trigger BOOLEAN
 
+"""
+
+triggers =  """CREATE TABLE triggers(i SERIAL PRIMARY KEY, type VARCHAR(50),
+days VARCHAR[], periods VARCHAR[], 
+status VARCHAR[], group_id INTEGER REFERENCES groupme_yahoo(index));
 """
 
 create_table = """

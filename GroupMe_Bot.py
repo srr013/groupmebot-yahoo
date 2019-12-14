@@ -27,9 +27,7 @@ class GroupMe_Bot():
 		if not self.oauth.token_is_valid():
 			self.oauth.refresh_access_token()
 		query = """SELECT * FROM application_data"""
-		vals = db.fetch_one(query)
-		logging.warn("logging in. Vals: %s"%(json.dumps(vals)))
-		self.monitoring_status, self.messaging_status = vals[0]
+		self.monitoring_status, self.messaging_status = db.fetch_one(query)
     
 	def create_group(self, group_id, bot_id):
 		#does not set the bot_id for the group - manuually set this in order to post messages
@@ -66,28 +64,34 @@ class GroupMe_Bot():
     
 	def fetch_group_data(self, group_id):
 		#groups: TEST:32836424, PRD:55536872
-		logging.debug("Fetching league data from DB")
+		logging.debug("Fetching group data from DB")
 		if group_id:
-			query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
-			results = db.fetch_one(query)
+			query = """SELECT index, groupme_group_id, message_num, message_limit, 
+			num_past_transactions, league_data, status, messaging_status, bot_id, members
+			FROM groupme_yahoo WHERE groupme_group_id = %s"""
+			values = (group_id,)
+			results = db.fetch_one(query, values)
 			if results:
-				message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index, trigger, messages = results
-				logging.warn("loading trigger: %s"%trigger)
-				group_data = {'index': index, 'message_num':message_num, 
-                            'message_limit': message_limit,
-                            'transaction_num': past_transaction_num,
-                            'status': int(status), 'messaging_status': int(messaging_status),
-                            'bot_id': prd_bot_id,
-                            'groupme_group_id': groupme_group_id, 
-							'messages': [] if not messages else json.loads(messages),
-							'trigger': [] if not trigger else json.loads(trigger),
-                            'members': members}
-				logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
-				(message_num,message_limit,messaging_status, status))
+				#message_num, message_limit, past_transaction_num, league_data, status, messaging_status, bot_id, members,groupme_group_id, index = results
+				# logging.warn("loading trigger: %s"%trigger)
+				group_data = {'index': results[0], 
+							'message_num':results[2], 
+                            'message_limit': results[3],
+                            'transaction_num': results[4],
+                            'status': int(results[6]), 
+							'messaging_status': int(results[7]),
+                            'bot_id': results[8],
+                            'groupme_group_id': results[1],
+                            'members': results[9] if results[9] else {}
+							}
+				#logging.warn(group_data)
+				group_data['triggers'] = self.load_triggers(group_data['index'])
+				# logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
+				# (message_num,message_limit,messaging_status, status))
                 # if not league_data:
                 #     league_data = self.get_league_data()
 				return group_data
-		return False
+		return {}
 
 	def get_group_data(self, group_id, bot_id):
 		logging.warn("Getting Group Data for group %s"%(group_id))
@@ -115,13 +119,14 @@ class GroupMe_Bot():
 		global_data = ["Global monitoring status: "+"On" if self.monitoring_status else "Off",
 		"Global messaging status: "+ "On" if self.messaging_status else "Off"]
 		if self.monitoring_status:
-			query = "SELECT * FROM groupme_yahoo"
+			query = "SELECT groupme_group_id FROM groupme_yahoo"
 			groups = db.fetch_all(query)
-			status = "" #need to configure a global status toggle
+			logging.warn("groups: %s"%groups)
 			for group in groups:
-				g = self.get_group_data(group[8],'')
+				g = self.get_group_data(group[0],'')
+				logging.warn("g %s"%g)
 				bot_id = g['bot_id'][0:4]
-				group_data.append([group[8],bot_id,"On" if g['status'] else "Off","On" if g['messaging_status'] else "Off", g['message_num'], g['message_limit']])
+				group_data.append([group[0],bot_id,"On" if g['status'] else "Off","On" if g['messaging_status'] else "Off", g['message_num'], g['message_limit']])
 		display = {"headers": headers, "group_data": group_data, "global_data": global_data}
                 # for k,v in g.items():
                 #     new_display += str(k) + ": "
@@ -160,8 +165,8 @@ class GroupMe_Bot():
 	def check_triggers(self, group_data):
 		trigger_types = ["test", "transactions"]
 		active_triggers = []
-		triggers = group_data['trigger']
-		logging.warn("triggers: %s"%group_data['trigger'])
+		triggers = group_data['triggers']
+		logging.warn("triggers: %s"%group_data['triggers'])
 		day, period = Triggers.get_date_period(datetime.now(tz=self.tz))
 		for trigger_type in trigger_types:
 			for t in triggers:
@@ -170,27 +175,79 @@ class GroupMe_Bot():
 		return active_triggers
 
 	def send_trigger_messages(self, group_data, active_triggers):
-		day,period = (Triggers.get_date_period(datetime.now(tz=self.tz)))
+		day,period = Triggers.get_date_period(datetime.now(tz=self.tz))
 		for trigger in active_triggers:
 			if trigger['type'] == 'transactions':
-				trigger['status'] = last_fired
+				trigger['status'] = (day, period)
 				self.post_trans_list(group_data)
+				self.update_trigger_status(trigger)
 
 	def create_trigger(self, group_data, req_dict):
 		periods = []
 		days = []
 		for k, v in req_dict.items():
+			#logging.warn(v, type(v))
 			if k.lower() == 'type':
 				trigger_type = v
 			elif k.lower() == 'days':
-				days = v
+				days = utilities.string_to_list(v)
 			elif k.lower() == 'periods':
-				periods = v
-		triggers = group_data['trigger']
+				periods = utilities.string_to_list(v)
 		new_trigger = Triggers.create_trigger(trigger_type, days, periods)
 		logging.warn("Creating trigger: %s"%(new_trigger))
-		triggers.append(new_trigger)
-		self.update_triggers(group_data['index'],json.dumps(triggers))
+		self.add_trigger(group_data['index'], new_trigger)
+
+	def add_trigger(self, group, trigger):
+		query = """INSERT INTO triggers (type,days,periods,status,group_id) 
+		VALUES (%s, %s, %s, %s, %s);"""
+		values = (trigger['type'],trigger['days'], trigger['periods'],
+		trigger['status'], str(group))
+		db.execute_table_action(query, values)
+	
+	def delete_trigger(self, index):
+		query = """DELETE FROM triggers WHERE index=%s"""
+		values = (index,)
+		db.execute_table_action(query, values)
+	
+	def load_triggers(self, group_id):
+		query = """SELECT * FROM triggers WHERE group_id=%s"""
+		values = (group_id,)
+		l = db.fetch_all(query, values)
+		triggers = []
+		for trigger in l:
+			d = {
+				'index':trigger[0],
+				'type':trigger[1],
+				'days':trigger[2],
+				'periods': trigger[3],
+				'status':trigger[4],
+				'group_id':trigger[5]
+			}
+			triggers.append(d)
+		return triggers
+	
+	def update_trigger_status(self, trigger):
+		query = """UPDATE triggers SET status=%s WHERE index=%s""" 
+		values = (trigger['status'], trigger['index'])
+		db.execute_table_action(query, values)
+
+	def increment_message_num(self, group):
+		query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = %s;"
+		values = (str(group),)
+		db.execute_table_action(query, values)
+
+	def reset_message_data(self, group):
+		lim = random.randint(self.low, self.high)
+		query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = %s WHERE index = %s;"
+		values = (str(lim), str(group))
+		db.execute_table_action(query, values)
+
+	def save_league_data(self, group, data):
+		data = json.dumps(data)
+		data.strip("'")
+		query = "UPDATE groupme_yahoo SET league_data = %s WHERE index = %s;"
+		values = (data, str(group))
+		db.execute_table_action(query, values)
 
 	def check_messages(self, group_data):
 		messages = self.load_messages(group_data['groupme_group_id'])
@@ -203,22 +260,6 @@ class GroupMe_Bot():
 				msg = groupme.talking_to_self(messages)
 			if msg:
 				m.reply(msg, group_data['bot_id'])
-
-	def increment_message_num(self, group):
-		query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"
-		db.execute_table_action(query)
-
-	def reset_message_data(self, group):
-		lim = random.randint(self.low, self.high)
-		query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = "+str(lim)+" WHERE index = "+str(group)+";"
-		db.execute_table_action(query)
-
-	def save_league_data(self, group, data):
-		data = json.dumps(data)
-		data.strip("'")
-		query = "UPDATE groupme_yahoo SET league_data = %s WHERE index = %s;"
-		values = (data, str(group))
-		db.execute_table_action(query, values)
 
 	def load_messages(self, groupme_group_id, message=None):
 		if groupme_group_id:
@@ -252,10 +293,4 @@ class GroupMe_Bot():
 			db.execute_table_action(query, values)
 			logging.warn("Old messages deleted")
     
-	def update_triggers(self, group, triggers):
-		data = json.dumps(triggers)
-		data.strip("'")
-		query = "UPDATE groupme_yahoo SET trigger = %s WHERE index = %s;"
-		values = (triggers, str(group))
-		db.execute_table_action(query, values)
 

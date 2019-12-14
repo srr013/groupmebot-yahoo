@@ -19,3 +19,12 @@ def dict_to_json(d):
         elif isinstance(v, dict):
             d[k] = dict_to_json(v)
     return json.dumps(d)
+
+def string_to_list(s):
+	s = s.replace("[","")
+	s = s.replace("]","")
+	s = s.split(",")
+	l = []
+	for item in s:
+		l.append(item)
+	return l
