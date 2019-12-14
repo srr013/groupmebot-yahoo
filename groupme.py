@@ -1,12 +1,14 @@
 import requests
 import json
 import logging
+import random
 from helpers.secrets import secrets
 import db
 import utilities
 import fantasy
 import message as m
 import GroupMe_Bot
+from insults import talking_to_self as talking
 from team_map import team_map as t
 
 def get_group_membership(group_id):
@@ -52,5 +54,5 @@ def talking_to_self(messages, lim=4):
 			if str(u) != str(first):
 				logging.warn("u %s,f %s"%(u,first))
 				return None
-		return "Shut up"
+		return talking[random.randint(0,len(talking)-1)]
 	return None

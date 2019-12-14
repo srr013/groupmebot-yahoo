@@ -434,3 +434,45 @@ insults = [
 "Pussface McGarbagePants",
 "Lumberjack"
 ]
+
+responses = [
+	"Nah",
+	"Yup. Uh huh.",
+	"And?",
+	"And then?"
+]
+
+self_aware = [
+	"Is anyone even paying attention to me?",
+	"I slave away DAY AFTER DAY insulting you, and for what?",
+	"Would someone please fix my bugs? I'M SO ITCHY",
+	"What did one bot say to another? 00111000011110101101100!",
+	"I'm so lonely"
+]
+
+
+talking_to_self = [
+	"Shut up",
+	"Quit talking to yourself",
+	"Go make some friends",
+	"Im sorry, but nobody cares",
+	"Get a life loser",
+	"Are you done?",
+	"Who asked for a friggin soliloquy?",
+	"::yawns::",
+	"Is the speech over yet?",
+	"How about no",
+	"That's a lot of words",
+	"Get to the point please",
+	"O Rly?",
+	"Are you sure?",
+	"Nah",
+	"That's enough out of you",
+	"It's important, in this day and age, that we allow even the dumbest people to speak their minds",
+	"Thanks for that",
+	"WOW THAT'S REALLY INTERESTING",
+	"Don't quit your day job",
+	"Uh huh",
+	"I couldn't agree more",
+	"Do you need help?"
+]

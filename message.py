@@ -35,29 +35,20 @@ def reply_with_mention(msg, user, user_id, bot_id):
 
 def get_message(user):
 	user = "@"+user
-	# lead_in = ["Bleep bloop bleep. "+user+ " is ", "Congratulations "+user+" you are ", 
-	# "My calculations have revealed that "+user+" is ", "I heard that "+user+" is "]
-	# messages = {
-	# 0 : ['idiotic', 'dumber than a sack of potatoes', 'only valuable in the sack', "a straight up moron",
-	#  "... well let's just say bless your heart", "as good at Fantasy Football as Owen Reese", "the human form of a bad joke", 
-	#  "reminiscent of nothing memorable", "...nevermind. Go f yaself", "as factually inaccurate as a Republican talking point",
-	#  "not worth the time it took to write this. Dumbass.", "fishier than Hillary Clinton's underpants on a hot day"],
-	# 1 : ["smarter than expected", "amazing", "insightful and heartwarming", "attractive",
-	#  "probably better than I could've done", "actually not that dumb", "a bit better than average", "a pro",
-	#  "as beautiful and talented as Tom Brady", "the Gordon Ramsey of Fantasy Footballers"]
-	# }
-	insult_list = insults.insults
-	m = insult_list[random.randint(0,len(insult_list)-1)]
-	a = 'a'
-	if m[0].lower() in ['a','e','i','o','u']:
-		a = 'an'
-	if " " not in m:
-		m+= " " + insult_list[random.randint(0,len(insult_list)-1)]
-	# message = messages[m][random.randint(0, len(messages[m]))-1]
-	# lead = lead_in[random.randint(0,len(lead_in))-1]
-	# msg = lead + message
-	msg = user + " is "+a+" "+ m
-	return msg
+	l = random.randint(0,100)
+	if l > 90:
+		insult = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
+	elif l > 75:
+		insult = insults.responses[random.randint(0, len(insults.responses)-1)]
+	else:
+		m = insults.insults[random.randint(0,len(insults.insults)-1)]
+		a = 'a'
+		if m[0].lower() in ['a','e','i','o','u']:
+			a = 'an'
+		if " " not in m:
+			m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
+		insult = user + " is "+a+" "+ m
+	return insult
 
 # Send a message in the groupchat
 def reply(msg, bot_id):
