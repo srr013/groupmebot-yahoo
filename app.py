@@ -40,7 +40,7 @@ def webhook():
 		logging.warn(message)
 		groupme_bot.save_message(message)
 		group_data = initialize_group(message['group_id'], groupme_bot=groupme_bot)
-		groupme_bot.check_messages(group_data)
+		#groupme_bot.check_messages(group_data)
 		if int(group_data['status']) > 0:
 			groupme_bot.increment_message_num(group_data['index'])
 			if group_data['message_num'] >= group_data['message_limit'] and not m.sender_is_bot(message):
