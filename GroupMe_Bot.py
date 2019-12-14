@@ -197,7 +197,7 @@ class GroupMe_Bot():
 				if len(messages) > 100:
 					self.delete_messages(messages)
 				msg = groupme.talking_to_self(messages)
-			if user:
+			if msg:
 				m.reply(msg, group_data['bot_id'])
 
 	def increment_message_num(self, group):
