@@ -178,7 +178,7 @@ class GroupMe_Bot():
 		day,period = Triggers.get_date_period(datetime.now(tz=self.tz))
 		for trigger in active_triggers:
 			if trigger['type'] == 'transactions':
-				trigger['status'] = (day, period)
+				trigger['status'] = [day, period]
 				self.post_trans_list(group_data)
 				self.update_trigger_status(trigger)
 
