@@ -190,14 +190,13 @@ class GroupMe_Bot():
 
 	def check_messages(self, group_data):
 		messages = self.load_messages(group_data['groupme_group_id'])
-		logging.warn("Messages: %s"%json.dumps(messages))
-		messages = messages.sort(key=lambda t: t[1])
-		logging.warn("Messages: %s"%json.dumps(messages))
-		if len(messages) > 100:
-			self.delete_messages(messages)
-		user = groupme.talking_to_self(messages)
-		if user:
-			m.reply(user, group_data['bot_id'])
+		if messages:
+			messages.sort(key=lambda t: t[1])
+			if len(messages) > 100:
+				self.delete_messages(messages)
+			user = groupme.talking_to_self(messages)
+			if user:
+				m.reply(user, group_data['bot_id'])
 
 	def increment_message_num(self, group):
 		query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"
