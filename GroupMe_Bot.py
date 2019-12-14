@@ -3,6 +3,7 @@ import json
 import logging
 import random
 from datetime import datetime
+import pytz
 import db
 import groupme
 import utilities
@@ -161,7 +162,8 @@ class GroupMe_Bot():
 		active_triggers = []
 		triggers = group_data['trigger']
 		logging.warn("triggers: %s"%group_data['trigger'])
-		days, periods = Triggers.get_date_period(datetime.now())
+		tz = pytz.timezone('US/Eastern')
+		days, periods = Triggers.get_date_period(datetime.now(tz=tz))
 		for trigger_type in trigger_types:
 			for t in triggers:
 				if Triggers.check_trigger(t, trigger_type, days, periods):
@@ -250,6 +252,7 @@ class GroupMe_Bot():
 			query = "DELETE FROM messages WHERE id=%s"
 			values = (i for i in index_list[:])
 			db.execute_table_action(query, values)
+			logging.warn("Old messages deleted")
     
 	def update_triggers(self, group, triggers):
 		data = json.dumps(triggers)
