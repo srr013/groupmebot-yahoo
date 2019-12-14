@@ -99,7 +99,10 @@ def check_triggers(groupme_id):
 		groupme_bot.create_trigger(group_data, request.values)
 	triggers = groupme_bot.check_triggers(group_data)
 	if triggers:
-		return triggers,200
+		m = ''
+		for t in triggers:
+			m += json.dumps(t)
+		return m,200
 	return "No trigger found", 404
 
 # @app.route('/messages/<int:groupme_id>')

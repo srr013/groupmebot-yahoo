@@ -69,7 +69,8 @@ class GroupMe_Bot():
 			cursor = db.execute_table_action(query, cur=True)
 			results = cursor.fetchone()
 			if results:
-				message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index, messages, trigger = results
+				message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index, trigger, messages = results
+				logging.warn("loading trigger: %s"%trigger)
 				group_data = {'index': index, 'message_num':message_num, 
                             'message_limit': message_limit,
                             'transaction_num': past_transaction_num,
@@ -156,12 +157,14 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
-		trigger_types = ["Test"]
+		trigger_types = ["Test", "transactions"]
 		active_triggers = []
 		triggers = group_data['trigger']
+		logging.warn("triggers: %s"%group_data['trigger'])
+		days, periods = Triggers.get_date_period(datetime.now())
 		for trigger_type in trigger_types:
 			for t in triggers:
-				if Triggers.check_trigger(t, trigger_type, datetime.now()):
+				if Triggers.check_trigger(t, trigger_type, days, periods):
 					active_triggers.append(t)
 		return active_triggers
 
@@ -172,9 +175,6 @@ class GroupMe_Bot():
 
 
 	def create_trigger(self, group_data, req_dict):
-        # trigger_type = "Test"
-        # days = ["mon"]
-        # periods = ["evening"]
 		periods = []
 		days = []
 		for k, v in req_dict.items():
@@ -186,12 +186,9 @@ class GroupMe_Bot():
 				periods = v
 		triggers = group_data['trigger']
 		new_trigger = Triggers.create_trigger(trigger_type, days, periods)
-		logging.warn(new_trigger)
-		if triggers:
-			triggers.append(new_trigger)
-			self.update_triggers(group_data['index'],json.dumps(triggers))
-		else:
-			self.update_triggers(group_data['index'], json.dumps([new_trigger]))
+		logging.warn("Creating trigger: %s"%(new_trigger))
+		triggers.append(new_trigger)
+		self.update_triggers(group_data['index'],json.dumps(triggers))
 
 	def check_messages(self, group_data):
 		messages = self.load_messages(group_data['groupme_group_id'])
