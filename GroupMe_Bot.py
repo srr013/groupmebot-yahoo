@@ -192,9 +192,10 @@ class GroupMe_Bot():
 		messages = self.load_messages(group_data['groupme_group_id'])
 		if messages:
 			messages.sort(key=lambda t: t[1])
-			if len(messages) > 100:
-				self.delete_messages(messages)
-			user = groupme.talking_to_self(messages)
+			if len(messages) > 5:
+				if len(messages) > 100:
+					self.delete_messages(messages)
+				user = groupme.talking_to_self(messages)
 			if user:
 				m.reply(user, group_data['bot_id'])
 
