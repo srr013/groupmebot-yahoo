@@ -37,16 +37,19 @@ def update_and_post_group_membership(group_data):
     db.execute_table_action(query)
     return string
 
-def talking_to_self(messages):
+def talking_to_self(messages, lim=4):
 	user = []
+	first = ''
 	for message in messages[-5:-1][0]:
 		if isinstance(message, dict):
 			user.append(message['sender_id'])
-	first = user[0]
+		if not first:
+			first = str(message['sender_id'])
 	toggle = True
-	for u in user[1:]:
-		if u != first:
-			toggle = False
-	if toggle:
-		return "Stop talking to yourself"
+	if len(user) > lim:
+		for u in user[1:]:
+			if u != first:
+				toggle = False
+		if toggle:
+			return "Stop talking to yourself"
 	return None
