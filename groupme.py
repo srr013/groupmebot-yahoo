@@ -43,7 +43,7 @@ def talking_to_self(messages, lim=3):
 	user = []
 	first = ''
 	for message in messages[len(messages)-5:len(messages)]:
-		logging.warn("%s, %s"%(message, first))
+		#logging.warn("%s, %s"%(message, first))
 		if isinstance(message[0], dict):
 			user.append(message[0]['sender_id'])
 		if not first:
@@ -52,7 +52,7 @@ def talking_to_self(messages, lim=3):
 	if len(user) >= lim:
 		for u in user:
 			if str(u) != str(first):
-				logging.warn("u %s,f %s"%(u,first))
+				#logging.warn("u %s,f %s"%(u,first))
 				return None
 		return talking[random.randint(0,len(talking)-1)]
 	return None
