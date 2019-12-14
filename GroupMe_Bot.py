@@ -191,7 +191,7 @@ class GroupMe_Bot():
 	def check_messages(self, group_data):
 		messages = self.load_messages(group_data['groupme_group_id'])
 		logging.warn("Messages: %s"%json.dumps(messages))
-		messages = messages.sort(key=lambda t: t[2])
+		messages = messages.sort(key=lambda t: t[1])
 		logging.warn("Messages: %s"%json.dumps(messages))
 		if len(messages) > 100:
 			self.delete_messages(messages)
@@ -217,10 +217,10 @@ class GroupMe_Bot():
 
 	def load_messages(self, groupme_group_id, message=None):
 		if groupme_group_id:
-			select = "SELECT message FROM messages WHERE groupme_group_id = %s;"
+			select = "SELECT message, i FROM messages WHERE groupme_group_id = %s;"
 			select_values = (str(groupme_group_id),)
 			cursor = db.execute_table_action(select, values=select_values, cur=True)
-			messages = cursor.fetchall()[0]
+			messages = cursor.fetchall()
 			if message:
 				messages.append(message)
 			return messages
