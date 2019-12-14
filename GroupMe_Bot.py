@@ -265,7 +265,7 @@ class GroupMe_Bot():
 		if groupme_group_id:
 			select = "SELECT message, i FROM messages WHERE groupme_group_id = %s;"
 			select_values = (str(groupme_group_id),)
-			messages = db.fetchall(select, values=select_values)
+			messages = db.fetch_all(select, values=select_values)
 			if message:
 				messages.append(message)
 			return messages
