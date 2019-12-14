@@ -50,6 +50,7 @@ def talking_to_self(messages, lim=4):
 	if len(user) > lim:
 		for u in user:
 			if str(u) != str(first):
+				logging.warn("u %s,f %s"%(u,first))
 				return None
 		return "Shut up"
 	return None
