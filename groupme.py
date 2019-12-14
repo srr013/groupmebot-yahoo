@@ -39,7 +39,7 @@ def update_and_post_group_membership(group_data):
     db.execute_table_action(query)
     return string
 
-def talking_to_self(messages, lim=4):
+def talking_to_self(messages, lim=3):
 	user = []
 	first = ''
 	for message in messages[len(messages)-5:len(messages)]:
@@ -49,7 +49,7 @@ def talking_to_self(messages, lim=4):
 		if not first:
 			first = str(message[0]['sender_id'])
 	logging.warn(user)
-	if len(user) > lim:
+	if len(user) >= lim:
 		for u in user:
 			if str(u) != str(first):
 				logging.warn("u %s,f %s"%(u,first))
