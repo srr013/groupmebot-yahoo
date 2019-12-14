@@ -196,9 +196,9 @@ class GroupMe_Bot():
 			if len(messages) > 5:
 				if len(messages) > 100:
 					self.delete_messages(messages)
-				user = groupme.talking_to_self(messages)
+				msg = groupme.talking_to_self(messages)
 			if user:
-				m.reply(user, group_data['bot_id'])
+				m.reply(msg, group_data['bot_id'])
 
 	def increment_message_num(self, group):
 		query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"

@@ -51,5 +51,5 @@ def talking_to_self(messages, lim=4):
 		for u in user[1:]:
 			if str(u) != str(first):
 				return None
-		return "Stop talking to yourself"
+		return "Shut up"
 	return None
