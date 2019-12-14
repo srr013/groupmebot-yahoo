@@ -42,7 +42,10 @@ def webhook():
 		if not m.sender_is_bot(message):
 			group_data = initialize_group(message['group_id'], groupme_bot=groupme_bot)
 			groupme_bot.check_messages(group_data)
-			if int(group_data['status']) > 0:
+			active_triggers = groupme_bot.check_triggers(group_data)
+			if active_triggers:
+				groupme_bot.send_trigger_messages(group_data, active_triggers)
+			elif int(group_data['status']) > 0:
 				groupme_bot.increment_message_num(group_data['index'])
 				if group_data['message_num'] >= group_data['message_limit']:
 					logging.warning("message: "+ message['text']+", "+
@@ -96,9 +99,7 @@ def check_triggers(groupme_id):
 		groupme_bot.create_trigger(group_data, request.values)
 	triggers = groupme_bot.check_triggers(group_data)
 	if triggers:
-		for trigger in triggers:
-			if trigger['type'] == 'Test':
-				return trigger,200
+		return triggers,200
 	return "No trigger found", 404
 
 # @app.route('/messages/<int:groupme_id>')

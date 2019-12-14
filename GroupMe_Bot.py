@@ -45,9 +45,6 @@ class GroupMe_Bot():
 		s = 'None'
 		if trans_list:
 			new_trans_num = f.get_transaction_total(league_data)
-			query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
-			logging.warn("Setting new transaction figure %s"%str(new_trans_num))
-			db.execute_table_action(query)
 			s = "Recent transactions: \n"
 			for t in trans_list:
 				s += t
@@ -58,6 +55,9 @@ class GroupMe_Bot():
 				# with open("transaction_list.txt", "w+") as o:
 				# 	for l in trans_list:
 				# 		o.write(str(l))
+			query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
+			logging.warn("Setting new transaction figure %s"%str(new_trans_num))
+			db.execute_table_action(query)
 			return str(s)
 		return "No transactions found"
     
@@ -156,7 +156,6 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
-		group_data['trigger']
 		trigger_types = ["Test"]
 		active_triggers = []
 		triggers = group_data['trigger']
@@ -165,6 +164,12 @@ class GroupMe_Bot():
 				if Triggers.check_trigger(t, trigger_type, datetime.now()):
 					active_triggers.append(t)
 		return active_triggers
+
+	def send_trigger_messages(self, group_data, active_triggers):
+		for trigger in active_triggers:
+			if trigger['type'] == 'transactions':
+				self.post_trans_list(group_data)
+
 
 	def create_trigger(self, group_data, req_dict):
         # trigger_type = "Test"
