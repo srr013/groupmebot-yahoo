@@ -48,7 +48,7 @@ def talking_to_self(messages, lim=4):
 			first = str(message[0]['sender_id'])
 	logging.warn(user)
 	if len(user) > lim:
-		for u in user[1:]:
+		for u in user:
 			if str(u) != str(first):
 				return None
 		return "Shut up"
