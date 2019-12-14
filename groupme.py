@@ -40,11 +40,8 @@ def update_and_post_group_membership(group_data):
 def talking_to_self(messages):
 	user = []
 	for message in messages[-5:-1][0]:
-		js = json.loads(message)
-		if isinstance(js, dict):
+		if isinstance(message, dict):
 			user.append(message['sender_id'])
-		else:
-			return None
 	first = user[0]
 	toggle = True
 	for u in user[1:]:
