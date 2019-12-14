@@ -5,6 +5,7 @@ from helpers.secrets import secrets
 import db
 import utilities
 import fantasy
+import message as m
 import GroupMe_Bot
 from team_map import team_map as t
 
@@ -35,3 +36,16 @@ def update_and_post_group_membership(group_data):
     query = "UPDATE groupme_yahoo SET members="+utilities.dict_to_json(group_data['members'])+"WHERE session=1;"
     db.execute_table_action(query)
     return string
+
+def talking_to_self(messages):
+	user = []
+	for message in messages[-5:-1]:
+		user.append(message['sender_id'])
+	first = user[0]
+	toggle = True
+	for u in user[1:]:
+		if u != first:
+			toggle = False
+	if toggle:
+		return "Stop talking to yourself"
+	return None

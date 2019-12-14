@@ -51,12 +51,13 @@ class GroupMe_Bot():
 			s = "Recent transactions: \n"
 			for t in trans_list:
 				s += t
+			logging.warn("s %s" % (s))
 			if group_data['status']:
 				logging.warn("id %s" %str(group_data['bot_id']))
 				m.reply(s, group_data['bot_id'])
-				with open("transaction_list.txt", "w+") as o:
-					for l in trans_list:
-						o.write(str(l))
+				# with open("transaction_list.txt", "w+") as o:
+				# 	for l in trans_list:
+				# 		o.write(str(l))
 			return str(s)
 		return "No transactions found"
     
@@ -187,6 +188,13 @@ class GroupMe_Bot():
 		else:
 			self.update_triggers(group_data['index'], json.dumps([new_trigger]))
 
+	def check_messages(self, group_data):
+		messages = self.load_messages(group_data['groupme_group_id']).sort(key=lambda t: t[2])
+		if len(messages) > 100:
+			self.delete_messages(messages)
+		user = groupme.talking_to_self(messages)
+		if user:
+			m.reply(user, group_data['bot_id'])
 
 	def increment_message_num(self, group):
 		query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = "+str(group)+";"
@@ -226,6 +234,16 @@ class GroupMe_Bot():
 		else:
 			logging.warn("Attempted save on null message")
 
+	def delete_messages(self, messages, anchor=100):
+		if len(messages) > 100:
+			index_list = []
+			for message in messages:
+				index_list.append(message[3])
+			index_list.sort()
+			val = len(index_list) - anchor
+			query = "DELETE FROM messages WHERE id=%s"
+			values = (i for i in index_list[:])
+			db.execute_table_action(query, values)
     
 	def update_triggers(self, group, triggers):
 		data = json.dumps(triggers)
