@@ -19,19 +19,32 @@ def get_message_loci(msg, user, user_id):
 	#logging.warning("Loci are: " + start +" " +end])
 	return [start, end]
 
+# Send a message in the groupchat
+def reply(msg, bot_id):
+	url = 'https://api.groupme.com/v3/bots/post'
+	data = {
+		'bot_id'		: bot_id,
+		'text'			: msg
+	}
+	request = Request(url, urlencode(data).encode())
+	json = urlopen(request).read().decode()
+	
 def reply_with_mention(msg, user, user_id, bot_id):
-	loci = get_message_loci(msg, user, user_id)
-	d = {'bot_id': bot_id,
-    		'text': msg,
-	    	'attachments': [
-                {"type": "mentions",
-                "loci": [loci],
-                "user_ids": [user_id]}
-            ]
-	    }
-	logging.warn(json.dumps(d))
-	url = "https://api.groupme.com/v3/bots/post"
-	resp = requests.post(url, json=d)
+	if "@" in msg:
+		loci = get_message_loci(msg, user, user_id)
+		d = {'bot_id': bot_id,
+				'text': msg,
+				'attachments': [
+					{"type": "mentions",
+					"loci": [loci],
+					"user_ids": [user_id]}
+				]
+			}
+		logging.warn(json.dumps(d))
+		url = "https://api.groupme.com/v3/bots/post"
+		resp = requests.post(url, json=d)
+	else:
+		reply(msg, bot_id)
 
 def get_message(user):
 	user = "@"+user
@@ -50,15 +63,6 @@ def get_message(user):
 		insult = user + " is "+a+" "+ m
 	return insult
 
-# Send a message in the groupchat
-def reply(msg, bot_id):
-	url = 'https://api.groupme.com/v3/bots/post'
-	data = {
-		'bot_id'		: bot_id,
-		'text'			: msg
-	}
-	request = Request(url, urlencode(data).encode())
-	json = urlopen(request).read().decode()
 
 # Send a message with an image attached in the groupchat
 def reply_with_image(msg, imgURL):
