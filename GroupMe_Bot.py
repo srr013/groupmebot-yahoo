@@ -159,7 +159,6 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
-		self.refresh_triggers(group_data)
 		trigger_types = ["Test", "transactions"]
 		active_triggers = []
 		triggers = group_data['trigger']
