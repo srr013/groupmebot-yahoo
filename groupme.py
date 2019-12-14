@@ -49,7 +49,7 @@ def talking_to_self(messages, lim=4):
 	logging.warn(user)
 	if len(user) > lim:
 		for u in user[1:]:
-			if u != first:
+			if str(u) != str(first):
 				return None
 		return "Stop talking to yourself"
 	return None
