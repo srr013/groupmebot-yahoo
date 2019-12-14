@@ -159,7 +159,7 @@ class GroupMe_Bot():
 	def check_triggers(self, group_data):
 		trigger_types = ["Test", "transactions"]
 		active_triggers = []
-		triggers = group_data['trigger']
+		triggers = []# group_data['trigger']
 		logging.warn("triggers: %s"%group_data['trigger'])
 		days, periods = Triggers.get_date_period(datetime.now())
 		for trigger_type in trigger_types:
@@ -171,6 +171,7 @@ class GroupMe_Bot():
 	def send_trigger_messages(self, group_data, active_triggers):
 		for trigger in active_triggers:
 			if trigger['type'] == 'transactions':
+				trigger['status'] = True
 				self.post_trans_list(group_data)
 
 
