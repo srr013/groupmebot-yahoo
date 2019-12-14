@@ -40,7 +40,8 @@ def update_and_post_group_membership(group_data):
 def talking_to_self(messages, lim=4):
 	user = []
 	first = ''
-	for message in messages[-5:-1][0]:
+	for message in messages[len(messages)-4:len(messages)][0]:
+		logging.warn(message)
 		if isinstance(message, dict):
 			user.append(message['sender_id'])
 		if not first:
