@@ -46,11 +46,10 @@ def talking_to_self(messages, lim=4):
 			user.append(message['sender_id'])
 		if not first:
 			first = str(message['sender_id'])
-	toggle = True
+	logging.warn(user)
 	if len(user) > lim:
 		for u in user[1:]:
 			if u != first:
-				toggle = False
-		if toggle:
-			return "Stop talking to yourself"
+				return None
+		return "Stop talking to yourself"
 	return None
