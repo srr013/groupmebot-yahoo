@@ -20,6 +20,7 @@ class GroupMe_Bot():
 		self.low = 4
 		self.monitoring_status = False
 		self.messaging_status = True
+		self.tz = pytz.timezone('US/Eastern')
 		self._login()
 
 	def _login(self):
@@ -158,24 +159,24 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
+		self.refresh_triggers(group_data)
 		trigger_types = ["Test", "transactions"]
 		active_triggers = []
 		triggers = group_data['trigger']
 		logging.warn("triggers: %s"%group_data['trigger'])
-		tz = pytz.timezone('US/Eastern')
-		days, periods = Triggers.get_date_period(datetime.now(tz=tz))
+		day, period = Triggers.get_date_period(datetime.now(tz=self.tz))
 		for trigger_type in trigger_types:
 			for t in triggers:
-				if Triggers.check_trigger(t, trigger_type, days, periods):
+				if Triggers.check_trigger(t, trigger_type, day, period):
 					active_triggers.append(t)
 		return active_triggers
 
 	def send_trigger_messages(self, group_data, active_triggers):
+		day,period = (Triggers.get_date_period(datetime.now(tz=self.tz)))
 		for trigger in active_triggers:
 			if trigger['type'] == 'transactions':
-				trigger['status'] = True
+				trigger['status'] = last_fired
 				self.post_trans_list(group_data)
-
 
 	def create_trigger(self, group_data, req_dict):
 		periods = []

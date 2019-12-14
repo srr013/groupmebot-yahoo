@@ -29,16 +29,15 @@ def get_date_period(date_time):
 	logging.warn("Current date, day, period: %s, %s, %s"%(dt, dt[0].lower(), p))
 	return (dt[0].lower(), p)
 
-def check_trigger(trigger, trigger_type, days, periods):
-	if trigger['type'] == trigger_type and days and periods:
-		for day in days:
+def check_trigger(trigger, trigger_type, day, period):
+	if trigger['status'][0] != day and trigger['status'][1] != period:
+		if trigger['type'] == trigger_type:
 			if day in trigger['days']:
-				for p in periods:
-					if p in trigger['periods']:
-						return True
+				if period in trigger['periods']:
+					return True
 	return False
 
 def create_trigger(trigger_type, days, periods):
 	# logging.warn("%s, %s, %s"%(days, periods, trigger_type))
 
-	return {"type": trigger_type, "days": days, "periods": periods, "status": False}
+	return {"type": trigger_type, "days": days, "periods": periods, "status": "(None, None)"}
