@@ -2,3 +2,4 @@ Flask==1.1.1
 gunicorn==19.6.0
 yahoo_oauth==0.1.9
 psycopg2-binary==2.8.4
+pytz

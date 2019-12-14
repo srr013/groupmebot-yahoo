@@ -27,8 +27,9 @@ class GroupMe_Bot():
 		if not self.oauth.token_is_valid():
 			self.oauth.refresh_access_token()
 		query = """SELECT * FROM application_data"""
-		cursor = db.execute_table_action(query, cur=True)
-		self.monitoring_status, self.messaging_status = cursor.fetchone()
+		vals = db.fetch_one(query)
+		logging.warn("logging in. Vals: %s"%(json.dumps(vals)))
+		self.monitoring_status, self.messaging_status = vals[0]
     
 	def create_group(self, group_id, bot_id):
 		#does not set the bot_id for the group - manuually set this in order to post messages
@@ -68,8 +69,7 @@ class GroupMe_Bot():
 		logging.debug("Fetching league data from DB")
 		if group_id:
 			query = "SELECT * FROM groupme_yahoo WHERE groupme_group_id = "+str(group_id)
-			cursor = db.execute_table_action(query, cur=True)
-			results = cursor.fetchone()
+			results = db.fetch_one(query)
 			if results:
 				message_num,message_limit, past_transaction_num, league_data, status, messaging_status, prd_bot_id, members,groupme_group_id, index, trigger, messages = results
 				logging.warn("loading trigger: %s"%trigger)
@@ -116,8 +116,7 @@ class GroupMe_Bot():
 		"Global messaging status: "+ "On" if self.messaging_status else "Off"]
 		if self.monitoring_status:
 			query = "SELECT * FROM groupme_yahoo"
-			cursor = db.execute_table_action(query, cur=True)
-			groups = cursor.fetchall()
+			groups = db.fetch_all(query)
 			status = "" #need to configure a global status toggle
 			for group in groups:
 				g = self.get_group_data(group[8],'')
@@ -159,7 +158,7 @@ class GroupMe_Bot():
     #     t0_name = team_0['team'][0][0].get(['team_name'])
     #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
-		trigger_types = ["Test", "transactions"]
+		trigger_types = ["test", "transactions"]
 		active_triggers = []
 		triggers = group_data['trigger']
 		logging.warn("triggers: %s"%group_data['trigger'])
@@ -225,8 +224,7 @@ class GroupMe_Bot():
 		if groupme_group_id:
 			select = "SELECT message, i FROM messages WHERE groupme_group_id = %s;"
 			select_values = (str(groupme_group_id),)
-			cursor = db.execute_table_action(select, values=select_values, cur=True)
-			messages = cursor.fetchall()
+			messages = db.fetchall(select, values=select_values)
 			if message:
 				messages.append(message)
 			return messages

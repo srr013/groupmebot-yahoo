@@ -14,18 +14,39 @@ def initialize_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
-def execute_table_action(query, values = (), cur=False):
+def execute_table_action(query, values = ()):
     conn = initialize_connection()
     cursor = conn.cursor()
     if not values:
         cursor.execute(query)
     else:
         cursor.execute(query, values)
-    if cur:
-        return cursor
     conn.commit()
     conn.close()
 
+def fetch_all(query, values = ()):
+	conn = initialize_connection()
+	cursor = conn.cursor()
+	if not values:
+		cursor.execute(query)
+	else:
+		cursor.execute(query, values)
+	l = cursor.fetchall()
+	conn.commit()
+	conn.close()
+	return l
+
+def fetch_one(query, values = ()):
+	conn = initialize_connection()
+	cursor = conn.cursor()
+	if not values:
+		cursor.execute(query)
+	else:
+		cursor.execute(query, values)
+	l = cursor.fetchone()
+	conn.commit()
+	conn.close()
+	return l
 
 table_model = """
 groupme_group_id INTEGER, 

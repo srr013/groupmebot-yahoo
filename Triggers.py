@@ -39,5 +39,12 @@ def check_trigger(trigger, trigger_type, day, period):
 
 def create_trigger(trigger_type, days, periods):
 	# logging.warn("%s, %s, %s"%(days, periods, trigger_type))
-
+	i = 0
+	for d in days:
+		days[i] = d[0:3].lower()
+		i += 1
+	j = 0
+	for p in periods:
+		periods[j] = p.lower()
+	trigger_type = trigger_type.lower()
 	return {"type": trigger_type, "days": days, "periods": periods, "status": "(None, None)"}
