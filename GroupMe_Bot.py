@@ -159,7 +159,7 @@ class GroupMe_Bot():
 	def check_triggers(self, group_data):
 		trigger_types = ["Test", "transactions"]
 		active_triggers = []
-		triggers = []# group_data['trigger']
+		triggers = group_data['trigger']
 		logging.warn("triggers: %s"%group_data['trigger'])
 		days, periods = Triggers.get_date_period(datetime.now())
 		for trigger_type in trigger_types:
