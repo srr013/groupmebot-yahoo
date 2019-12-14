@@ -220,7 +220,7 @@ class GroupMe_Bot():
 			select = "SELECT message FROM messages WHERE groupme_group_id = %s;"
 			select_values = (str(groupme_group_id),)
 			cursor = db.execute_table_action(select, values=select_values, cur=True)
-			messages = cursor.fetchall()
+			messages = cursor.fetchall()[0]
 			if message:
 				messages.append(message)
 			return messages
