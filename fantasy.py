@@ -30,7 +30,7 @@ def get_league_data(oauth):
     return data
 
 def parse_league_data(group_data, data):
-	
+	pass	
 
 def append_league_data(group_data, oauth):
 	data = get_league_data(oauth)
