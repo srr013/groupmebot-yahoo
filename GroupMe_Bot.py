@@ -265,7 +265,7 @@ class GroupMe_Bot():
 			index_list.sort()
 			val = len(index_list) - anchor
 			query = "DELETE FROM messages WHERE id IN %s"
-			values = (i for i in index_list[0:val])
+			values = tuple(index_list[0:val])
 			db.execute_table_action(query, values)
 			logging.warn("Old messages deleted")
     
