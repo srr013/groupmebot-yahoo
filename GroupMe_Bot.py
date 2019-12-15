@@ -257,15 +257,15 @@ class GroupMe_Bot():
 			logging.warn("Attempted save on null message")
 
 	def delete_messages(self, messages, anchor=100):
-		if len(messages) > 100:
+		if len(messages) > anchor:
 			index_list = []
 			logging.warn(messages[0])
 			for message in messages:
 				index_list.append(message[1])
 			index_list.sort()
 			val = len(index_list) - anchor
-			query = "DELETE FROM messages WHERE id=%s"
-			values = (i for i in index_list[:])
+			query = "DELETE FROM messages WHERE id IN %s"
+			values = (i for i in index_list[0:val])
 			db.execute_table_action(query, values)
 			logging.warn("Old messages deleted")
     
