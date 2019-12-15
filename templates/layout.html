@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+		<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
         <title>{% block title %}InsultBot{% endblock %}</title>
     </head>
     <body>
     {% block body %}
-        <h1>GroupMe Bot with Yahoo Integration</h1>
     {% endblock %}
     </body>
 </html>

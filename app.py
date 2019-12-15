@@ -93,6 +93,27 @@ def transactions(groupme_id):
 	else:
 		return (display_status(groupme_bot=groupme_bot), 200)
 
+@app.route('/group/<int:groupme_id>')
+def display_group(groupme_id):
+	groupme_bot = GroupMe_Bot.GroupMe_Bot()
+	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+	if group_data:
+		top = {'Bot Status':group_data['status'], 
+		'Messaging Status': group_data['messaging_status']}
+		t1 = {'GroupMe Group ID': group_data['groupme_group_id'], 
+		'Current Message Count': group_data['message_num'], 
+		'Current Message Cap': group_data['message_limit'],
+		'Bot ID (do not share)': group_data['bot_id']}
+		member_list = []
+		for k, v in group_data['members'].items():
+			member_list.append({'Name': v['name'], 
+			'GroupMe ID': v['user_id'], 'GroupMe Nickname': v['nickname']})
+		return render_template("group.html", top = top, group_table = t1, 
+		member_list=member_list,triggers=group_data['triggers'], group_data=group_data)
+	else:
+		return ("No group found", 404)
+
+
 @app.route('/checkTriggers/<int:groupme_id>')
 def check_triggers(groupme_id):
 	groupme_bot = GroupMe_Bot.GroupMe_Bot()

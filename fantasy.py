@@ -13,12 +13,11 @@ def build_url(req):
     league_key = sport + '.l.' + league_id
     return str(base_url + league_key + request)
 
-
 def get_league_data(oauth):
     league = 12
     weeks = 10
     data = {}
-    url_list = ['teams', 'transactions;types=add']
+    url_list = ['teams', 'transactions;types=add','scoreboard']
     # 'standings','scoreboard',
     # ;week='+str(week),,'players',
     # '.t.'+str(team)+'/roster;week='+str(week) ]
@@ -27,12 +26,15 @@ def get_league_data(oauth):
         response = oauth.session.get(build_url(url), params={'format': 'json'})
         url = url.split(';')
         data[url[0]] = json.loads(response.text)
+	
     return data
 
+def parse_league_data(group_data, data):
+	
 
-# oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-# data = get_league_data(oauth)
-# print(data)
+def append_league_data(group_data, oauth):
+	data = get_league_data(oauth)
+	group_data['league'] = parse_league_data(group_data, data)
 
 def get_team_data(teams):
     team_data = {}
@@ -136,3 +138,11 @@ def get_transaction_list(data, past_trans_total):
         if string:
                 trans_list.append(string)
     return trans_list
+
+    # def get_matchup_score(self, data, matchup):
+	# 	matchup = {}
+    #     team_0 = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
+    #     team_1 = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][1]
+	# 	#t0_id = team_0['team'][0][0].get(['team_key'])
+    #     t0_name = team_0['team'][0][0].get(['team_name'])
+    #     t0_current_score = team_0['team'][1]['team_points']['total']

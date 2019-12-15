@@ -40,8 +40,11 @@ class GroupMe_Bot():
 		values = (str(group_id),0,1,0,1,1,str(bot_id),utilities.dict_to_json(members))
 		db.execute_table_action(query, values)
 
+	def post_group(self, group_data):
+		group_data = f.append_league_data(group_data, self.oauth)
+
 	def post_trans_list(self, group_data):
-		league_data = self.get_league_data()
+		league_data = f.get_league_data(self.oauth)
 		trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
 		s = 'None'
 		if trans_list:
@@ -132,36 +135,7 @@ class GroupMe_Bot():
                 #     new_display += str(k) + ": "
                 #     new_display += str(v)
 		return display
-	
-	def get_league_data(self):
-        #TODO: pass in league through here
-		league = 12
-		weeks = 10
-		data = {}
-		url_list = ['teams','transactions;types=add']
-                #'standings','scoreboard',
-                # ;week='+str(week),'teams','players',
-                #'.t.'+str(team)+'/roster;week='+str(week) ]
 
-		for url in url_list:
-			response = self.oauth.session.get(self.build_url(url), params={'format': 'json'})
-			url = url.split(';')
-			data[url[0]] = json.loads(response.text)
-            #there's paging involved to get additional pages of data - players
-            #data[url]['fantasy_content']['league'][0] - settings for that league
-            #data[url]['fantasy_content']['league'][1][url] - url-related data fo
-
-
-        #'https://fantasysports.yahooapis.com/fantasy/v2/league/nfl.l.186306/season?format=json'
-        #self.save_league_data(group_data['index'], data)
-		return data
-
-    # def get_matchup_score(self, matchup):
-    #     team_0 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
-    #     team_1 = self.data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][1]
-    #     t0_id = team_0['team'][0][0].get(['team_key'])
-    #     t0_name = team_0['team'][0][0].get(['team_name'])
-    #     t0_current_score = team_0['team'][1]['team_points']['total']
 	def check_triggers(self, group_data):
 		trigger_types = ["test", "transactions"]
 		active_triggers = []
@@ -242,6 +216,7 @@ class GroupMe_Bot():
 		values = (str(lim), str(group))
 		db.execute_table_action(query, values)
 
+	#refresh
 	def save_league_data(self, group, data):
 		data = json.dumps(data)
 		data.strip("'")
@@ -284,6 +259,7 @@ class GroupMe_Bot():
 	def delete_messages(self, messages, anchor=100):
 		if len(messages) > 100:
 			index_list = []
+			logging.warn(messages[0])
 			for message in messages:
 				index_list.append(message[3])
 			index_list.sort()

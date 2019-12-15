@@ -1,0 +1,56 @@
+{# templates/group.html #}
+
+{% extends "layout.html" %}
+{% block title %}Group Data{% endblock %}
+{% block body %}
+	{{ super() }}
+	<h1>{{group_data['groupme_group_id']}}</h1>
+	{% for k, v in top.items() %}
+    <h3>{{k}}: {{v}}</h3>
+    {% endfor %}
+    <table>
+		<caption><h2>Group Data</h2></caption>
+        <tr>
+			{% for k in group_table.keys() %}
+			<th>{{k}}</th>
+			{% endfor %}
+        </tr>
+        <tr>
+            {% for v in group_table.values() %}
+            <td>{{v}}</td>
+            {% endfor %}
+        </tr>
+	</table>
+	<table>
+		<caption><h2>Member Data</h2></caption>
+        <tr>
+			{% for k in member_list[0].keys() %}
+			<th>{{k}}</th>
+			{% endfor %}
+        </tr>
+        
+		{% for m in member_list %}
+		<tr>
+		{% for v in m.values() %}
+			<td>{{v}}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+	<table>
+		<caption><h2>Event Data</h2></caption>
+        <tr>
+			{% for k in triggers[0].keys() %}
+			<th>{{k}}</th>
+			{% endfor %}
+        </tr>
+        
+		{% for t in triggers%}
+		<tr>
+		{% for v in t.values() %}
+			<td>{{v}}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+    </table>
+{% endblock %}
