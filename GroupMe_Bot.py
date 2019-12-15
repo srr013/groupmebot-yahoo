@@ -261,7 +261,7 @@ class GroupMe_Bot():
 			index_list = []
 			logging.warn(messages[0])
 			for message in messages:
-				index_list.append(message[3])
+				index_list.append(message[1])
 			index_list.sort()
 			val = len(index_list) - anchor
 			query = "DELETE FROM messages WHERE id=%s"
