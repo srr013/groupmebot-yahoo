@@ -73,23 +73,7 @@ def get_team_data(teams):
                 'num_trades': num_trades, 'team_key': team_key}
     logging.warn("Team Data output: %s" % utilities.dict_to_json(team_data))
     return team_data
-
-
-"""
-{'team': 
-[
-    [{'team_key': '390.l.186306.t.12'}, {'team_id': '12'}, {'name': 'FFB Fournography'}, [], 
-    {'url': 'https://football.fantasysports.yahoo.com/f1/186306/12'}, 
-    {'team_logos': [{'team_logo': {'size': 'large', 'url': 'https://s.yimg.com/cv/apiv2/default/nfl/nfl_12.png'}}]}, 
-    [], 
-    {'waiver_priority': 6}, [], {'number_of_moves': '36'}, {'number_of_trades': '1'}, 
-    {'roster_adds': {'coverage_type': 'week', 'coverage_value': 13,'value': '3'}}, 
-    {'clinched_playoffs': 1}, {'league_scoring_type': 'head'}, [], [], 
-    {'has_draft_grade': 1, 'draft_grade': 'B+', 'draft_recap_url': 'https://football.fantasysports.yahoo.com/f1/186306/12/draftrecap'}, 
-    [], [], {'managers': [{'manager': {'manager_id': '12', 'nickname': 'Steve', 'guid': 'NX5WSOP6KRPWEGJ44JJJ3KLYBI', 
-    'image_url': 'https://s.yimg.com/ag/images/default_user_profile_pic_64sq.jpg'}}]}]]}
-"""
-
+	
 
 def get_transaction_total(data):
     return data['transactions']['fantasy_content']['league'][1]['transactions']["0"]['transaction'][0]['transaction_id']

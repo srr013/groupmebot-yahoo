@@ -11,31 +11,38 @@
     <table>
 		<caption><h2>Group Data</h2></caption>
         <tr>
+			<div class='center'>
 			{% for k in group_table.keys() %}
 			<th>{{k}}</th>
 			{% endfor %}
+			</div>
         </tr>
-        <tr>
+        <tr align="center">
+			<div class='center'>
             {% for v in group_table.values() %}
             <td>{{v}}</td>
-            {% endfor %}
+			{% endfor %}
+			</div>
         </tr>
 	</table>
-	<table>
+	<table style="center">
 		<caption><h2>Member Data</h2></caption>
-        <tr>
+		<tr align="center">
+			<div class='center'>
 			{% for k in member_list[0].keys() %}
 			<th>{{k}}</th>
 			{% endfor %}
+		</div>
         </tr>
-        
+		<div class='center'>
 		{% for m in member_list %}
-		<tr>
+		<tr align="center">
 		{% for v in m.values() %}
 			<td>{{v}}</td>
 			{% endfor %}
 		</tr>
 		{% endfor %}
+	</div>
 	</table>
 	<table>
 		<caption><h2>Event Data</h2></caption>
