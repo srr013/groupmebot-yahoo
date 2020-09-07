@@ -278,7 +278,7 @@ def delete_messages(messages, msg_limit=100):
 		for message in messages:
 			index_list.append(message[1])
 		index_list.sort()
-		val = len(index_list) - anchor
+		val = len(index_list) - msg_limit
 		query = "DELETE FROM messages WHERE i IN %s"
 		values = tuple(index_list[0:val])
 		logging.warn("values: %s" % (values,))
