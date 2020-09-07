@@ -1,6 +1,7 @@
 from yahoo_oauth import OAuth2
 import json
 import logging
+import os
 import random
 from datetime import datetime
 import pytz
@@ -11,19 +12,31 @@ import fantasy as f
 import message as m
 import Triggers
 
-#"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
-
 class GroupMe_Bot():
-	def __init__(self):
-		self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
+	def __init__(self, app):
 		self.high = 16
 		self.low = 4
 		self.monitoring_status = False
 		self.messaging_status = True
 		self.tz = pytz.timezone('US/Eastern')
+		self.app = app
+		# self.auth = {
+		# 	"access_token": os.environ["ACCESS_TOKEN"],
+		# 	"consumer_key": os.environ["CONSUMER_KEY"],
+		# 	"consumer_secret": os.environ["CONSUMER_SECRET"],
+		# 	"guid": "DBB4EWZHLD3WLDR6XYRQ6ZPQKQ",
+		# 	"refresh_token": os.environ["REFRESH_TOKEN"],
+		# 	"token_time": 1576623325.5492997,
+		# 	"token_type": "bearer"
+		# }
+		from boto.s3.connection import S3Connection
+		s3 = S3Connection(app.config.from_envvar('CONSUMER_KEY'),
+		 app.config.from_envvar('CONSUMER_SECRET'))
+		self.oauth = OAuth2(app.config.from_envvar('CONSUMER_KEY'), app.config.from_envvar('CONSUMER_SECRET'))
 		self._login()
 
 	def _login(self):
+
 		if not self.oauth.token_is_valid():
 			self.oauth.refresh_access_token()
 		query = """SELECT * FROM application_data"""
@@ -259,15 +272,13 @@ class GroupMe_Bot():
 	def delete_messages(self, messages, anchor=100):
 		if len(messages) > anchor:
 			index_list = []
-			logging.warn(messages[0])
 			for message in messages:
 				index_list.append(message[1])
 			index_list.sort()
 			val = len(index_list) - anchor
 			query = "DELETE FROM messages WHERE i IN %s"
 			values = tuple(index_list[0:val])
-			logging.warn("values: %s" % (values,))
 			db.execute_table_action(query, (values,))
-			logging.warn("Old messages deleted")
+			logging.warn("Old messages deleted: %s"% (values,))
     
 

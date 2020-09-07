@@ -2,6 +2,40 @@ import os
 import psycopg2
 import logging
 
+"""
+table name: groupme_yahoo
+      column_name      |     data_type
+-----------------------+-------------------
+ message_num           | integer
+ message_limit         | integer
+ num_past_transactions | integer
+ league_data           | json
+ status                | integer
+ messaging_status      | integer
+ bot_id                | character varying
+ members               | json
+ groupme_group_id      | integer
+ index                 | integer
+ messages              | character varying
+
+application_data
+    column_name    | data_type
+-------------------+-----------
+ monitoring_status | boolean
+ messaging_status  | boolean
+
+triggers TODO: rename
+        column_name         |        data_type
+----------------------------+--------------------------
+ i                          | integer
+ type                       | character varying
+ days                       | ARRAY
+ periods                    | ARRAY
+ status                     | ARRAY
+ group_id                   | integer
+
+"""
+
 def initialize_connection():
     if os.environ.get('DATABASE_URL'):
         DATABASE_URL = os.environ['DATABASE_URL']
@@ -46,20 +80,7 @@ def fetch_one(query, values = ()):
 	conn.close()
 	return l
 
-table_model = """
-groupme_group_id INTEGER, 
-message_num INTEGER, 
-message_limit INTEGER,
-num_past_transactions INTEGER,
-status BOOLEAN,
-messaging_status BOOLEAN,
-bot_id VARCHAR(200),
-members VARCHAR(MAX),
-index SERIAL PRIMARY KEY, 
-anchor_datetime TIMESTAMP,
-trigger BOOLEAN
 
-"""
 
 triggers =  """CREATE TABLE triggers(i SERIAL PRIMARY KEY, type VARCHAR(50),
 days VARCHAR[], periods VARCHAR[], 

@@ -1,2 +1,0 @@
-Heroku will push an app from GitHub and run a command from the PROCFILE.windows(locally)
-and PROCFILE from the cloud. This command starts the app - it's akin to flask start.

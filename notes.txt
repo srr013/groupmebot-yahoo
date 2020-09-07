@@ -1,6 +1,0 @@
-    Web-interface to control the bot?
-        + login and user database to website...
-
-
-There's no link in the database yet to the fantasy league
-No way to manage multiple Yahoo leagues currently
