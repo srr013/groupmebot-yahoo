@@ -65,6 +65,7 @@ def webhook():
 				insult_last_sender(group_data, message)
 				#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
 			else:
+				logging.info("Evaluating else criteria")
 				talking_to_bot, msg = GroupMe_Bot.talking_to_bot(message, group_data)
 				if talking_to_bot:
 					m.reply(msg, group_data['bot_id'])
