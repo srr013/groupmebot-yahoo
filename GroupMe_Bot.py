@@ -52,28 +52,25 @@ def post_group(group_data):
 	oauth = yahoo_login()
 	group_data = f.append_league_data(group_data, oauth)
 
-def post_trans_list(group_data):
+def get_transaction_msg(group_data):
 	oauth = yahoo_login()
 	league_data = f.get_league_data(oauth)
+	teams = f.get_fantasy_teams(league_data)
 	trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
-	s = 'Recent transactions: None'
+	s = ''
+	new_trans_num = 0
 	if trans_list:
 		new_trans_num = f.get_transaction_total(league_data)
 		s = "Recent transactions: \n"
 		for t in trans_list:
-			s += t
-		logging.warn("s %s" % (s))
-		if group_data['status']:
-			logging.warn("id %s" %str(group_data['bot_id']))
-			m.reply(s, group_data['bot_id'])
-			# with open("transaction_list.txt", "w+") as o:
-			# 	for l in trans_list:
-			# 		o.write(str(l))
-		query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
-		logging.warn("Setting new transaction figure %s"%str(new_trans_num))
-		db.execute_table_action(query)
-		return str(s)
-	return "No transactions found"
+			team_id = t['team_key'].split('.')[-1]
+			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']
+	return str(s), new_trans_num
+
+def set_new_transaction_total(new_trans_num, group_data):
+	query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
+	logging.warn("Setting new transaction figure %s"%str(new_trans_num))
+	db.execute_table_action(query)
 
 def get_group_data(group_id):
 	#groups: TEST:32836424, PRD:55536872
@@ -148,74 +145,7 @@ def get_display_status():
 			#     new_display += str(v)
 	return display
 
-def check_triggers(group_data):
-	trigger_types = ["test", "transactions"]
-	active_triggers = []
-	triggers = group_data['triggers']
-	logging.warn("triggers: %s"%group_data['triggers'])
-	day, period = Triggers.get_date_period(datetime.now(tz=tz))
-	for trigger_type in trigger_types:
-		for t in triggers:
-			if Triggers.check_trigger(t, trigger_type, day, period):
-				active_triggers.append(t)
-	return active_triggers
 
-def send_trigger_messages(group_data, active_triggers):
-	day,period = Triggers.get_date_period(datetime.now(tz=tz))
-	for trigger in active_triggers:
-		if trigger['type'] == 'transactions':
-			trigger['status'] = [day, period]
-			post_trans_list(group_data)
-			update_trigger_status(trigger)
-
-def create_trigger(group_data, req_dict):
-	periods = []
-	days = []
-	for k, v in req_dict.items():
-		#logging.warn(v, type(v))
-		if k.lower() == 'type':
-			trigger_type = v
-		elif k.lower() == 'days':
-			days = utilities.string_to_list(v)
-		elif k.lower() == 'periods':
-			periods = utilities.string_to_list(v)
-	new_trigger = Triggers.create_trigger(trigger_type, days, periods)
-	logging.warn("Creating trigger: %s"%(new_trigger))
-	add_trigger(group_data['index'], new_trigger)
-
-def add_trigger(group, trigger):
-	query = """INSERT INTO triggers (type,days,periods,status,group_id) 
-	VALUES (%s, %s, %s, %s, %s);"""
-	values = (trigger['type'],trigger['days'], trigger['periods'],
-	trigger['status'], str(group))
-	db.execute_table_action(query, values)
-
-def delete_trigger(index):
-	query = """DELETE FROM triggers WHERE index=%s"""
-	values = (index,)
-	db.execute_table_action(query, values)
-
-def load_triggers(group_id):
-	query = """SELECT * FROM triggers WHERE group_id=%s"""
-	values = (group_id,)
-	l = db.fetch_all(query, values)
-	triggers = []
-	for trigger in l:
-		d = {
-			'index':trigger[0],
-			'type':trigger[1],
-			'days':trigger[2],
-			'periods': trigger[3],
-			'status':trigger[4],
-			'group_id':trigger[5]
-		}
-		triggers.append(d)
-	return triggers
-
-def update_trigger_status(trigger):
-	query = """UPDATE triggers SET status=%s WHERE i=%s""" 
-	values = (trigger['status'], trigger['index'])
-	db.execute_table_action(query, values)
 
 def increment_message_num(group):
 	query = "UPDATE groupme_yahoo SET message_num = message_num + 1 WHERE index = %s;"
@@ -308,3 +238,73 @@ def delete_messages(messages, msg_limit=100):
 		db.execute_table_action(query, (values,))
 		#logging.warn("Old messages deleted")
 
+
+
+def check_triggers(group_data):
+	trigger_types = ["test", "transactions"]
+	active_triggers = []
+	triggers = group_data['triggers']
+	logging.warn("triggers: %s"%group_data['triggers'])
+	day, period = Triggers.get_date_period(datetime.now(tz=tz))
+	for trigger_type in trigger_types:
+		for t in triggers:
+			if Triggers.check_trigger(t, trigger_type, day, period):
+				active_triggers.append(t)
+	return active_triggers
+
+def send_trigger_messages(group_data, active_triggers):
+	day,period = Triggers.get_date_period(datetime.now(tz=tz))
+	for trigger in active_triggers:
+		if trigger['type'] == 'transactions':
+			trigger['status'] = [day, period]
+			post_trans_list(group_data)
+			update_trigger_status(trigger)
+
+def create_trigger(group_data, req_dict):
+	periods = []
+	days = []
+	for k, v in req_dict.items():
+		#logging.warn(v, type(v))
+		if k.lower() == 'type':
+			trigger_type = v
+		elif k.lower() == 'days':
+			days = utilities.string_to_list(v)
+		elif k.lower() == 'periods':
+			periods = utilities.string_to_list(v)
+	new_trigger = Triggers.create_trigger(trigger_type, days, periods)
+	logging.warn("Creating trigger: %s"%(new_trigger))
+	add_trigger(group_data['index'], new_trigger)
+
+def add_trigger(group, trigger):
+	query = """INSERT INTO triggers (type,days,periods,status,group_id) 
+	VALUES (%s, %s, %s, %s, %s);"""
+	values = (trigger['type'],trigger['days'], trigger['periods'],
+	trigger['status'], str(group))
+	db.execute_table_action(query, values)
+
+def delete_trigger(index):
+	query = """DELETE FROM triggers WHERE index=%s"""
+	values = (index,)
+	db.execute_table_action(query, values)
+
+def load_triggers(group_id):
+	query = """SELECT * FROM triggers WHERE group_id=%s"""
+	values = (group_id,)
+	l = db.fetch_all(query, values)
+	triggers = []
+	for trigger in l:
+		d = {
+			'index':trigger[0],
+			'type':trigger[1],
+			'days':trigger[2],
+			'periods': trigger[3],
+			'status':trigger[4],
+			'group_id':trigger[5]
+		}
+		triggers.append(d)
+	return triggers
+
+def update_trigger_status(trigger):
+	query = """UPDATE triggers SET status=%s WHERE i=%s""" 
+	values = (trigger['status'], trigger['index'])
+	db.execute_table_action(query, values)

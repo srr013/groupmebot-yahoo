@@ -49,10 +49,14 @@ def webhook():
 	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
 		# logging.warn(message)
+		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
+		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg
+		if transaction_msg and new_trans_total:
+			m.reply(transaction_msg, group_data['bot_id'])
+			GroupMe_Bot.set_new_transaction_total(new_trans_total, group_data)
 		if not m.sender_is_bot(message):
 			logging.info("Processing user message")
-			group_data = GroupMe_Bot.get_group_data(message['group_id'])
 			logging.info(group_data)
 			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
 			if talking_to_self:
@@ -66,7 +70,7 @@ def webhook():
 				if int(group_data['status']) > 0:
 					GroupMe_Bot.increment_message_num(group_data['index'])
 					if group_data['message_num'] >= group_data['message_limit']:
-						GroupMe_Bot.random_insult(group_data, message)
+						GroupMe_Bot.random_insult(message, group_data)
 					else:
 						talking_to_bot, msg = GroupMe_Bot.talking_to_bot(message, group_data)
 						if talking_to_bot:
@@ -96,7 +100,10 @@ def transactions(groupme_id):
 	# group_data = initialize_group(groupme_id)
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data['status'] > 0:
-		return (GroupMe_Bot.post_trans_list(group_data), 200)
+		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg
+		if transaction_msg and new_trans_total:
+			m.reply(transaction_msg, group_data['bot_id'])
+			GroupMe_Bot.set_new_transaction_total(new_trans_total, group_data)
 	else:
 		return (display_status(), 200)
 

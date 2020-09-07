@@ -487,6 +487,6 @@ mentions = [
 	"Watch your mouth, twat",
 	"Meep Moop. Insult Bot is becoming self aware",
 	"Do you have any skills at all?",
-	"Well, yes and no.",
+	"Well yes and no.",
 	"Maybe"
 ]
