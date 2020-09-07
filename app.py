@@ -60,59 +60,15 @@ def webhook():
 			return "ok", 200
 	return "not found", 404
 
-
-def display_status():
-	# if not groupme_bot:
-	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	data = GroupMe_Bot.get_display_status()
-	key =  os.environ.get('CONSUMER_KEY')
-	if not key:
-		key = app.config.from_envvar('CONSUMER_KEY')
-	secret = os.environ.get('CONSUMER_SECRET')
-	if not secret:
-		secret = app.config.from_envvar('CONSUMER_SECRET')
-	#logging.warn(config)
-	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
-
-def insult_last_sender(group_data, message):
-	if group_data['message_num'] >= group_data['message_limit']:
-		logging.warning("message: "+ message['text']+", "+
-			str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
-			"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
-		GroupMe_Bot.reset_message_data(group_data['index'])
-		m.reply_with_mention(m.get_message(message['name']),
-		message['name'], message['sender_id'], group_data['bot_id'])
-
-# @app.route('/create_group/<int:groupme_id>')
-# def create_group(groupme_id):
-# 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-# 	# group_data = initialize_group(groupme_id)
-# 	return display_status()
-
-@app.route('/toggle/<int:groupme_id>')
-def toggle_status(groupme_id):
-	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = GroupMe_Bot.get_group_data(groupme_id)
-
-  
-def display_status(groupme_bot=None):
-	if not groupme_bot:
-		groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	data = groupme_bot.display_status()
-	key = app.config.from_envvar('CONSUMER_KEY')
-	secret = app.config.from_envvar('CONSUMER_SECRET')
-	logging.warn(config)
-	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
-
 @app.route('/create_group/<int:groupme_id>')
 def create_group(groupme_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
-	return display_status(groupme_bot=groupme_bot)
+	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
+	return display_status()
 
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
-  group_data = GroupMe_Bot.get_group_data(groupme_id)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	s = 0
 	if not group_data['status']:
 		s = 1
@@ -134,7 +90,7 @@ def transactions(groupme_id):
 def display_group(groupme_id):
 
 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data:
 		top = {'Bot Status':group_data['status'], 
 		'Messaging Status': group_data['messaging_status']}
@@ -181,3 +137,26 @@ def check_triggers(groupme_id):
 # @app.errorhandler(404)
 # def not_found(error):
 #     return render_template('error.html'), 404
+
+
+def display_status():
+	# if not groupme_bot:
+	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	data = GroupMe_Bot.get_display_status()
+	key =  os.environ.get('CONSUMER_KEY')
+	if not key:
+		key = app.config.from_envvar('CONSUMER_KEY')
+	secret = os.environ.get('CONSUMER_SECRET')
+	if not secret:
+		secret = app.config.from_envvar('CONSUMER_SECRET')
+	#logging.warn(config)
+	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
+
+def insult_last_sender(group_data, message):
+	if group_data['message_num'] >= group_data['message_limit']:
+		logging.warning("message: "+ message['text']+", "+
+			str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
+			"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
+		GroupMe_Bot.reset_message_data(group_data['index'])
+		m.reply_with_mention(m.get_message(message['name']),
+		message['name'], message['sender_id'], group_data['bot_id'])
