@@ -5,7 +5,7 @@ import logging
 import GroupMe_Bot
 import message as m
 import fantasy as f
-from helpers.secrets import secrets
+#from helpers.secrets import secrets
 import db
 import groupme
 
