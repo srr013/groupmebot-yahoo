@@ -247,7 +247,7 @@ def talking_to_self(group_data):
 			msg_limit = 100
 			if len(messages) > msg_limit:
 				delete_messages(messages, msg_limit=msg_limit)
-			msg = groupme.talking_to_self(messages)
+			msg = m.talking_to_self(messages)
 			if msg:
 				send = True
 	return send, msg
