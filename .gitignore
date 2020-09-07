@@ -7,3 +7,6 @@ __pycache__/app.cpython-38.pyc
 helpers/oauth2yahoo.json
 example_data/
 helpers/
+config.cfg
+groupme app creds.txt
+oauth2yahoo.json
