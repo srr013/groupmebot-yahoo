@@ -55,9 +55,9 @@ def webhook():
 			send_msg, msg = GroupMe_Bot.check_messages(group_data)
 			if send_msg:
 				m.reply(msg, group_data['bot_id'])
-			active_triggers = GroupMe_Bot.check_triggers(group_data)
-			if active_triggers:
-				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
+			# active_triggers = GroupMe_Bot.check_triggers(group_data)
+			# if active_triggers:
+			# 	GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
 			elif int(group_data['status']) > 0:
 				GroupMe_Bot.increment_message_num(group_data['index'])
 				insult_last_sender(group_data, message)
