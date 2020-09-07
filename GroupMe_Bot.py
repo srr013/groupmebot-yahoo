@@ -270,9 +270,9 @@ def load_messages(groupme_group_id, message=None):
 		
 def save_message(message):
 	if message:
-		is_bot = 0
+		is_bot = False
 		if message['sender_type'] != 'user':
-			is_bot = 1
+			is_bot = True
 		query = "INSERT INTO messages(message, groupme_group_id, sender_is_bot) VALUES (%s, %s, %s);"
 		values = (str(json.dumps(message)), str(message['group_id']), is_bot)
 		db.execute_table_action(query, values)
