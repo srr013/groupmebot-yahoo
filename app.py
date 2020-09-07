@@ -10,57 +10,91 @@ import db
 import groupme
 
 app = Flask(__name__)
+#app.config = "config.cfg"
 app.secret_key = secrets["secret_key"]
 
-def initialize_group(group_id, groupme_bot = None):
-	if not groupme_bot:
-		groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	#logging.warn("initializing: %i"% (group_id))
-	bot_id = ''
-	if request.args.get("bot_id"):
-		bot_id = request.args['bot_id']
-	group_data = groupme_bot.get_group_data(group_id, bot_id)
-	if not group_data:
-		logging.warn("Group data not found for group %s"%group_id)
-	# if transaction_list:
-	# 	s = "Recent transactions: \n"
-	# 	for t in transaction_list:
-	# 		s += t 
-	# 	m.reply(s, bot_id)
-	return group_data
+
+# def initialize_group(group_id):
+# 	# if not groupme_bot:
+# 	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+# 	#logging.warn("initializing: %i"% (group_id))
+# 	bot_id = ''
+# 	if request.args.get("bot_id"):
+# 		bot_id = request.args['bot_id']
+# 	group_data = GroupMe_Bot.get_group_data(group_id, bot_id)
+# 	if not group_data:
+# 		logging.warn("Group data not found for group %s"%group_id)
+# 	# if transaction_list:
+# 	# 	s = "Recent transactions: \n"
+# 	# 	for t in transaction_list:
+# 	# 		s += t 
+# 	# 	m.reply(s, bot_id)
+# 	return group_data
+
 
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	monitoring_status, messaging_status = GroupMe_Bot.get_application_status()
 	if request.method == 'GET':
-		return display_status(groupme_bot=groupme_bot)
-	elif request.method == 'POST' and groupme_bot.monitoring_status:
+		return display_status()
+	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
 		logging.warn(message)
-		groupme_bot.save_message(message)
+		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
-			group_data = initialize_group(message['group_id'], groupme_bot=groupme_bot)
-			groupme_bot.check_messages(group_data)
-			active_triggers = groupme_bot.check_triggers(group_data)
+			group_data = GroupMe_Bot.get_group_data(message['group_id'])
+			send_msg, msg = GroupMe_Bot.check_messages(group_data)
+			if send_msg:
+				m.reply(msg, group_data['bot_id'])
+			active_triggers = GroupMe_Bot.check_triggers(group_data)
 			if active_triggers:
-				groupme_bot.send_trigger_messages(group_data, active_triggers)
+				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
 			elif int(group_data['status']) > 0:
-				groupme_bot.increment_message_num(group_data['index'])
-				if group_data['message_num'] >= group_data['message_limit']:
-					logging.warning("message: "+ message['text']+", "+
-						str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
-						"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
-					groupme_bot.reset_message_data(group_data['index'])
-					m.reply_with_mention(m.get_message(message['name']),
-					message['name'], message['sender_id'], group_data['bot_id'])
+				GroupMe_Bot.increment_message_num(group_data['index'])
+				insult_last_sender(group_data, message)
 				#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
 				return "ok", 200
 			return "ok", 200
 	return "not found", 404
 
+
+def display_status():
+	# if not groupme_bot:
+	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	data = GroupMe_Bot.get_display_status()
+	key =  os.environ.get('CONSUMER_KEY')
+	if not key:
+		key = app.config.from_envvar('CONSUMER_KEY')
+	secret = os.environ.get('CONSUMER_SECRET')
+	if not secret:
+		secret = app.config.from_envvar('CONSUMER_SECRET')
+	#logging.warn(config)
+	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
+
+def insult_last_sender(group_data, message):
+	if group_data['message_num'] >= group_data['message_limit']:
+		logging.warning("message: "+ message['text']+", "+
+			str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
+			"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
+		GroupMe_Bot.reset_message_data(group_data['index'])
+		m.reply_with_mention(m.get_message(message['name']),
+		message['name'], message['sender_id'], group_data['bot_id'])
+
+# @app.route('/create_group/<int:groupme_id>')
+# def create_group(groupme_id):
+# 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+# 	# group_data = initialize_group(groupme_id)
+# 	return display_status()
+
+@app.route('/toggle/<int:groupme_id>')
+def toggle_status(groupme_id):
+	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
+
+  
 def display_status(groupme_bot=None):
 	if not groupme_bot:
 		groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
@@ -78,28 +112,29 @@ def create_group(groupme_id):
 
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+  group_data = GroupMe_Bot.get_group_data(groupme_id)
 	s = 0
 	if not group_data['status']:
 		s = 1
 	query = 'UPDATE groupme_yahoo SET status='+str(s)+', messaging_status= '+str(s)+' WHERE groupme_group_id='+str(groupme_id)+';'
 	db.execute_table_action(query)
-	return display_status(groupme_bot=groupme_bot)
+	return display_status()
 
 @app.route('/transactions/<int:groupme_id>')
 def transactions(groupme_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	# group_data = initialize_group(groupme_id)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data['status'] > 0:
-		return (groupme_bot.post_trans_list(group_data), 200)
+		return (GroupMe_Bot.post_trans_list(group_data), 200)
 	else:
-		return (display_status(groupme_bot=groupme_bot), 200)
+		return (display_status(), 200)
 
 @app.route('/group/<int:groupme_id>')
 def display_group(groupme_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+
+	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	group_data = initialize_group(groupme_id)
 	if group_data:
 		top = {'Bot Status':group_data['status'], 
 		'Messaging Status': group_data['messaging_status']}
@@ -119,11 +154,11 @@ def display_group(groupme_id):
 
 @app.route('/checkTriggers/<int:groupme_id>')
 def check_triggers(groupme_id):
-	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if request.values:
-		groupme_bot.create_trigger(group_data, request.values)
-	triggers = groupme_bot.check_triggers(group_data)
+		GroupMe_Bot.create_trigger(group_data, request.values)
+	triggers = GroupMe_Bot.check_triggers(group_data)
 	logging.warn("t %s"%json.dumps(triggers))
 	if triggers:
 		m = ''
