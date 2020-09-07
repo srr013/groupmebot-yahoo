@@ -53,6 +53,7 @@ def webhook():
 		if not m.sender_is_bot(message):
 			logging.info("Processing user message")
 			group_data = GroupMe_Bot.get_group_data(message['group_id'])
+			logging.info(group_data)
 			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
 			if talking_to_self:
 				logging.info("Someone's talking to themselves. Insulting.")

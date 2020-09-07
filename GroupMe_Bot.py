@@ -75,7 +75,7 @@ def post_trans_list(group_data):
 		return str(s)
 	return "No transactions found"
 
-def fetch_group_data(group_id):
+def get_group_data(group_id):
 	#groups: TEST:32836424, PRD:55536872
 	logging.debug("Fetching group data from DB")
 	if group_id:
@@ -104,17 +104,18 @@ def fetch_group_data(group_id):
 			# if not league_data:
 			#     league_data = self.get_league_data()
 			return group_data
+	logging.error("No Group Found in fetch_group_data")
 	return {}
 
-def get_group_data(group_id):
-	logging.warn("Getting Group Data for group %s"%(group_id))
-	group_data = fetch_group_data(group_id)
-	# if not group_data and bot_id:
-	# 	logging.warn("Creating new group: %s /n" %(bot_id))
-	# 	create_group(group_id, bot_id)
-	# 	group_data = fetch_group_data(group_id)
-	#league_data = self.get_league_data()
-	return group_data
+# def get_group_data(group_id):
+# 	logging.warn("Getting Group Data for group %s"%(group_id))
+# 	group_data = fetch_group_data(group_id)
+# 	# if not group_data and bot_id:
+# 	# 	logging.warn("Creating new group: %s /n" %(bot_id))
+# 	# 	create_group(group_id, bot_id)
+# 	# 	group_data = fetch_group_data(group_id)
+# 	#league_data = self.get_league_data()
+# 	return group_data
 
 def build_url(req):
 	base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
