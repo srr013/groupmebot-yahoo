@@ -235,6 +235,7 @@ def save_league_data(group, data):
 	values = (data, str(group))
 	db.execute_table_action(query, values)
 
+
 def talking_to_self(group_data):
 	messages = load_messages(group_data['groupme_group_id'])
 	send = False
@@ -258,6 +259,13 @@ def talking_to_bot(message, group_data):
 		return True, m.talking_to_bot()
 	return False, ''
 
+def random_insult(message, group_data):
+	# logging.warning("message: "+ message['text']+", "+
+	# 	str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
+	# 	"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
+	reset_message_data(group_data['index'])
+	m.reply_with_mention(m.get_message(message['name']),
+	message['name'], message['sender_id'], group_data['bot_id'])
 
 
 def load_messages(groupme_group_id):

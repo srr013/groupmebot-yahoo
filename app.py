@@ -60,15 +60,16 @@ def webhook():
 			# active_triggers = GroupMe_Bot.check_triggers(group_data)
 			# if active_triggers:
 			# 	GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
-			elif int(group_data['status']) > 0:
-				GroupMe_Bot.increment_message_num(group_data['index'])
-				insult_last_sender(group_data, message)
 				#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
 			else:
-				logging.info("Evaluating else criteria")
-				talking_to_bot, msg = GroupMe_Bot.talking_to_bot(message, group_data)
-				if talking_to_bot:
-					m.reply(msg, group_data['bot_id'])
+				if int(group_data['status']) > 0:
+					GroupMe_Bot.increment_message_num(group_data['index'])
+					if group_data['message_num'] >= group_data['message_limit']:
+						GroupMe_Bot.random_insult(group_data, message)
+					else:
+						talking_to_bot, msg = GroupMe_Bot.talking_to_bot(message, group_data)
+						if talking_to_bot:
+							m.reply(msg, group_data['bot_id'])
 		return "ok", 200
 	return "not found", 404
 
@@ -157,13 +158,3 @@ def display_status():
 	data = GroupMe_Bot.get_display_status()
 	#logging.warn(config)
 	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
-
-def insult_last_sender(group_data, message):
-	if group_data['message_num'] >= group_data['message_limit']:
-		logging.info("Insulting last sender")
-		# logging.warning("message: "+ message['text']+", "+
-		# 	str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
-		# 	"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
-		GroupMe_Bot.reset_message_data(group_data['index'])
-		m.reply_with_mention(m.get_message(message['name']),
-		message['name'], message['sender_id'], group_data['bot_id'])
