@@ -255,7 +255,7 @@ def talking_to_self(group_data):
 def talking_to_bot(message, group_data):
 	logging.info(message['text'].lower())
 	names = ['insultbot', 'insult bot']
-	if any(names) in message['text'].lower():
+	if any(name in message['text'].lower() for name in names):
 		logging.info("Responding to comment to bot")
 		return True, m.talking_to_bot()
 	return False, ''
