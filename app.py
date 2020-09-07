@@ -48,9 +48,10 @@ def webhook():
 		return display_status()
 	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
-		logging.warn(message)
+		# logging.warn(message)
 		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
+			logging.info("Processing user message")
 			group_data = GroupMe_Bot.get_group_data(message['group_id'])
 			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
 			if talking_to_self:

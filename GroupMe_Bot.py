@@ -252,7 +252,9 @@ def talking_to_self(group_data):
 	return send, msg
 
 def talking_to_bot(message, group_data):
+	logging.info(message['text'].lower())
 	if any ('insultbot', 'insult bot') in message['text'].lower():
+		logging.info("Responding to comment to bot")
 		return True, m.talking_to_bot()
 	return False, ''
 
