@@ -11,7 +11,13 @@ import groupme
 
 app = Flask(__name__)
 #app.config = "config.cfg"
-app.secret_key = secrets["secret_key"]
+key =  os.environ.get('CONSUMER_KEY')
+if not key:
+	key = app.config.from_envvar('CONSUMER_KEY')
+secret = os.environ.get('CONSUMER_SECRET')
+if not secret:
+	secret = app.config.from_envvar('CONSUMER_SECRET')
+app.secret_key = secret
 
 
 # def initialize_group(group_id):
@@ -143,12 +149,6 @@ def display_status():
 	# if not groupme_bot:
 	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
 	data = GroupMe_Bot.get_display_status()
-	key =  os.environ.get('CONSUMER_KEY')
-	if not key:
-		key = app.config.from_envvar('CONSUMER_KEY')
-	secret = os.environ.get('CONSUMER_SECRET')
-	if not secret:
-		secret = app.config.from_envvar('CONSUMER_SECRET')
 	#logging.warn(config)
 	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
 
