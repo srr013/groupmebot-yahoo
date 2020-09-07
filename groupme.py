@@ -2,7 +2,7 @@ import requests
 import json
 import logging
 import random
-from helpers.secrets import secrets
+#from helpers.secrets import secrets
 import db
 import utilities
 import fantasy
@@ -11,8 +11,8 @@ import GroupMe_Bot
 from insults import talking_to_self as talking
 from team_map import team_map as t
 
-def get_group_membership(group_id):
-    res =requests.get('https://api.groupme.com/v3/groups/'+str(group_id)+'?token='+secrets['access_token'])
+def get_group_membership(group_id, groupme_access_token):
+    res =requests.get('https://api.groupme.com/v3/groups/'+str(group_id)+'?token='+groupme_access_token)
     if res.status_code == 200:
         data = json.loads(res.text)
         members = {}

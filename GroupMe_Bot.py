@@ -15,6 +15,7 @@ import Triggers
 
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 tz = pytz.timezone('US/Eastern')
+groupme_access_token = os.environ.get('GM_ACCESS_TOKEN')
 # class GroupMe_Bot():
 # def __init__(self, app):
 	# self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
@@ -43,7 +44,7 @@ def create_group(group_id, bot_id):
 		num_past_transactions,
 		status, messaging_status, bot_id, members) 
 		VALUES (%s,%s,%s,%s,%s,%s,%s,%s);"""
-	members = groupme.get_group_membership(group_id)
+	members = groupme.get_group_membership(group_id, groupme_access_token)
 	values = (str(group_id),0,1,0,1,1,str(bot_id),utilities.dict_to_json(members))
 	db.execute_table_action(query, values)
 
