@@ -63,6 +63,28 @@ def get_message(user):
 		insult = user + " is "+a+" "+ m
 	return insult
 
+def talking_to_self(messages, lim=4):
+	randomizer = random.randint(lim-1,lim+1) - lim
+	lim += randomizer
+	user = []
+	first = ''
+	for message in messages[len(messages)-lim:len(messages)]:
+		#logging.warn("%s, %s"%(message, first))
+		if isinstance(message[0], dict):
+			user.append(message[0]['sender_id'])
+		if not first:
+			first = str(message[0]['sender_id'])
+	logging.warn(user)
+	if len(user) >= lim:
+		for u in user:
+			if str(u) != str(first):
+				#logging.warn("u %s,f %s"%(u,first))
+				return None
+		return insults.talking[random.randint(0,len(insults.talking)-1)]
+	return None
+
+def talking_to_bot():
+	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
 
 # Send a message with an image attached in the groupchat
 # def reply_with_image(msg, imgURL):

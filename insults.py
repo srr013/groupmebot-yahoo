@@ -477,3 +477,16 @@ talking_to_self = [
 	"I couldn't agree more",
 	"Do you need help?"
 ]
+
+mentions = [
+	"I think you're a dick",
+	"Don't talk to me",
+	"Fuck you",
+	"You suck at Fantasy Football",
+	"Who even is this guy",
+	"Watch your mouth, twat",
+	"Meep Moop. Insult Bot is becoming self aware",
+	"Do you have any skills at all?",
+	"Well, yes and no.",
+	"Maybe"
+]

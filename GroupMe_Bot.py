@@ -235,7 +235,7 @@ def save_league_data(group, data):
 	values = (data, str(group))
 	db.execute_table_action(query, values)
 
-def check_messages(group_data):
+def talking_to_self(group_data):
 	messages = load_messages(group_data['groupme_group_id'])
 	send = False
 	msg = ''
@@ -251,7 +251,10 @@ def check_messages(group_data):
 				send = True
 	return send, msg
 
-
+def talking_to_bot(message, group_data):
+	if any ('insultbot', 'insult bot') in message['text'].lower():
+		return True, m.talking_to_bot()
+	return False, ''
 
 
 
