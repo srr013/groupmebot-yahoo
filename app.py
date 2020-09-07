@@ -13,6 +13,7 @@ app = Flask(__name__)
 #app.config = "config.cfg"
 app.secret_key = secrets["secret_key"]
 
+
 # def initialize_group(group_id):
 # 	# if not groupme_bot:
 # 	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
@@ -29,6 +30,7 @@ app.secret_key = secrets["secret_key"]
 # 	# 		s += t 
 # 	# 	m.reply(s, bot_id)
 # 	return group_data
+
 
 
 # Called whenever the app's callback URL receives a POST request
@@ -57,6 +59,7 @@ def webhook():
 				return "ok", 200
 			return "ok", 200
 	return "not found", 404
+
 
 def display_status():
 	# if not groupme_bot:
@@ -90,6 +93,26 @@ def insult_last_sender(group_data, message):
 def toggle_status(groupme_id):
 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
+
+  
+def display_status(groupme_bot=None):
+	if not groupme_bot:
+		groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	data = groupme_bot.display_status()
+	key = app.config.from_envvar('CONSUMER_KEY')
+	secret = app.config.from_envvar('CONSUMER_SECRET')
+	logging.warn(config)
+	return render_template("index.html", groupme_groups=data['group_data'],	groupme_headers=data['headers'], global_data=data['global_data'])
+
+@app.route('/create_group/<int:groupme_id>')
+def create_group(groupme_id):
+	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
+	group_data = initialize_group(groupme_id, groupme_bot=groupme_bot)
+	return display_status(groupme_bot=groupme_bot)
+
+@app.route('/toggle/<int:groupme_id>')
+def toggle_status(groupme_id):
+  group_data = GroupMe_Bot.get_group_data(groupme_id)
 	s = 0
 	if not group_data['status']:
 		s = 1
@@ -109,6 +132,7 @@ def transactions(groupme_id):
 
 @app.route('/group/<int:groupme_id>')
 def display_group(groupme_id):
+
 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
 	group_data = initialize_group(groupme_id)
 	if group_data:

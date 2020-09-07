@@ -1,6 +1,7 @@
 from yahoo_oauth import OAuth2
 import json
 import logging
+import os
 import random
 from datetime import datetime
 import pytz
@@ -10,6 +11,7 @@ import utilities
 import fantasy as f
 import message as m
 import Triggers
+
 
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 tz = pytz.timezone('US/Eastern')
@@ -32,6 +34,7 @@ def get_application_status():
 	query = """SELECT * FROM application_data"""
 	monitoring_status, messaging_status = db.fetch_one(query)
 	return monitoring_status, messaging_status
+
 
 def create_group(group_id, bot_id):
 	#does not set the bot_id for the group - manuually set this in order to post messages
@@ -280,5 +283,4 @@ def delete_messages(messages, msg_limit=100):
 		logging.warn("values: %s" % (values,))
 		db.execute_table_action(query, (values,))
 		logging.warn("Old messages deleted")
-
 
