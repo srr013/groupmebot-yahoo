@@ -56,7 +56,7 @@ def post_trans_list(group_data):
 	oauth = yahoo_login()
 	league_data = f.get_league_data(oauth)
 	trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
-	s = 'None'
+	s = 'Recent transactions: None'
 	if trans_list:
 		new_trans_num = f.get_transaction_total(league_data)
 		s = "Recent transactions: \n"
@@ -247,8 +247,12 @@ def check_messages(group_data):
 			if len(messages) > msg_limit:
 				delete_messages(messages, msg_limit=msg_limit)
 			msg = groupme.talking_to_self(messages)
-			send = True
+			if msg:
+				send = True
 	return send, msg
+
+
+
 
 
 def load_messages(groupme_group_id, message=None):
@@ -256,6 +260,7 @@ def load_messages(groupme_group_id, message=None):
 		select = "SELECT message, i FROM messages WHERE groupme_group_id = %s;"
 		select_values = (str(groupme_group_id),)
 		messages = db.fetch_all(select, values=select_values)
+		messages = filter(lambda msg: not m.sender_is_bot(msg), messages)
 		if message:
 			messages.append(message)
 		return messages
@@ -265,8 +270,11 @@ def load_messages(groupme_group_id, message=None):
 		
 def save_message(message):
 	if message:
-		query = "INSERT INTO messages(message, groupme_group_id) VALUES (%s, %s);"
-		values = (str(json.dumps(message)), str(message['group_id']))
+		is_bot = 0
+		if message['sender_type'] != 'user':
+			is_bot = 1
+		query = "INSERT INTO messages(message, groupme_group_id, sender_is_bot) VALUES (%s, %s, %s);"
+		values = (str(json.dumps(message)), str(message['group_id']), is_bot)
 		db.execute_table_action(query, values)
 	else:
 		logging.warn("Attempted save on null message")
@@ -274,14 +282,14 @@ def save_message(message):
 def delete_messages(messages, msg_limit=100):
 	if len(messages) > msg_limit:
 		index_list = []
-		logging.warn(messages[0])
+		#logging.warn(messages[0])
 		for message in messages:
 			index_list.append(message[1])
 		index_list.sort()
 		val = len(index_list) - msg_limit
 		query = "DELETE FROM messages WHERE i IN %s"
 		values = tuple(index_list[0:val])
-		logging.warn("values: %s" % (values,))
+		#logging.warn("values: %s" % (values,))
 		db.execute_table_action(query, (values,))
-		logging.warn("Old messages deleted")
+		#logging.warn("Old messages deleted")
 

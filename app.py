@@ -52,14 +52,16 @@ def webhook():
 		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
 			group_data = GroupMe_Bot.get_group_data(message['group_id'])
-			send_msg, msg = GroupMe_Bot.check_messages(group_data)
-			if send_msg:
+			talking_to_self, msg = GroupMe_Bot.check_messages(group_data)
+			if talking_to_self:
+				logging.info("Someone's talking to themselves. Insulting.")
 				m.reply(msg, group_data['bot_id'])
 			# active_triggers = GroupMe_Bot.check_triggers(group_data)
 			# if active_triggers:
 			# 	GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
 			elif int(group_data['status']) > 0:
 				GroupMe_Bot.increment_message_num(group_data['index'])
+				logging.info("Insulting last sender")
 				insult_last_sender(group_data, message)
 				#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
 				return "ok", 200
