@@ -255,17 +255,15 @@ def check_messages(group_data):
 
 
 
-def load_messages(groupme_group_id, message=None):
+def load_messages(groupme_group_id):
 	messages = []
 	if groupme_group_id:
-		select = "SELECT message, i FROM messages WHERE groupme_group_id = %s;"
+		select = "SELECT message, i, sender_is_bot FROM messages WHERE groupme_group_id = %s;"
 		select_values = (str(groupme_group_id),)
 		raw_messages = db.fetch_all(select, values=select_values)
 		for msg in raw_messages:
-			if not m.sender_is_bot(msg):
+			if not msg[2]:
 				messages.append(msg)
-		if message:
-			messages.append(message)
 	else:
 		logging.warn("Attempted save on null message")
 	return messages
