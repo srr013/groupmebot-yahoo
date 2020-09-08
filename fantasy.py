@@ -9,7 +9,7 @@ import team_map
 def build_url(req):
     base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
     sport = 'nfl'
-    league_id = '186306'
+    league_id = '568950'
     request = "/"+str(req)
     league_key = sport + '.l.' + league_id
     return str(base_url + league_key + request)
@@ -32,13 +32,9 @@ def get_league_data(oauth):
     return data
 
 
-def parse_league_data(group_data, data):
-	pass
-
-
 def append_league_data(group_data, oauth):
-	data = get_league_data(oauth)
-	group_data['league'] = parse_league_data(group_data, data)
+    data = get_league_data(oauth)
+    group_data['league'] = parse_league_data(group_data, data)
 
 def get_fantasy_teams(league_data):
     teams = league_data['teams']['fantasy_content']['league'][1]['teams']
@@ -84,7 +80,7 @@ def get_team_data(teams):
             team_data[team_id] = {
                 'name': name, 'num_moves': num_moves,
                 'num_trades': num_trades, 'team_key': team_key, 'owner': owner}
-    logging.warn("Team Data output: %s" % utilities.dict_to_json(team_data))
+    # logging.warn("Team Data output: %s" % utilities.dict_to_json(team_data))
     return team_data
 
 
@@ -100,43 +96,43 @@ def get_transaction_list(data, past_trans_total):
     tl = [t for t in trans.keys()]
     i = 0
     for t in tl[0:transaction_diff]:
-		t_dict = {}
-		i += 1
-		if t == 'count':
-			continue
+        t_dict = {}
+        i += 1
+        if t == 'count':
+            continue
             # if trans[t]['transaction'][0]['transaction_id'] == str(past_trans_total+i):
             # logging.warn("Key located")
-		players = trans[t]['transaction'][1]['players']
+        players = trans[t]['transaction'][1]['players']
         # string = str(i)+'. '
-		count = 0
-		for player in players.keys():
+        count = 0
+        for player in players.keys():
             # logging.warn("player located")
-			if player == 'count':
-				continue
-			# logging.warning("Player %s" % json.dumps(players[player]))
-			count += 1
-			t_dict['player_name'] = players[player]['player'][0][2]['name']['full']
-			if isinstance(players[player]['player'][1]['transaction_data'], list):
-				trans_type = players[player]['player'][1]['transaction_data'][0]['type']
-				if trans_type == 'drop':
-					team_key = players[player]['player'][1]['transaction_data'][0]['source_team_key']
-				else:
-					team_key = players[player]['player'][1]['transaction_data'][0]['destination_team_key']
-				# string += team_key + " " + trans_type + "s "+player_name+"\n"
-			else:
-				trans_type = players[player]['player'][1]['transaction_data']['type']
-				if trans_type == 'drop':
-					team_key = players[player]['player'][1]['transaction_data']['source_team_key']
-				else:
-					team_key = players[player]['player'][1]['transaction_data']['destination_team_key']
-			t_dict['team_key'] = team_key
-			t_dict['trans_type'] = trans_type
-				# if count == 1:
-				#     string += team_name + " " + trans_type + "s "+player_name+"\n"
-				# else:
-				#     string += "and " + trans_type + "s "+player_name+"\n"
-		if t_dict:
-			trans_list.append(t_dict)
+            if player == 'count':
+                continue
+            # logging.warning("Player %s" % json.dumps(players[player]))
+            count += 1
+            t_dict['player_name'] = players[player]['player'][0][2]['name']['full']
+            if isinstance(players[player]['player'][1]['transaction_data'], list):
+                trans_type = players[player]['player'][1]['transaction_data'][0]['type']
+                if trans_type == 'drop':
+                    team_key = players[player]['player'][1]['transaction_data'][0]['source_team_key']
+                else:
+                    team_key = players[player]['player'][1]['transaction_data'][0]['destination_team_key']
+                # string += team_key + " " + trans_type + "s "+player_name+"\n"
+            else:
+                trans_type = players[player]['player'][1]['transaction_data']['type']
+                if trans_type == 'drop':
+                    team_key = players[player]['player'][1]['transaction_data']['source_team_key']
+                else:
+                    team_key = players[player]['player'][1]['transaction_data']['destination_team_key']
+            t_dict['team_key'] = team_key
+            t_dict['trans_type'] = trans_type
+                # if count == 1:
+                #     string += team_name + " " + trans_type + "s "+player_name+"\n"
+                # else:
+                #     string += "and " + trans_type + "s "+player_name+"\n"
+        if t_dict:
+            trans_list.append(t_dict)
         # if string:
         #         trans_list.append(string)
     return trans_list

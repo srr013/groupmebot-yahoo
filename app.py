@@ -51,21 +51,17 @@ def webhook():
 		# logging.warn(message)
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
-		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg
-		if transaction_msg and new_trans_total:
-			m.reply(transaction_msg, group_data['bot_id'])
-			GroupMe_Bot.set_new_transaction_total(new_trans_total, group_data)
 		if not m.sender_is_bot(message):
 			logging.info("Processing user message")
-			logging.info(group_data)
+			# logging.info(group_data)
 			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
 			if talking_to_self:
 				logging.info("Someone's talking to themselves. Insulting.")
 				m.reply(msg, group_data['bot_id'])
-			# active_triggers = GroupMe_Bot.check_triggers(group_data)
-			# if active_triggers:
-			# 	GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
-				#f.post_trans_list(groupme_bot, group_data, group_data['bot_id'])
+			active_triggers = GroupMe_Bot.check_triggers(group_data)
+			if active_triggers:
+				logging.info("Checking for active triggers")
+				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
 			else:
 				if int(group_data['status']) > 0:
 					GroupMe_Bot.increment_message_num(group_data['index'])
@@ -100,16 +96,16 @@ def transactions(groupme_id):
 	# group_data = initialize_group(groupme_id)
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data['status'] > 0:
-		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg
+		logging.warn("Getting league transactions")
+		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg(group_data)
+		logging.warn("Transaction message: %s" %(transaction_msg))
 		if transaction_msg and new_trans_total:
 			m.reply(transaction_msg, group_data['bot_id'])
 			GroupMe_Bot.set_new_transaction_total(new_trans_total, group_data)
-	else:
-		return (display_status(), 200)
+	return display_status()
 
 @app.route('/group/<int:groupme_id>')
 def display_group(groupme_id):
-
 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data:
@@ -136,7 +132,7 @@ def check_triggers(groupme_id):
 	if request.values:
 		GroupMe_Bot.create_trigger(group_data, request.values)
 	triggers = GroupMe_Bot.check_triggers(group_data)
-	logging.warn("t %s"%json.dumps(triggers))
+	# logging.warn("t %s"%json.dumps(triggers))
 	if triggers:
 		m = ''
 		for t in triggers:

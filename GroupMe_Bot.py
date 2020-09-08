@@ -53,6 +53,7 @@ def post_group(group_data):
 	group_data = f.append_league_data(group_data, oauth)
 
 def get_transaction_msg(group_data):
+	logging.warn("Defining transaction message for group %s" %(group_data['groupme_group_id']))
 	oauth = yahoo_login()
 	league_data = f.get_league_data(oauth)
 	teams = f.get_fantasy_teams(league_data)
@@ -64,7 +65,7 @@ def get_transaction_msg(group_data):
 		s = "Recent transactions: \n"
 		for t in trans_list:
 			team_id = t['team_key'].split('.')[-1]
-			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']
+			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']+'\n'
 	return str(s), new_trans_num
 
 def set_new_transaction_total(new_trans_num, group_data):
@@ -133,10 +134,10 @@ def get_display_status():
 	if monitoring_status:
 		query = "SELECT groupme_group_id FROM groupme_yahoo"
 		groups = db.fetch_all(query)
-		logging.warn("groups: %s"%groups)
+		# logging.warn("groups: %s"%groups)
 		for group in groups:
 			g = get_group_data(group[0])
-			logging.warn("g %s"%g)
+			# logging.warn("g %s"%g)
 			bot_id = g['bot_id'][0:4]
 			group_data.append([group[0],bot_id,"On" if g['status'] else "Off","On" if g['messaging_status'] else "Off", g['message_num'], g['message_limit']])
 	display = {"headers": headers, "group_data": group_data, "global_data": global_data}
@@ -184,7 +185,7 @@ def talking_to_self(group_data):
 	return send, msg
 
 def talking_to_bot(message, group_data):
-	logging.info(message['text'].lower())
+	# logging.info(message['text'].lower())
 	names = ['insultbot', 'insult bot']
 	if any(name in message['text'].lower() for name in names):
 		logging.info("Responding to comment to bot")
@@ -244,7 +245,7 @@ def check_triggers(group_data):
 	trigger_types = ["test", "transactions"]
 	active_triggers = []
 	triggers = group_data['triggers']
-	logging.warn("triggers: %s"%group_data['triggers'])
+	# logging.warn("triggers: %s"%group_data['triggers'])
 	day, period = Triggers.get_date_period(datetime.now(tz=tz))
 	for trigger_type in trigger_types:
 		for t in triggers:
@@ -257,8 +258,13 @@ def send_trigger_messages(group_data, active_triggers):
 	for trigger in active_triggers:
 		if trigger['type'] == 'transactions':
 			trigger['status'] = [day, period]
-			post_trans_list(group_data)
-			update_trigger_status(trigger)
+			transaction_msg, new_trans_total = get_transaction_msg(group_data)
+			if transaction_msg and new_trans_total:
+				m.reply(transaction_msg, group_data['bot_id'])
+				set_new_transaction_total(new_trans_total, group_data)
+		if trigger['type'] == 'test':
+			logging.warn("Test trigger fired successfully")
+		update_trigger_status(trigger)
 
 def create_trigger(group_data, req_dict):
 	periods = []
@@ -270,6 +276,7 @@ def create_trigger(group_data, req_dict):
 		elif k.lower() == 'days':
 			days = utilities.string_to_list(v)
 		elif k.lower() == 'periods':
+			#morning, noon, evening, late
 			periods = utilities.string_to_list(v)
 	new_trigger = Triggers.create_trigger(trigger_type, days, periods)
 	logging.warn("Creating trigger: %s"%(new_trigger))
