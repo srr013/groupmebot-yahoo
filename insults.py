@@ -368,7 +368,7 @@ encouragement = [
 	"Fantastic.",
 	"Beautiful",
 	"Perfect",
-	"Please and thankyou
+	"Please and thank you"
 ]
 
 
