@@ -53,6 +53,8 @@ def get_message(user):
 		insult = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
 	elif l > 75:
 		insult = insults.responses[random.randint(0, len(insults.responses)-1)]
+	elif l > 65:
+		insult = insults.responses[random.randint(0, len(insults.encouragement)-1)]
 	else:
 		m = insults.insults[random.randint(0,len(insults.insults)-1)]
 		a = 'a'
@@ -67,21 +69,27 @@ def talking_to_self(messages, lim=4):
 	randomizer = random.randint(lim-1,lim+1) - lim
 	lim += randomizer
 	user = []
-	first = ''
+	first = messages[0][0]['sender_id']
+	name = messages[0][0]['name']
+	msg = ''
 	for message in messages[len(messages)-lim:len(messages)]:
 		#logging.warn("%s, %s"%(message, first))
 		if isinstance(message[0], dict):
-			user.append(message[0]['sender_id'])
-		if not first:
-			first = str(message[0]['sender_id'])
+			user.append()
 	# logging.warn(user)
 	if len(user) >= lim:
 		for u in user:
 			if str(u) != str(first):
 				#logging.warn("u %s,f %s"%(u,first))
 				return None
-		return insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
-	return None
+		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
+		if random.randint(0, 10) == 7:
+			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
+			if isinstance(mention, tuple):
+				msg = mention[0]+ str(name) + mention[1]
+			else:
+				msg=mention
+	return msg
 
 def talking_to_bot():
 	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
