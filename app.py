@@ -137,8 +137,8 @@ def check_triggers(groupme_id):
 		m = ''
 		for t in triggers:
 			m += json.dumps(t)
-		return group_data['triggers'],200
-	return "No trigger found", 404
+			#not rendering active versus inactive/fired vs waiting to fire
+	return group_data['triggers'], 200
 
 # @app.route('/messages/<int:groupme_id>')
 # def get_messages(groupme_id):
