@@ -138,7 +138,7 @@ def check_triggers(groupme_id):
 		for t in triggers:
 			m += json.dumps(t)
 			#not rendering active versus inactive/fired vs waiting to fire
-	return group_data['triggers'], 200
+	return json.dumps(group_data['triggers']), 200
 
 # @app.route('/messages/<int:groupme_id>')
 # def get_messages(groupme_id):
