@@ -137,7 +137,7 @@ def check_triggers(groupme_id):
 		m = ''
 		for t in triggers:
 			m += json.dumps(t)
-		return m,200
+		return group_data['triggers'],200
 	return "No trigger found", 404
 
 # @app.route('/messages/<int:groupme_id>')
