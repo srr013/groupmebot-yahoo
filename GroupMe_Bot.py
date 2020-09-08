@@ -251,13 +251,17 @@ def check_triggers(group_data):
 		for t in triggers:
 			if Triggers.check_trigger(t, trigger_type, day, period):
 				active_triggers.append(t)
+			else:
+				if t['status'][0] != day or t['status'][1] != period:
+					t['status'] = ['','']
+					update_trigger_status(t)
 	return active_triggers
 
 def send_trigger_messages(group_data, active_triggers):
 	day,period = Triggers.get_date_period(datetime.now(tz=tz))
 	for trigger in active_triggers:
+		trigger['status'] = [day, period]
 		if trigger['type'] == 'transactions':
-			trigger['status'] = [day, period]
 			transaction_msg, new_trans_total = get_transaction_msg(group_data)
 			if transaction_msg and new_trans_total:
 				m.reply(transaction_msg, group_data['bot_id'])
