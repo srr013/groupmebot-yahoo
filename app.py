@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 from flask import Flask, request, session, render_template
 import logging
 import GroupMe_Bot
@@ -43,24 +44,25 @@ app.secret_key = secret
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
+	now = datetime.datetime.now()
 	monitoring_status, messaging_status = GroupMe_Bot.get_application_status()
 	if request.method == 'GET':
 		return display_status()
 	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
-		# logging.warn(message)
+		logging.warn("Message received from %s at %s"%(str(message['name'], now)))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
-			logging.info("Processing user message")
+			logging.warn("Processing user message")
 			# logging.info(group_data)
 			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
 			if talking_to_self:
 				logging.info("Someone's talking to themselves. Insulting.")
 				m.reply(msg, group_data['bot_id'])
+			logging.warn("Checking for active triggers")
 			active_triggers = GroupMe_Bot.check_triggers(group_data)
 			if active_triggers:
-				logging.info("Checking for active triggers")
 				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
 			else:
 				if int(group_data['status']) > 0:
@@ -130,7 +132,10 @@ def check_triggers(groupme_id):
 	# groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if request.values:
-		GroupMe_Bot.create_trigger(group_data, request.values)
+		if request.values.get('type') and request.values.get('days') and request.values.get('periods'):
+			GroupMe_Bot.create_trigger(group_data, request.values)
+		else:
+			return "Bad parameters", 404
 	triggers = GroupMe_Bot.check_triggers(group_data)
 	# logging.warn("t %s"%json.dumps(triggers))
 	if triggers:

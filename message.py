@@ -74,7 +74,7 @@ def talking_to_self(messages, lim=4):
 			user.append(message[0]['sender_id'])
 		if not first:
 			first = str(message[0]['sender_id'])
-	logging.warn(user)
+	# logging.warn(user)
 	if len(user) >= lim:
 		for u in user:
 			if str(u) != str(first):

@@ -27,7 +27,7 @@ def get_date_period(date_time):
 	dt = dt.replace(" ", "")
 	dt = dt.split(",")
 	p = get_period(dt[1])
-	logging.warn("Current date, day, period: %s, %s, %s"%(dt, dt[0].lower(), p))
+	# logging.warn("Current date, day, period: %s, %s, %s"%(dt, dt[0].lower(), p))
 	return (dt[0].lower(), p)
 
 def check_trigger(trigger, trigger_type, day, period):
