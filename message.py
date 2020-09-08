@@ -80,7 +80,7 @@ def talking_to_self(messages, lim=4):
 			if str(u) != str(first):
 				#logging.warn("u %s,f %s"%(u,first))
 				return None
-		return insults.talking[random.randint(0,len(insults.talking)-1)]
+		return insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
 	return None
 
 def talking_to_bot():
