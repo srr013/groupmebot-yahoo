@@ -44,13 +44,12 @@ app.secret_key = secret
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
-	now = datetime.datetime.now()
 	monitoring_status, messaging_status = GroupMe_Bot.get_application_status()
 	if request.method == 'GET':
 		return display_status()
 	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
-		logging.warn("Message received from %s at %s"%(str(message['name'], datetime.datetime.strftime(now, '%d-%m-%Y %H:%M'))))
+		logging.warn("Message received from %s at %s"%(str(message['name'], datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M'))))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
