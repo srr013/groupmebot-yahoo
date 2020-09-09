@@ -75,7 +75,7 @@ def talking_to_self(messages, lim=4):
 	for message in messages[len(messages)-lim:len(messages)]:
 		#logging.warn("%s, %s"%(message, first))
 		if isinstance(message[0], dict):
-			user.append()
+			user.append(message[0]['sender_id'])
 	# logging.warn(user)
 	if len(user) >= lim:
 		for u in user:
