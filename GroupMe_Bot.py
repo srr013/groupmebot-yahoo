@@ -16,19 +16,16 @@ import Triggers
 #"70e9ad5bc50020fdb3a14dbca1", "test_bot_id": "566e3b05b73cb551006cf34410"
 tz = pytz.timezone('US/Eastern')
 groupme_access_token = os.environ.get('GM_ACCESS_TOKEN')
-# class GroupMe_Bot():
-# def __init__(self, app):
-	# self.oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-	# self.high = 16
-	# self.low = 4
-	# self.monitoring_status = False
-	# self.messaging_status = True
-	# self.tz = pytz.timezone('US/Eastern')
-	# self._login()
+consumer_key = os.environ.get('CONSUMER_KEY')
+consumer_secret = os.environ.get('CONSUMER_SECRET')
 
 def yahoo_login():
-	oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-	oauth.refresh_access_token()
+	if consumer_key:
+		oauth = OAuth2( consumer_key, consumer_secret)
+	else:
+		oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
+	if not oauth.token_is_valid():
+		oauth.refresh_access_token()
 	return oauth
 
 def get_application_status():
@@ -252,7 +249,7 @@ def check_triggers(group_data):
 			if Triggers.check_trigger(t, trigger_type, day, period):
 				active_triggers.append(t)
 			else:
-				if t['status'][0] != day or t['status'][1] != period:
+				if t['status'][0] != day and t['status'][1] != period:
 					t['status'] = ['','']
 					update_trigger_status(t)
 	return active_triggers

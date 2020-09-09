@@ -86,7 +86,7 @@ def talking_to_self(messages, lim=4):
 		if random.randint(0, 10) == 7:
 			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
 			if isinstance(mention, tuple):
-				msg = mention[0]+ str(name) + mention[1]
+				msg = mention[0]+' '+ str(name) + ' '+ mention[1]
 			else:
 				msg=mention
 	return msg
