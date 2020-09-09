@@ -49,7 +49,7 @@ def webhook():
 		return display_status()
 	elif request.method == 'POST' and monitoring_status:
 		message = request.get_json()
-		logging.warn("Message received from %s at %s"%(str(message['name'], datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M'))))
+		logging.warn("Message received from %s at %s" % (str(message['name']), datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M')))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
 		if not m.sender_is_bot(message):
