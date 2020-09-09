@@ -18,14 +18,16 @@ tz = pytz.timezone('US/Eastern')
 groupme_access_token = os.environ.get('GM_ACCESS_TOKEN')
 consumer_key = os.environ.get('CONSUMER_KEY')
 consumer_secret = os.environ.get('CONSUMER_SECRET')
+access_token = os.environ.get('ACCESS_TOKEN')
+refresh_token = os.environ.get('REFRESH_TOKEN')
 
 def yahoo_login():
 	if consumer_key:
-		oauth = OAuth2( consumer_key, consumer_secret)
+		oauth = OAuth2(consumer_key, consumer_secret, access_token=access_token, refresh_token=refresh_token, token_type="bearer", token_time=1599612658.9733138)
 	else:
 		oauth = OAuth2(None, None, from_file='helpers/oauth2yahoo.json')
-	if not oauth.token_is_valid():
-		oauth.refresh_access_token()
+	# if not oauth.token_is_valid():
+	# 	oauth.refresh_access_token()
 	return oauth
 
 def get_application_status():
