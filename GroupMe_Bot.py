@@ -250,10 +250,12 @@ def check_triggers(group_data):
 		for t in triggers:
 			if Triggers.check_trigger(t, trigger_type, day, period):
 				active_triggers.append(t)
+				t['active'] = True
 			else:
 				if t['status'][0] != day and t['status'][1] != period:
 					t['status'] = ['','']
 					update_trigger_status(t)
+				t['active'] = False
 	return active_triggers
 
 def send_trigger_messages(group_data, active_triggers):
