@@ -96,7 +96,6 @@ def get_transaction_list(data, past_trans_total):
     tl = [t for t in trans.keys()]
     i = 0
     for t in tl[0:transaction_diff]:
-        t_dict = {}
         i += 1
         if t == 'count':
             continue
@@ -106,6 +105,7 @@ def get_transaction_list(data, past_trans_total):
         # string = str(i)+'. '
         count = 0
         for player in players.keys():
+            t_dict = {}
             # logging.warn("player located")
             if player == 'count':
                 continue
@@ -132,8 +132,8 @@ def get_transaction_list(data, past_trans_total):
                 #     string += team_name + " " + trans_type + "s "+player_name+"\n"
                 # else:
                 #     string += "and " + trans_type + "s "+player_name+"\n"
-        if t_dict:
-            trans_list.append(t_dict)
+            if t_dict:
+                trans_list.append(t_dict)
         # if string:
         #         trans_list.append(string)
     return trans_list
