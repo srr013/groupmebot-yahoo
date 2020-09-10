@@ -112,6 +112,7 @@ def get_transaction_list(data, past_trans_total):
             # logging.warning("Player %s" % json.dumps(players[player]))
             count += 1
             t_dict['player_name'] = players[player]['player'][0][2]['name']['full']
+            t_dict['player_position'] = players[player]['player'][0][4]['display_position']
             if isinstance(players[player]['player'][1]['transaction_data'], list):
                 trans_type = players[player]['player'][1]['transaction_data'][0]['type']
                 if trans_type == 'drop':

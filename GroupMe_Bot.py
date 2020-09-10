@@ -64,7 +64,7 @@ def get_transaction_msg(group_data):
 		s = "Recent transactions: \n"
 		for t in trans_list:
 			team_id = t['team_key'].split('.')[-1]
-			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']+'\n'
+			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']+'('+t['player_position']+')\n'
 	return str(s), new_trans_num
 
 def set_new_transaction_total(new_trans_num, group_data):
