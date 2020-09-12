@@ -144,16 +144,6 @@ def check_triggers(groupme_id):
 			#not rendering active versus inactive/fired vs waiting to fire
 	return json.dumps(group_data['triggers']), 200
 
-# @app.route('/messages/<int:groupme_id>')
-# def get_messages(groupme_id):
-# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-# 	messages = groupme_bot.load_messages()
-# 	return (groupme_bot.)
-
-# @app.route('/name-changes/*')
-# def name_changes():	
-# 	groupme_bot, group_data = initialize_group(group_id)
-# 	return (groupme.update_group_membership(group_data))
 
 # @app.errorhandler(404)
 # def not_found(error):

@@ -5,6 +5,7 @@ import random
 import logging
 import json
 import insults
+import os
 
 def ad_hoc_message(msg, bot_id):
 	if isinstance(msg,str):
@@ -29,7 +30,7 @@ def reply(msg, bot_id):
 	request = Request(url, urlencode(data).encode())
 	json = urlopen(request).read().decode()
 
-def reply_with_mention(msg, user, user_id, bot_id):
+def send_with_mention(msg, user, user_id, bot_id):
 	if "@" in msg:
 		loci = get_message_loci(msg, user, user_id)
 		d = {'bot_id': bot_id,
@@ -49,21 +50,28 @@ def reply_with_mention(msg, user, user_id, bot_id):
 def get_message(user):
 	user = "@"+user
 	l = random.randint(0,100)
+	photo = False
 	if l > 90:
 		insult = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
 	elif l > 75:
 		insult = insults.responses[random.randint(0, len(insults.responses)-1)]
-	elif l > 65:
-		insult = insults.responses[random.randint(0, len(insults.encouragement)-1)]
+	elif l > 60:
+		insult = insults.encouragement[random.randint(0, len(insults.encouragement)-1)]
+	elif l > 40:
+		insult = "static\\memes\\" + insults.meme_files[random.ranint(0, len(insults.meme_files)-1)]
+		photo = True
 	else:
 		m = insults.insults[random.randint(0,len(insults.insults)-1)]
 		a = 'a'
 		if m[0].lower() in ['a','e','i','o','u']:
 			a = 'an'
-		if " " not in m:
-			m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
-		insult = user + " is "+a+" "+ m
-	return insult
+		if random.randint(0, 99) > 50:
+			if " " not in m:
+				m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
+			insult = user + " is "+a+" "+ m
+		else:
+			insult = user + " is "+a+" "+ m
+	return insult, photo
 
 def talking_to_self(messages, lim=4):
 	randomizer = random.randint(lim-1,lim+1) - lim
@@ -94,37 +102,29 @@ def talking_to_self(messages, lim=4):
 def talking_to_bot():
 	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
 
-# Send a message with an image attached in the groupchat
-# def reply_with_image(msg, imgURL):
-# 	url = 'https://api.groupme.com/v3/bots/post'
-# 	urlOnGroupMeService = upload_image_to_groupme(imgURL)
-# 	data = {
-# 		'bot_id'		: bot_id,
-# 		'text'			: msg,
-# 		'picture_url'		: urlOnGroupMeService
-# 	}
-# 	request = Request(url, urlencode(data).encode())
-# 	json = urlopen(request).read().decode()
+#Send a message with an image attached in the groupchat
+def send_with_image(bot_id, img):
+	url = 'https://api.groupme.com/v3/bots/post'
+	urlOnGroupMeService = upload_image_to_groupme(img)
+	data = {
+		'bot_id'		: bot_id,
+		'text'			: '',
+		'picture_url'		: urlOnGroupMeService['payload']['url']
+	}
+	res = requests.post(url, data=data)
+	return res
+
 	
-# Uploads image to GroupMe's services and returns the new URL
-# def upload_image_to_groupme(imgURL):
-# 	imgRequest = requests.get(imgURL, stream=True)
-# 	filename = 'temp.png'
-# 	postImage = None
-# 	if imgRequest.status_code == 200:
-# 		# Save Image
-# 		with open(filename, 'wb') as image:
-# 			for chunk in imgRequest:
-# 				image.write(chunk)
-# 		# Send Image
-# 		headers = {'content-type': 'application/json'}
-# 		url = 'https://image.groupme.com/pictures'
-# 		files = {'file': open(filename, 'rb')}
-# 		payload = {'access_token': 'eo7JS8SGD49rKodcvUHPyFRnSWH1IVeZyOqUMrxU'}
-# 		r = requests.post(url, files=files, params=payload)
-# 		imageurl = r.json()['payload']['url']
-# 		os.remove(filename)
-# 		return imageurl
+#Uploads image to GroupMe's services and returns the new URL
+def upload_image_to_groupme(filename):
+	headers = {'Content-Type': 'image/jpeg',
+				'X-Access-Token': os.environ.get("GM_ACCESS_TOKEN")}
+	url = 'https://image.groupme.com/pictures'
+	data = open(filename, 'rb').read()
+	r = requests.post(url, headers=headers, data=data)
+	imageurl = json.loads(r.text)
+	return imageurl
+
 
 # Checks whether the message sender is a bot
 def sender_is_bot(message):

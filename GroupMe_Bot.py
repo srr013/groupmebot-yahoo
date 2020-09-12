@@ -196,9 +196,11 @@ def random_insult(message, group_data):
 	# 	str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
 	# 	"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
 	reset_message_data(group_data['index'])
-	m.reply_with_mention(m.get_message(message['name']),
-	message['name'], message['sender_id'], group_data['bot_id'])
-
+	msg, photo = m.get_message(message['name'])
+	if not photo:
+		m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
+	else:
+		m.send_with_image(group_data['bot_id'], msg)
 
 def load_messages(groupme_group_id):
 	messages = []

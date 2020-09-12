@@ -368,7 +368,8 @@ encouragement = [
 	"Fantastic.",
 	"Beautiful",
 	"Perfect",
-	"Please and thank you"
+	"Excellent",
+	"100%"
 ]
 
 
@@ -445,4 +446,25 @@ mentions = [
 	"#scrollup",
 	"Clever",
 	"... ..."
+]
+
+meme_files = [
+	"Adam",
+	"arguing",
+	"charity",
+	"decision",
+	"Jesse",
+	"Lions",
+	"Mielke",
+	"my team",
+	"No idea",
+	"Owen",
+	"Scott",
+	"Spaeth",
+	"Steve C",
+	"Steve S",
+	"stfu",
+	"Trevor",
+	"yoda",
+	"you suck"
 ]
