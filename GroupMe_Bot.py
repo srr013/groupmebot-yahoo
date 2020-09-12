@@ -153,7 +153,7 @@ def increment_message_num(group):
 	db.execute_table_action(query, values)
 
 def reset_message_data(group):
-	lim = random.randint(4, 22)
+	lim = random.randint(7, 22)
 	query = "UPDATE groupme_yahoo SET message_num = 0, message_limit = %s WHERE index = %s;"
 	values = (str(lim), str(group))
 	db.execute_table_action(query, values)
