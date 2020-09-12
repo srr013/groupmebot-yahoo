@@ -466,5 +466,7 @@ meme_files = [
 	"stfu",
 	"Trevor",
 	"yoda",
-	"you suck"
+	"you suck",
+	"cowboys",
+	"Jimmy"
 ]
