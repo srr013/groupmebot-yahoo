@@ -228,16 +228,18 @@ def random_insult(message, group_data, insult_type=''):
 	return ready, msg, msg_type
 
 def toggle_group_messaging_status(group_data, val=''):
+	s = ''
 	if val == '':
 		s = 0
-		if not group_data['status']:
+		if not group_data['messaging_status']:
 			s = 1
 	else:
 		if val == 0 or val == 1:
 			s = val
-	if s:
+	if s != '':
 		query = 'UPDATE groupme_yahoo SET messaging_status= '+str(s)+' WHERE groupme_group_id='+str(group_data['groupme_group_id'])+';'
 		db.execute_table_action(query)
+		logging.warn("Updating messaging_status for group %s to %s" % (group_data['groupme_group_id'], str(s)))
 	return
 
 def load_messages(groupme_group_id):
