@@ -51,29 +51,7 @@ def post_group(group_data):
 	oauth = yahoo_login()
 	group_data = f.append_league_data(group_data, oauth)
 
-def get_transaction_msg(group_data):
-	logging.warn("Defining transaction message for group %s" %(group_data['groupme_group_id']))
-	oauth = yahoo_login()
-	league_data = f.get_league_data(oauth)
-	teams = f.get_fantasy_teams(league_data)
-	trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
-	s = ''
-	new_trans_num = 0
-	if trans_list:
-		new_trans_num = f.get_transaction_total(league_data)
-		s = "Recent transactions: \n"
-		for t in trans_list:
-			team_id = t['team_key'].split('.')[-1]
-			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']+'('+t['player_position']+')\n'
-	return str(s), new_trans_num
-
-def set_new_transaction_total(new_trans_num, group_data):
-	query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
-	logging.warn("Setting new transaction figure %s"%str(new_trans_num))
-	db.execute_table_action(query)
-
 def get_group_data(group_id):
-	#groups: TEST:32836424, PRD:55536872
 	logging.debug("Fetching group data from DB")
 	if group_id:
 		query = """SELECT index, groupme_group_id, message_num, message_limit, 
@@ -82,8 +60,6 @@ def get_group_data(group_id):
 		values = (group_id,)
 		results = db.fetch_one(query, values)
 		if results:
-			#message_num, message_limit, past_transaction_num, league_data, status, messaging_status, bot_id, members,groupme_group_id, index = results
-			# logging.warn("loading trigger: %s"%trigger)
 			group_data = {'index': results[0], 
 						'message_num':results[2], 
 						'message_limit': results[3],
@@ -94,25 +70,11 @@ def get_group_data(group_id):
 						'groupme_group_id': results[1],
 						'members': results[9] if results[9] else {}
 						}
-			#logging.warn(group_data)
 			group_data['triggers'] = load_triggers(group_data['index'])
-			# logging.warning("Messaging Trigger: %i / %i messages, Messaging Status: %i, Monitoring Status: %i (1 is On)"%
-			# (message_num,message_limit,messaging_status, status))
-			# if not league_data:
-			#     league_data = self.get_league_data()
 			return group_data
 	logging.error("No Group Found in fetch_group_data")
 	return {}
 
-# def get_group_data(group_id):
-# 	logging.warn("Getting Group Data for group %s"%(group_id))
-# 	group_data = fetch_group_data(group_id)
-# 	# if not group_data and bot_id:
-# 	# 	logging.warn("Creating new group: %s /n" %(bot_id))
-# 	# 	create_group(group_id, bot_id)
-# 	# 	group_data = fetch_group_data(group_id)
-# 	#league_data = self.get_league_data()
-# 	return group_data
 
 def build_url(req):
 	base_url = 'https://fantasysports.yahooapis.com/fantasy/v2/league/'
@@ -140,9 +102,6 @@ def get_display_status():
 			bot_id = g['bot_id'][0:4]
 			group_data.append([group[0],bot_id,"On" if g['status'] else "Off","On" if g['messaging_status'] else "Off", g['message_num'], g['message_limit']])
 	display = {"headers": headers, "group_data": group_data, "global_data": global_data}
-			# for k,v in g.items():
-			#     new_display += str(k) + ": "
-			#     new_display += str(v)
 	return display
 
 
@@ -166,6 +125,63 @@ def save_league_data(group, data):
 	values = (data, str(group))
 	db.execute_table_action(query, values)
 
+def get_transaction_msg(group_data):
+	logging.warn("Defining transaction message for group %s" %(group_data['groupme_group_id']))
+	oauth = yahoo_login()
+	league_data = f.get_league_data(oauth)
+	teams = f.get_fantasy_teams(league_data)
+	trans_list = f.get_transaction_list(league_data, group_data['transaction_num'])
+	s = ''
+	new_trans_num = 0
+	if trans_list:
+		new_trans_num = f.get_transaction_total(league_data)
+		s = "Recent transactions: \n"
+		for t in trans_list:
+			team_id = t['team_key'].split('.')[-1]
+			s += teams[team_id]['name'] + ' ('+teams[team_id]['owner']+') ' + t['trans_type']+ 's '+ t['player_name']+'('+t['player_position']+')\n'
+		set_new_transaction_total(new_trans_num, group_data)
+	return str(s)
+
+def set_new_transaction_total(new_trans_num, group_data):
+	query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
+	logging.warn("Setting new transaction figure %s"%str(new_trans_num))
+	db.execute_table_action(query)
+
+def check_msg_for_command(message, group_data):
+	ready = True
+	msg = ''
+	help_text = """
+	Bot Help Text: \n
+	--help        : this help text screen \n
+	-stop        : turn off all bot GroupMe messages \n
+	--start       : restart GroupMe messaging \n
+	--status      : return the messaging status of the bot \n
+	--transactions: show fantasy league transactions \n
+	"""
+	msg = help_text
+	msg_type = 'reply'
+	if message:
+		insult_type = ''
+		if "--stop" in message['text'].lower():
+			msg = 'Stopping GroupMe Bot messaging service'
+		elif "--start" in message['text'].lower():
+			msg = 'Starting GroupMe Bot messaging service'
+		elif "--status" in message['text'].lower():
+			s = 'On' if int(group_data['status']) else 'Off'
+			msg = 'GroupMe Bot messaging status is: ' + s
+		elif "--transactions" in message['text'].lower():
+			msg = get_transaction_msg(group_data)
+		elif "--insult" in message['text'].lower():
+			if '--response' in message['text'].lower():
+				insult_type = 'response'
+			elif '--self-aware' in message['text'].lower():
+				insult_type = 'self-aware'
+			elif '--encouragement' in message['text'].lower():
+				insult_type = 'encouragement'
+			elif '--image' in message['text'].lower():
+				insult_type = 'image'
+		ready, msg, msg_type = random_insult(message, group_data, insult_type=insult_type)
+	return ready, msg, msg_type
 
 def talking_to_self(group_data):
 	messages = load_messages(group_data['groupme_group_id'])
@@ -180,27 +196,31 @@ def talking_to_self(group_data):
 				delete_messages(messages, msg_limit=msg_limit)
 			msg = m.talking_to_self(messages)
 			if msg:
+				logging.warn("Someone's talking to themselves. Insulting.")
 				send = True
 	return send, msg
 
 def talking_to_bot(message, group_data):
 	# logging.info(message['text'].lower())
 	names = ['insultbot', 'insult bot']
+	ready = False
+	msg = ''
+	msg_type = 'reply'
 	if any(name in message['text'].lower() for name in names):
+		ready = True
 		logging.info("Responding to comment to bot")
-		return True, m.talking_to_bot()
-	return False, ''
+		msg =  m.talking_to_bot()
+	return ready, msg, msg_type
 
-def random_insult(message, group_data):
+def random_insult(message, group_data, insult_type=''):
 	# logging.warning("message: "+ message['text']+", "+
 	# 	str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
 	# 	"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])
+	ready = True
 	reset_message_data(group_data['index'])
-	msg, photo = m.get_message(message['name'])
-	if not photo:
-		m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
-	else:
-		m.send_with_image(group_data['bot_id'], msg)
+	msg, msg_type = m.get_message(message['name'], insult_type)
+	return ready, msg, msg_type
+
 
 def load_messages(groupme_group_id):
 	messages = []

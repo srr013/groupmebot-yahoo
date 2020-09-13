@@ -47,61 +47,6 @@ def send_with_mention(msg, user, user_id, bot_id):
 	else:
 		reply(msg, bot_id)
 
-def get_message(user):
-	user = "@"+user
-	l = random.randint(0,100)
-	photo = False
-	if l > 90:
-		insult = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
-	elif l > 75:
-		insult = insults.responses[random.randint(0, len(insults.responses)-1)]
-	elif l > 60:
-		insult = insults.encouragement[random.randint(0, len(insults.encouragement)-1)]
-	elif l > 40:
-		insult = "static\\memes\\" + insults.meme_files[random.ranint(0, len(insults.meme_files)-1)]
-		photo = True
-	else:
-		m = insults.insults[random.randint(0,len(insults.insults)-1)]
-		a = 'a'
-		if m[0].lower() in ['a','e','i','o','u']:
-			a = 'an'
-		if random.randint(0, 99) > 50:
-			if " " not in m:
-				m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
-			insult = user + " is "+a+" "+ m
-		else:
-			insult = user + " is "+a+" "+ m
-	return insult, photo
-
-def talking_to_self(messages, lim=4):
-	randomizer = random.randint(lim-1,lim+1) - lim
-	lim += randomizer
-	user = []
-	first = messages[0][0]['sender_id']
-	name = messages[0][0]['name']
-	msg = ''
-	for message in messages[len(messages)-lim:len(messages)]:
-		#logging.warn("%s, %s"%(message, first))
-		if isinstance(message[0], dict):
-			user.append(message[0]['sender_id'])
-	# logging.warn(user)
-	if len(user) >= lim:
-		for u in user:
-			if str(u) != str(first):
-				#logging.warn("u %s,f %s"%(u,first))
-				return None
-		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
-		if random.randint(0, 10) == 7:
-			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
-			if isinstance(mention, tuple):
-				msg = mention[0]+' '+ str(name) + ' '+ mention[1]
-			else:
-				msg=mention
-	return msg
-
-def talking_to_bot():
-	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
-
 #Send a message with an image attached in the groupchat
 def send_with_image(bot_id, img):
 	url = 'https://api.groupme.com/v3/bots/post'
@@ -125,6 +70,65 @@ def upload_image_to_groupme(filename):
 	imageurl = json.loads(r.text)
 	return imageurl
 
+def get_message(user, insult_type):
+	user = "@"+user
+	l = random.randint(0,100)
+	msg_type = 'reply'
+	if l > 90 or insult_type=='self-aware':
+		msg = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
+	elif l > 75 or insult_type=='response':
+		msg = insults.responses[random.randint(0, len(insults.responses)-1)]
+	elif l > 60 or insult_type=='encouragement':
+		msg = insults.encouragement[random.randint(0, len(insults.encouragement)-1)]
+	elif l > 40 or insult_type=='image':
+		msg = "static\\memes\\" + insults.meme_files[random.ranint(0, len(insults.meme_files)-1)]
+		msg_type = 'image'
+	else:
+		msg_type = 'mention'
+		m = insults.insults[random.randint(0,len(insults.insults)-1)]
+		a = 'a'
+		if m[0].lower() in ['a','e','i','o','u']:
+			a = 'an'
+		if random.randint(0, 99) > 50:
+			if " " not in m:
+				m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
+			msg = user + " is "+a+" "+ m
+		else:
+			msg = user + " is "+a+" "+ m
+	return msg, msg_type
+
+def talking_to_self(messages, lim=4):
+	randomizer = random.randint(lim-1,lim+1) - lim
+	lim += randomizer
+	user = []
+	first = messages[0][0]['sender_id']
+	name = messages[0][0]['name']
+	msg = ''
+	#store the sender of the last <lim> messages to a list
+	for message in messages[len(messages)-lim:len(messages)]:
+		#logging.warn("%s, %s"%(message, first))
+		if isinstance(message[0], dict):
+			user.append(message[0]['sender_id'])
+	# logging.warn(user)
+	#if there are enough messages in <user> check if the sender ID is the same on all
+	if len(user) >= lim:
+		for u in user:
+			if str(u) != str(first):
+				#logging.warn("u %s,f %s"%(u,first))
+				return None
+		#send a response if the user is the same
+		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
+		#use a mention-based message sometimes
+		if random.randint(0, 10) == 7:
+			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
+			if isinstance(mention, tuple):
+				msg = mention[0]+' @'+ str(name) + ' '+ mention[1]
+			else:
+				msg = mention+' @'+ str(name)
+	return msg, msg_type
+
+def talking_to_bot():
+	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
 
 # Checks whether the message sender is a bot
 def sender_is_bot(message):

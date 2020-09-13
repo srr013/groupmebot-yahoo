@@ -52,26 +52,32 @@ def webhook():
 		logging.warn("Message received from %s at %s" % (str(message['name']), datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M')))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
-		if not m.sender_is_bot(message):
-			logging.warn("Processing user message")
-			# logging.info(group_data)
-			talking_to_self, msg = GroupMe_Bot.talking_to_self(group_data)
-			if talking_to_self:
-				logging.info("Someone's talking to themselves. Insulting.")
-				m.reply(msg, group_data['bot_id'])
+		if not m.sender_is_bot(message) and int(group_data['status']) > 0:
+			GroupMe_Bot.increment_message_num(group_data['index'])
 			logging.warn("Checking for active triggers")
 			active_triggers = GroupMe_Bot.check_triggers(group_data)
 			if active_triggers:
 				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
-			else:
-				if int(group_data['status']) > 0:
-					GroupMe_Bot.increment_message_num(group_data['index'])
-					if group_data['message_num'] >= group_data['message_limit']:
-						GroupMe_Bot.random_insult(message, group_data)
-					else:
-						talking_to_bot, msg = GroupMe_Bot.talking_to_bot(message, group_data)
-						if talking_to_bot:
-							m.reply(msg, group_data['bot_id'])
+			
+			logging.warn("Processing user message")
+			# logging.info(group_data)
+			msg_ready = False
+			msg_type = 'reply'
+			msg_ready, msg, msg_type = GroupMe_Bot.check_msg_for_command(message, group_data)
+			if not msg_ready:
+				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_self(group_data)
+			if not msg_ready:
+				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_bot(message, group_data)
+			if not msg_ready:
+				if group_data['message_num'] >= group_data['message_limit']:
+					msg_ready, msg, msg_type = GroupMe_Bot.random_insult(message, group_data)
+			if msg_ready:
+				if msg_type == 'mention':
+					m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
+				elif msg_type == 'image':
+					m.send_with_image(msg, group_data['bot_id'])
+				else:
+					m.reply(msg, group_data['bot_id'])
 		return "ok", 200
 	return "not found", 404
 
@@ -98,11 +104,10 @@ def transactions(groupme_id):
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
 	if group_data['status'] > 0:
 		logging.warn("Getting league transactions")
-		transaction_msg, new_trans_total = GroupMe_Bot.get_transaction_msg(group_data)
+		transaction_msg = GroupMe_Bot.get_transaction_msg(group_data)
 		logging.warn("Transaction message: %s" %(transaction_msg))
-		if transaction_msg and new_trans_total:
+		if transaction_msg:
 			m.reply(transaction_msg, group_data['bot_id'])
-			GroupMe_Bot.set_new_transaction_total(new_trans_total, group_data)
 	return display_status()
 
 @app.route('/group/<int:groupme_id>')

@@ -416,14 +416,18 @@ talking_to_self = [
 	"Do you need help?",
 	"And then?",
 	"Awkward...",
-	"Literary friggin genious up in this bitch"
+	"Literary friggin genious up in this bitch",
+	"Please quit drinking"
 ]
 
 talking_to_self_with_mention = [
 	"We get it, thanks",
 	("Why is","still talking?"),
 	("Dear", ", No one cares"),
-	
+	("So", ", how's the weather near you?"),
+	("", "has such a way with words"),
+	("", "must be in a bad mood today"),
+	("Did", "forget to eat breakfast this morning?")
 ]
 
 mentions = [
