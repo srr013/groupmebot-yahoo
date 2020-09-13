@@ -81,7 +81,7 @@ def get_message(user, insult_type):
 	elif l > 60 or insult_type=='encouragement':
 		msg = insults.encouragement[random.randint(0, len(insults.encouragement)-1)]
 	elif l > 40 or insult_type=='image':
-		msg = "static\\memes\\" + insults.meme_files[random.ranint(0, len(insults.meme_files)-1)]
+		msg = "static\\memes\\" + insults.meme_files[random.randint(0, len(insults.meme_files)-1)]
 		msg_type = 'image'
 	else:
 		msg_type = 'mention'
