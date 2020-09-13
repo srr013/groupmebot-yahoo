@@ -166,16 +166,18 @@ def check_msg_for_command(message, group_data):
 		if "--stop" in message['text'].lower():
 			msg = 'Stopping GroupMe Bot messaging service'
 			toggle_group_messaging_status(group_data, val=0)
-		elif "--help" in message['text'].lower():
-			msg = help_text
 		elif "--start" in message['text'].lower():
 			msg = 'Starting GroupMe Bot messaging service'
 			toggle_group_messaging_status(group_data, val=1)
 		elif "--status" in message['text'].lower():
-			s = 'On' if int(group_data['status']) else 'Off'
+			s = 'On' if int(group_data['messaging_status']) else 'Off'
 			msg = 'GroupMe Bot messaging status is: ' + s
+		elif "--help" in message['text'].lower():
+			msg = help_text
 		elif "--transactions" in message['text'].lower():
 			msg = get_transaction_msg(group_data)
+			if not msg:
+				msg = 'No new transactions' #if someone requests transactions they should get a specific message back instead of defaulting to standard response stream
 		elif "--insult" in message['text'].lower():
 			if '--response' in message['text'].lower():
 				insult_type = 'response'
@@ -226,7 +228,7 @@ def random_insult(message, group_data, insult_type=''):
 	return ready, msg, msg_type
 
 def toggle_group_messaging_status(group_data, val=''):
-	if not val:
+	if val == '':
 		s = 0
 		if not group_data['status']:
 			s = 1
