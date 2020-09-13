@@ -152,10 +152,10 @@ def check_msg_for_command(message, group_data):
 	msg = ''
 	help_text = """
 	Bot Help Text: \n
-	--help        : this help text screen \n
-	-stop        : turn off all bot GroupMe messages \n
-	--start       : restart GroupMe messaging \n
-	--status      : return the messaging status of the bot \n
+	--help : this help text screen \n
+	-stop : turn off all bot GroupMe messages \n
+	--start : restart GroupMe messaging \n
+	--status : return the messaging status of the bot \n
 	--transactions: show fantasy league transactions \n
 	"""
 	msg = ''

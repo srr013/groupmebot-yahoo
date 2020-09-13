@@ -104,6 +104,7 @@ def talking_to_self(messages, lim=4):
 	first = messages[0][0]['sender_id']
 	name = messages[0][0]['name']
 	msg = ''
+	msg_type = 'reply'
 	#store the sender of the last <lim> messages to a list
 	for message in messages[len(messages)-lim:len(messages)]:
 		#logging.warn("%s, %s"%(message, first))
@@ -120,6 +121,7 @@ def talking_to_self(messages, lim=4):
 		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
 		#use a mention-based message sometimes
 		if random.randint(0, 10) == 7:
+			msg_type = 'mention'
 			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
 			if isinstance(mention, tuple):
 				msg = mention[0]+' @'+ str(name) + ' '+ mention[1]
