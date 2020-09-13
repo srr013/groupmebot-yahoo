@@ -21,7 +21,7 @@ def get_message_loci(msg, user, user_id):
 	return [start, end]
 
 # Send a message in the groupchat
-def reply(msg, bot_id):
+def send_message(msg, bot_id):
 	url = 'https://api.groupme.com/v3/bots/post'
 	data = {
 		'bot_id'		: bot_id,

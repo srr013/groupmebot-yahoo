@@ -36,8 +36,9 @@ def webhook():
 			logging.warn("Checking for active triggers")
 			active_triggers = GroupMe_Bot.check_triggers(group_data)
 			if active_triggers:
-				GroupMe_Bot.send_trigger_messages(group_data, active_triggers)
-			
+				trigger_msg = GroupMe_Bot.get_trigger_messages(group_data, active_triggers)
+				if trigger_msg:
+					m.send_message(trigger_msg, group_data['bot_id'])
 			logging.warn("Processing user message")
 			# logging.info(group_data)
 			msg_ready = False
@@ -56,7 +57,7 @@ def webhook():
 				elif msg_type == 'image':
 					m.send_with_image(msg, group_data['bot_id'])
 				else:
-					m.reply(msg, group_data['bot_id'])
+					m.send_message(msg, group_data['bot_id'])
 		return "ok", 200
 	return "not found", 404
 
@@ -82,7 +83,7 @@ def transactions(groupme_id):
 		transaction_msg = GroupMe_Bot.get_transaction_msg(group_data)
 		logging.warn("Transaction message: %s" %(transaction_msg))
 		if transaction_msg:
-			m.reply(transaction_msg, group_data['bot_id'])
+			m.send_message(transaction_msg, group_data['bot_id'])
 	return display_status()
 
 @app.route('/group/<int:groupme_id>')

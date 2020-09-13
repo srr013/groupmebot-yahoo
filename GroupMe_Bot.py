@@ -184,10 +184,10 @@ def check_msg_for_command(message, group_data):
 				insult_type = 'encouragement'
 			elif '--image' in message['text'].lower():
 				insult_type = 'image'
+			ready, msg, msg_type = random_insult(message, group_data, insult_type=insult_type)
 		if msg:
 			ready = True
 			logging.warn("Command identified in message")
-		ready, msg, msg_type = random_insult(message, group_data, insult_type=insult_type)
 	return ready, msg, msg_type
 
 def talking_to_self(group_data):
@@ -299,18 +299,19 @@ def check_triggers(group_data):
 				t['active'] = False
 	return active_triggers
 
-def send_trigger_messages(group_data, active_triggers):
+def get_trigger_messages(group_data, active_triggers):
+	transaction_msg = ''
 	day,period = Triggers.get_date_period(datetime.now(tz=tz))
 	for trigger in active_triggers:
 		trigger['status'] = [day, period]
 		if trigger['type'] == 'transactions':
 			transaction_msg, new_trans_total = get_transaction_msg(group_data)
 			if transaction_msg and new_trans_total:
-				m.reply(transaction_msg, group_data['bot_id'])
 				set_new_transaction_total(new_trans_total, group_data)
 		if trigger['type'] == 'test':
 			logging.warn("Test trigger fired successfully")
 		update_trigger_status(trigger)
+	return transaction_msg
 
 def create_trigger(group_data, req_dict):
 	periods = []
