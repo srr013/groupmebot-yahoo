@@ -116,7 +116,7 @@ def talking_to_self(messages, lim=4):
 		for u in user:
 			if str(u) != str(first):
 				#logging.warn("u %s,f %s"%(u,first))
-				return None
+				return msg, msg_type
 		#send a response if the user is the same
 		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
 		#use a mention-based message sometimes
