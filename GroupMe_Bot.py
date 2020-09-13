@@ -71,6 +71,7 @@ def get_group_data(group_id):
 						'members': results[9] if results[9] else {}
 						}
 			group_data['triggers'] = load_triggers(group_data['index'])
+			delete_messages(load_messages(group_data['groupme_group_id']), msg_limit=10)
 			return group_data
 	logging.error("No Group Found in fetch_group_data")
 	return {}
@@ -192,20 +193,16 @@ def check_msg_for_command(message, group_data):
 
 def talking_to_self(group_data):
 	messages = load_messages(group_data['groupme_group_id'])
-	send = False
+	ready = False
 	msg = ''
 	if messages:
 		messages.sort(key=lambda t: t[1])
-		user = ''
 		if len(messages) > 5:
-			msg_limit = 100
-			if len(messages) > msg_limit:
-				delete_messages(messages, msg_limit=msg_limit)
-			msg = m.talking_to_self(messages)
+			msg, msg_type = m.talking_to_self(messages)
 			if msg:
 				logging.warn("Someone's talking to themselves. Insulting.")
-				send = True
-	return send, msg
+				ready = True
+	return ready, msg, msg_type
 
 def talking_to_bot(message, group_data):
 	# logging.info(message['text'].lower())
