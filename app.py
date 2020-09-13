@@ -11,7 +11,6 @@ import db
 import groupme
 
 app = Flask(__name__)
-#app.config = "config.cfg"
 key =  os.environ.get('CONSUMER_KEY')
 if not key:
 	key = app.config.from_envvar('CONSUMER_KEY')
@@ -19,26 +18,6 @@ secret = os.environ.get('CONSUMER_SECRET')
 if not secret:
 	secret = app.config.from_envvar('CONSUMER_SECRET')
 app.secret_key = secret
-
-
-# def initialize_group(group_id):
-# 	# if not groupme_bot:
-# 	# 	groupme_bot = GroupMe_Bot.GroupMe_Bot(app)
-# 	#logging.warn("initializing: %i"% (group_id))
-# 	bot_id = ''
-# 	if request.args.get("bot_id"):
-# 		bot_id = request.args['bot_id']
-# 	group_data = GroupMe_Bot.get_group_data(group_id, bot_id)
-# 	if not group_data:
-# 		logging.warn("Group data not found for group %s"%group_id)
-# 	# if transaction_list:
-# 	# 	s = "Recent transactions: \n"
-# 	# 	for t in transaction_list:
-# 	# 		s += t 
-# 	# 	m.reply(s, bot_id)
-# 	return group_data
-
-
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
@@ -52,7 +31,7 @@ def webhook():
 		logging.warn("Message received from %s at %s" % (str(message['name']), datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M')))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
-		if not m.sender_is_bot(message) and int(group_data['status']) > 0:
+		if not m.sender_is_bot(message) and int(group_data['messaging_status']) > 0:
 			GroupMe_Bot.increment_message_num(group_data['index'])
 			logging.warn("Checking for active triggers")
 			active_triggers = GroupMe_Bot.check_triggers(group_data)
@@ -90,11 +69,7 @@ def create_group(groupme_id):
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
-	s = 0
-	if not group_data['status']:
-		s = 1
-	query = 'UPDATE groupme_yahoo SET status='+str(s)+', messaging_status= '+str(s)+' WHERE groupme_group_id='+str(groupme_id)+';'
-	db.execute_table_action(query)
+	GroupMe_Bot.toggle_group(group_data)
 	return display_status()
 
 @app.route('/transactions/<int:groupme_id>')

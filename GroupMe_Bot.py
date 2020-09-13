@@ -164,8 +164,10 @@ def check_msg_for_command(message, group_data):
 		insult_type = ''
 		if "--stop" in message['text'].lower():
 			msg = 'Stopping GroupMe Bot messaging service'
+			toggle_group(group_data, val=0)
 		elif "--start" in message['text'].lower():
 			msg = 'Starting GroupMe Bot messaging service'
+			toggle_group(group_data, val=1)
 		elif "--status" in message['text'].lower():
 			s = 'On' if int(group_data['status']) else 'Off'
 			msg = 'GroupMe Bot messaging status is: ' + s
@@ -221,6 +223,16 @@ def random_insult(message, group_data, insult_type=''):
 	msg, msg_type = m.get_message(message['name'], insult_type)
 	return ready, msg, msg_type
 
+def toggle_group(group_data, val=''):
+	if not val:
+		s = 0
+		if not group_data['status']:
+			s = 1
+	else:
+		s = val
+	query = 'UPDATE groupme_yahoo SET status='+str()+', messaging_status= '+str(s)+' WHERE groupme_group_id='+str(group_data['groupme_group_id'])+';'
+	db.execute_table_action(query)
+	return
 
 def load_messages(groupme_group_id):
 	messages = []
