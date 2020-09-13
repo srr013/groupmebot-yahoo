@@ -31,7 +31,11 @@ def webhook():
 		logging.warn("Message received from %s at %s" % (str(message['name']), datetime.datetime.strftime(datetime.datetime.now(), '%d-%m-%Y %H:%M')))
 		group_data = GroupMe_Bot.get_group_data(message['group_id'])
 		GroupMe_Bot.save_message(message)
-		if not m.sender_is_bot(message) and int(group_data['messaging_status']) > 0:
+		msg_ready = False
+		msg_type = 'reply'
+		msg = ''
+		msg_ready, msg, msg_type = GroupMe_Bot.check_msg_for_command(message, group_data)
+		if not m.sender_is_bot(message) and (int(group_data['messaging_status']) > 0 or msg_ready):
 			GroupMe_Bot.increment_message_num(group_data['index'])
 			logging.warn("Checking for active triggers")
 			active_triggers = GroupMe_Bot.check_triggers(group_data)
@@ -41,9 +45,6 @@ def webhook():
 					m.send_message(trigger_msg, group_data['bot_id'])
 			logging.warn("Processing user message")
 			# logging.info(group_data)
-			msg_ready = False
-			msg_type = 'reply'
-			msg_ready, msg, msg_type = GroupMe_Bot.check_msg_for_command(message, group_data)
 			if not msg_ready:
 				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_self(group_data)
 			if not msg_ready:
