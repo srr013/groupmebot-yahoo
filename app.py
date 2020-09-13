@@ -69,7 +69,7 @@ def create_group(groupme_id):
 @app.route('/toggle/<int:groupme_id>')
 def toggle_status(groupme_id):
 	group_data = GroupMe_Bot.get_group_data(groupme_id)
-	GroupMe_Bot.toggle_group(group_data)
+	GroupMe_Bot.toggle_group_messaging_status(group_data)
 	return display_status()
 
 @app.route('/transactions/<int:groupme_id>')

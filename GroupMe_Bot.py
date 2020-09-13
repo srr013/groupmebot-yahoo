@@ -148,7 +148,7 @@ def set_new_transaction_total(new_trans_num, group_data):
 	db.execute_table_action(query)
 
 def check_msg_for_command(message, group_data):
-	ready = True
+	ready = False
 	msg = ''
 	help_text = """
 	Bot Help Text: \n
@@ -158,16 +158,18 @@ def check_msg_for_command(message, group_data):
 	--status      : return the messaging status of the bot \n
 	--transactions: show fantasy league transactions \n
 	"""
-	msg = help_text
+	msg = ''
 	msg_type = 'reply'
 	if message:
 		insult_type = ''
 		if "--stop" in message['text'].lower():
 			msg = 'Stopping GroupMe Bot messaging service'
-			toggle_group(group_data, val=0)
+			toggle_group_messaging_status(group_data, val=0)
+		elif "--help" in message['text'].lower():
+			msg = help_text
 		elif "--start" in message['text'].lower():
 			msg = 'Starting GroupMe Bot messaging service'
-			toggle_group(group_data, val=1)
+			toggle_group_messaging_status(group_data, val=1)
 		elif "--status" in message['text'].lower():
 			s = 'On' if int(group_data['status']) else 'Off'
 			msg = 'GroupMe Bot messaging status is: ' + s
@@ -182,6 +184,9 @@ def check_msg_for_command(message, group_data):
 				insult_type = 'encouragement'
 			elif '--image' in message['text'].lower():
 				insult_type = 'image'
+		if msg:
+			ready = True
+			logging.warn("Command identified in message")
 		ready, msg, msg_type = random_insult(message, group_data, insult_type=insult_type)
 	return ready, msg, msg_type
 
@@ -223,15 +228,17 @@ def random_insult(message, group_data, insult_type=''):
 	msg, msg_type = m.get_message(message['name'], insult_type)
 	return ready, msg, msg_type
 
-def toggle_group(group_data, val=''):
+def toggle_group_messaging_status(group_data, val=''):
 	if not val:
 		s = 0
 		if not group_data['status']:
 			s = 1
 	else:
-		s = val
-	query = 'UPDATE groupme_yahoo SET status='+str()+', messaging_status= '+str(s)+' WHERE groupme_group_id='+str(group_data['groupme_group_id'])+';'
-	db.execute_table_action(query)
+		if val == 0 or val == 1:
+			s = val
+	if s:
+		query = 'UPDATE groupme_yahoo SET messaging_status= '+str(s)+' WHERE groupme_group_id='+str(group_data['groupme_group_id'])+';'
+		db.execute_table_action(query)
 	return
 
 def load_messages(groupme_group_id):
