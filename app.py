@@ -34,31 +34,32 @@ def webhook():
 		msg_ready = False
 		msg_type = 'reply'
 		msg = ''
-		msg_ready, msg, msg_type = GroupMe_Bot.check_msg_for_command(message, group_data)
-		if not m.sender_is_bot(message) and (int(group_data['messaging_status']) > 0 or msg_ready):
-			GroupMe_Bot.increment_message_num(group_data['index'])
-			logging.warn("Checking for active triggers")
-			active_triggers = GroupMe_Bot.check_triggers(group_data)
-			if active_triggers:
-				trigger_msg = GroupMe_Bot.get_trigger_messages(group_data, active_triggers)
-				if trigger_msg:
-					m.send_message(trigger_msg, group_data['bot_id'])
-			logging.warn("Processing user message")
-			# logging.info(group_data)
-			if not msg_ready:
-				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_self(group_data)
-			if not msg_ready:
-				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_bot(message, group_data)
-			if not msg_ready:
-				if group_data['message_num'] >= group_data['message_limit']:
-					msg_ready, msg, msg_type = GroupMe_Bot.insult(message, group_data)
-			if msg_ready:
-				if msg_type == 'mention':
-					m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
-				elif msg_type == 'image':
-					m.send_with_image(group_data['bot_id'], msg)
-				else:
-					m.send_message(msg, group_data['bot_id'])
+		if not m.sender_is_bot(message):
+			msg_ready, msg, msg_type = GroupMe_Bot.check_msg_for_command(message, group_data)
+			if int(group_data['messaging_status']) > 0 or msg_ready:
+				GroupMe_Bot.increment_message_num(group_data['index'])
+				logging.warn("Checking for active triggers")
+				active_triggers = GroupMe_Bot.check_triggers(group_data)
+				if active_triggers:
+					trigger_msg = GroupMe_Bot.get_trigger_messages(group_data, active_triggers)
+					if trigger_msg:
+						m.send_message(trigger_msg, group_data['bot_id'])
+				logging.warn("Processing user message")
+				# logging.info(group_data)
+				if not msg_ready:
+					msg_ready, msg, msg_type = GroupMe_Bot.talking_to_self(group_data)
+				if not msg_ready:
+					msg_ready, msg, msg_type = GroupMe_Bot.talking_to_bot(message, group_data)
+				if not msg_ready:
+					if group_data['message_num'] >= group_data['message_limit']:
+						msg_ready, msg, msg_type = GroupMe_Bot.insult(message, group_data)
+				if msg_ready:
+					if msg_type == 'mention':
+						m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
+					elif msg_type == 'image':
+						m.send_with_image(group_data['bot_id'], msg)
+					else:
+						m.send_message(msg, group_data['bot_id'])
 		return "ok", 200
 	return "not found", 404
 
