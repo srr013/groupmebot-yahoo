@@ -74,13 +74,14 @@ def get_message(user, insult_type):
 	user = "@"+user
 	l = random.randint(0,100)
 	msg_type = 'reply'
+	msg = ''
 	if l > 90 or insult_type=='self-aware':
 		msg = insults.self_aware[random.randint(0, len(insults.self_aware)-1)]
-	elif l > 75 or insult_type=='response':
+	elif not msg and l > 75 or insult_type=='response':
 		msg = insults.responses[random.randint(0, len(insults.responses)-1)]
-	elif l > 60 or insult_type=='encouragement':
+	elif not msg and l > 60 or insult_type=='encouragement':
 		msg = insults.encouragement[random.randint(0, len(insults.encouragement)-1)]
-	elif l > 40 or insult_type=='image':
+	elif not msg and l > 40 or insult_type=='image':
 		msg = "static\\memes\\" + insults.meme_files[random.randint(0, len(insults.meme_files)-1)]
 		msg_type = 'image'
 	else:
