@@ -98,35 +98,38 @@ def get_message(user, insult_type):
 	return msg, msg_type
 
 def talking_to_self(messages, lim=4):
+	messages.sort(key=lambda t: t['index'])
 	randomizer = random.randint(lim-1,lim+1) - lim
 	lim += randomizer
 	user = []
-	first = messages[0][0]['sender_id']
-	name = messages[0][0]['name']
+	first = messages[0]['message_object']['sender_id']
+	name = messages[0]['message_object']['name']
 	msg = ''
 	msg_type = 'reply'
+	proceed = True
 	#store the sender of the last <lim> messages to a list
 	for message in messages[len(messages)-lim:len(messages)]:
 		#logging.warn("%s, %s"%(message, first))
-		if isinstance(message[0], dict):
-			user.append(message[0]['sender_id'])
+		if isinstance(message['message_object'], dict):
+			user.append(message['message_object']['sender_id'])
 	# logging.warn(user)
 	#if there are enough messages in <user> check if the sender ID is the same on all
 	if len(user) >= lim:
 		for u in user:
 			if str(u) != str(first):
-				#logging.warn("u %s,f %s"%(u,first))
-				return msg, msg_type
+				proceed = False
 		#send a response if the user is the same
-		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
-		#use a mention-based message sometimes
-		if random.randint(0, 10) == 7:
-			msg_type = 'mention'
-			mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
-			if isinstance(mention, tuple):
-				msg = mention[0]+' @'+ str(name) + ' '+ mention[1]
+		if proceed:
+			#use a mention-based message sometimes
+			if random.randint(0, 10) == 7:
+				msg_type = 'mention'
+				mention = insults.talking_to_self_with_mention[random.randint(0,len(insults.talking_to_self_with_mention)-1)]
+				if isinstance(mention, tuple):
+					msg = mention[0]+' @'+ str(name) + ' '+ mention[1]
+				else:
+					msg = mention+' @'+ str(name)
 			else:
-				msg = mention+' @'+ str(name)
+				msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
 	return msg, msg_type
 
 def talking_to_bot():

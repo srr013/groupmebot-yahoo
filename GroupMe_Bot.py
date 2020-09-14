@@ -201,9 +201,9 @@ def talking_to_self(group_data):
 	ready = False
 	msg = ''
 	if messages:
-		messages.sort(key=lambda t: t[1])
-		if len(messages) > 5:
-			msg, msg_type = m.talking_to_self(messages)
+		lim = 4
+		if len(messages) > lim+1:
+			msg, msg_type = m.talking_to_self(messages, lim=lim)
 			if msg:
 				logging.warn("Someone's talking to themselves. Insulting.")
 				ready = True
@@ -246,17 +246,21 @@ def toggle_group_messaging_status(group_data, val=''):
 	return
 
 def load_messages(groupme_group_id):
-	messages = []
+	msg_list = []
 	if groupme_group_id:
-		select = "SELECT message, i, sender_is_bot FROM messages WHERE groupme_group_id = %s;"
+		select = "SELECT * FROM messages WHERE groupme_group_id = %s;"
 		select_values = (str(groupme_group_id),)
 		raw_messages = db.fetch_all(select, values=select_values)
 		for msg in raw_messages:
-			if not msg[2]:
-				messages.append(msg)
-	else:
-		logging.warn("Attempted save on null message")
-	return messages
+			msg_list.append(
+				{
+					"groupme_group_id": msg[0],
+					"message_object": msg[1],
+					"index": msg[2],
+					"sender_is_bot": msg[3]
+				}
+			)
+	return msg_list
 		
 def save_message(message):
 	if message:
@@ -275,7 +279,7 @@ def delete_messages(groupme_group_id, retain=10):
 		index_list = []
 		#logging.warn(messages[0])
 		for message in messages:
-			index_list.append(message[1])
+			index_list.append(message['index'])
 		index_list.sort()
 		val = len(index_list) - retain
 		query = "DELETE FROM messages WHERE i IN %s"
