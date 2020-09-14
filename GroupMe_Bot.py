@@ -175,6 +175,7 @@ def check_msg_for_command(message, group_data):
 		elif "--help" in message['text'].lower():
 			msg = help_text
 		elif "--delete-messages" in message['text'].lower():
+			logging.warn("Deleting all messages from group %s" % (str(group_data['groupme_group_id'])))
 			delete_messages(delete_messages(group_data['groupme_group_id']), retain=0)
 		elif "--transactions" in message['text'].lower():
 			msg = get_transaction_msg(group_data)
@@ -269,7 +270,7 @@ def save_message(message):
 		logging.warn("Attempted save on null message")
 
 def delete_messages(groupme_group_id, retain=10):
-	msgs = load_messages(groupme_group_id)
+	messages = load_messages(groupme_group_id)
 	if len(messages) > retain:
 		index_list = []
 		#logging.warn(messages[0])
