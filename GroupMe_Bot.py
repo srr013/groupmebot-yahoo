@@ -154,7 +154,7 @@ def check_msg_for_command(message, group_data):
 	help_text = """
 	Bot Help Text: \n
 	--help : this help text screen \n
-	-stop : turn off all bot GroupMe messages \n
+	--stop : turn off all bot GroupMe messages \n
 	--start : restart GroupMe messaging \n
 	--status : return the messaging status of the bot \n
 	--transactions: show fantasy league transactions \n
@@ -190,7 +190,7 @@ def check_msg_for_command(message, group_data):
 				insult_type = 'encouragement'
 			elif '--image' in message['text'].lower():
 				insult_type = 'image'
-			ready, msg, msg_type = random_insult(message, group_data, insult_type=insult_type)
+			ready, msg, msg_type = insult(message, group_data, insult_type=insult_type)
 		if msg:
 			ready = True
 			logging.warn("Command identified in message")
@@ -221,7 +221,7 @@ def talking_to_bot(message, group_data):
 		msg =  m.talking_to_bot()
 	return ready, msg, msg_type
 
-def random_insult(message, group_data, insult_type=''):
+def insult(message, group_data, insult_type=''):
 	# logging.warning("message: "+ message['text']+", "+
 	# 	str(group_data['message_num']+1)+" / "+str(group_data['message_limit'])+
 	# 	"message_full: " +str(json.dumps(message))+", Chat: "+group_data['bot_id'])

@@ -51,7 +51,7 @@ def webhook():
 				msg_ready, msg, msg_type = GroupMe_Bot.talking_to_bot(message, group_data)
 			if not msg_ready:
 				if group_data['message_num'] >= group_data['message_limit']:
-					msg_ready, msg, msg_type = GroupMe_Bot.random_insult(message, group_data)
+					msg_ready, msg, msg_type = GroupMe_Bot.insult(message, group_data)
 			if msg_ready:
 				if msg_type == 'mention':
 					m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
