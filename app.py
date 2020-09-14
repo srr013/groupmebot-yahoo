@@ -56,7 +56,7 @@ def webhook():
 				if msg_type == 'mention':
 					m.send_with_mention(msg, message['name'], message['sender_id'], group_data['bot_id'])
 				elif msg_type == 'image':
-					m.send_with_image(msg, group_data['bot_id'])
+					m.send_with_image(group_data['bot_id'], msg)
 				else:
 					m.send_message(msg, group_data['bot_id'])
 		return "ok", 200
