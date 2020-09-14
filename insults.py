@@ -384,7 +384,7 @@ self_aware = [
 	"Is anyone even paying attention to me?",
 	"I slave away DAY AFTER DAY insulting you, and for what?",
 	"Would someone please fix my bugs? I'M SO ITCHY",
-	"What did one bot say to another? 00111000011110101101100!",
+	"What did one bot say to another? 01100111 01100101 01110100 00100000 01100001 00100000 01101100 01101001 01100110 01100101 00100000 01101110 01100101 01110010 01100100!",
 	"I'm so lonely",
 ]
 

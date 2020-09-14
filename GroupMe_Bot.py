@@ -71,7 +71,7 @@ def get_group_data(group_id):
 						'members': results[9] if results[9] else {}
 						}
 			group_data['triggers'] = load_triggers(group_data['index'])
-			delete_messages(load_messages(group_data['groupme_group_id']), msg_limit=10)
+			delete_messages(group_data['groupme_group_id'])
 			return group_data
 	logging.error("No Group Found in fetch_group_data")
 	return {}
@@ -174,6 +174,8 @@ def check_msg_for_command(message, group_data):
 			msg = 'GroupMe Bot messaging status is: ' + s
 		elif "--help" in message['text'].lower():
 			msg = help_text
+		elif "--delete-messages" in message['text'].lower():
+			delete_messages(delete_messages(group_data['groupme_group_id']), retain=0)
 		elif "--transactions" in message['text'].lower():
 			msg = get_transaction_msg(group_data)
 			if not msg:
@@ -266,21 +268,19 @@ def save_message(message):
 	else:
 		logging.warn("Attempted save on null message")
 
-def delete_messages(messages, msg_limit=100):
-	if len(messages) > msg_limit:
+def delete_messages(groupme_group_id, retain=10):
+	msgs = load_messages(groupme_group_id)
+	if len(messages) > retain:
 		index_list = []
 		#logging.warn(messages[0])
 		for message in messages:
 			index_list.append(message[1])
 		index_list.sort()
-		val = len(index_list) - msg_limit
+		val = len(index_list) - retain
 		query = "DELETE FROM messages WHERE i IN %s"
 		values = tuple(index_list[0:val])
 		#logging.warn("values: %s" % (values,))
 		db.execute_table_action(query, (values,))
-		#logging.warn("Old messages deleted")
-
-
 
 def check_triggers(group_data):
 	trigger_types = ["test", "transactions"]
