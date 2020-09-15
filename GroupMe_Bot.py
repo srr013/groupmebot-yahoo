@@ -182,13 +182,13 @@ def check_msg_for_command(message, group_data):
 			if not msg:
 				msg = 'No new transactions' #if someone requests transactions they should get a specific message back instead of defaulting to standard response stream
 		elif "--insult" in message['text'].lower():
-			if '--response' in message['text'].lower():
+			if '-response' in message['text'].lower():
 				insult_type = 'response'
-			elif '--self-aware' in message['text'].lower():
+			elif '-self-aware' in message['text'].lower():
 				insult_type = 'self-aware'
-			elif '--encouragement' in message['text'].lower():
+			elif '-encourage' in message['text'].lower():
 				insult_type = 'encouragement'
-			elif '--image' in message['text'].lower():
+			elif '-image' in message['text'].lower():
 				insult_type = 'image'
 			ready, msg, msg_type = insult(message, group_data, insult_type=insult_type)
 		if msg:
