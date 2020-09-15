@@ -143,6 +143,22 @@ def get_transaction_msg(group_data):
 		set_new_transaction_total(new_trans_num, group_data)
 	return str(s)
 
+def get_scoreboard(group_data):
+	oauth = yahoo_login()
+	league_data = f.get_league_data(oauth)
+	teams = f.get_fantasy_teams(league_data)
+	scoreboard = f.get_scoreboard(league_data, teams)
+	msg_type = 'reply'
+	s = ""
+	if scoreboard:
+		for matchup in scoreboard:
+			s += matchup['team_0_owner']+": "+matchup['team_0_score']+"  /  "+matchup['team_1_owner']+": "+matchup['team_1_score']+'\n'
+	return scoreboard, msg_type
+
+	#Save the data to DB if it's a Tuesday and not yet done
+
+
+
 def set_new_transaction_total(new_trans_num, group_data):
 	query = "UPDATE groupme_yahoo SET num_past_transactions = "+str(new_trans_num)+" WHERE index = "+str(group_data['index'])+";"
 	logging.warn("Setting new transaction figure %s"%str(new_trans_num))
@@ -181,6 +197,8 @@ def check_msg_for_command(message, group_data):
 			msg = get_transaction_msg(group_data)
 			if not msg:
 				msg = 'No new transactions' #if someone requests transactions they should get a specific message back instead of defaulting to standard response stream
+		elif '--scoreboard' in message['text'].lower():
+			msg, msg_type = get_scoreboard(group_data)
 		elif "--insult" in message['text'].lower():
 			if '-response' in message['text'].lower():
 				insult_type = 'response'

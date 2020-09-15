@@ -70,10 +70,10 @@ def get_team_data(teams):
                         num_trades = v
                     elif k == 'team_key':
                         team_key = v
-                        team_num = v.split('.')[-1]
+                        team_id = v.split('.')[-1]
                         owner = team_map.team_map[team_num]
                     elif k == 'team_id':
-                        team_id = v
+                        team_key = v
                         team_num = v.split('.')[-1]
                         owner = team_map.team_map[team_num]                    
         if team_id:
@@ -138,10 +138,22 @@ def get_transaction_list(data, past_trans_total):
         #         trans_list.append(string)
     return trans_list
 
-    # def get_matchup_score(self, data, matchup):
-	# 	matchup = {}
-    #     team_0 = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][0]
-    #     team_1 = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups'][matchup][0]['teams'][1]
-	# 	#t0_id = team_0['team'][0][0].get(['team_key'])
-    #     t0_name = team_0['team'][0][0].get(['team_name'])
-    #     t0_current_score = team_0['team'][1]['team_points']['total']
+def get_scoreboard(league_data, teams):
+	scoreboard = {}
+    matchups = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups']
+    for m in matchups:
+        match = {
+            'team_0_id': m['matchup']['0']['teams'][0]['team'][0][1]['team_id'],
+            'team_0_score': m['matchup']['0']['teams'][0]['team'][1]['team_points']['total'],
+            'team_1_id': m['matchup']['0']['teams'][1]['team'][0][1]['team_id'],
+            'team_1_score': m['matchup']['0']['teams'][1]['team'][1]['team_points']['total'],
+        }
+        for t in teams:
+            if t['team_id'] == match['team_0_id']:
+                match['team_0_owner'] = t['owner']
+            elif t['team_id'] == match['team_1_id']:
+                match['team_1_owner'] = t['owner']
+        scoreboard.append(match)
+
+    return scoreboard
+    
