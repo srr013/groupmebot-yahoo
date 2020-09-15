@@ -71,11 +71,11 @@ def get_team_data(teams):
                     elif k == 'team_key':
                         team_key = v
                         team_id = v.split('.')[-1]
-                        owner = team_map.team_map[team_num]
+                        owner = team_map.team_map['team_num']
                     elif k == 'team_id':
                         team_key = v
                         team_num = v.split('.')[-1]
-                        owner = team_map.team_map[team_num]                    
+                        owner = team_map.team_map['team_num']              
         if team_id:
             team_data[team_id] = {
                 'name': name, 'num_moves': num_moves,
@@ -140,7 +140,7 @@ def get_transaction_list(data, past_trans_total):
 
 def get_scoreboard(league_data, teams):
     scoreboard = {}
-    matchups = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups']
+    matchups = league_data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups']
     for m in matchups:
         match = {
             'team_0_id': m['matchup']['0']['teams'][0]['team'][0][1]['team_id'],
