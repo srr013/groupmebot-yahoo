@@ -71,14 +71,14 @@ def get_team_data(teams):
                     elif k == 'team_key':
                         team_key = v
                         team_id = v.split('.')[-1]
-                        owner = team_map.team_map['team_num']
+                        owner = team_map.team_map[team_id]
                     elif k == 'team_id':
                         team_key = v
-                        team_num = v.split('.')[-1]
-                        owner = team_map.team_map['team_num']              
+                        team_id = v.split('.')[-1]
+                        owner = team_map.team_map[team_id]              
         if team_id:
             team_data[team_id] = {
-                'name': name, 'num_moves': num_moves,
+                'name': name, 'num_moves': num_moves, 'team_id': team_id,
                 'num_trades': num_trades, 'team_key': team_key, 'owner': owner}
     # logging.warn("Team Data output: %s" % utilities.dict_to_json(team_data))
     return team_data
