@@ -139,7 +139,7 @@ def get_transaction_list(data, past_trans_total):
     return trans_list
 
 def get_scoreboard(league_data, teams):
-	scoreboard = {}
+    scoreboard = {}
     matchups = data['scoreboard']['fantasy_content']['league'][1]['scoreboard'][0]['matchups']
     for m in matchups:
         match = {
@@ -156,4 +156,3 @@ def get_scoreboard(league_data, teams):
         scoreboard.append(match)
 
     return scoreboard
-    
