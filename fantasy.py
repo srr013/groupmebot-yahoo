@@ -151,9 +151,9 @@ def get_scoreboard(league_data, teams):
             }
             for t in teams.keys():
                 if t == match['team_0_id']:
-                    match['team_0_owner'] = teams[t]
+                    match['team_0_owner'] = teams[t]['owner']
                 elif t == match['team_1_id']:
-                    match['team_1_owner'] = teams[t]
+                    match['team_1_owner'] = teams[t]['owner']
             scoreboard.append(match)
 
     return scoreboard
