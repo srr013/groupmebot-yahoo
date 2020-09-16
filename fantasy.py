@@ -141,8 +141,8 @@ def get_transaction_list(data, past_trans_total):
 def get_scoreboard(league_data, teams):
     scoreboard = {}
     matchups = league_data['scoreboard']['fantasy_content']['league'][1]['scoreboard']["0"]['matchups']
-    logging.warn(m['matchup'][0]['teams']["0"]['team'])
-    logging.warn(m['matchup'][0]['teams']["0"]['team'][0])
+    logging.warn(m['matchup'][0])
+    logging.warn(m['matchup'][0]['teams']["0"])
     logging.warn(m['matchup'][0]['teams']["0"]['team'][0][1])
     for m in matchups:
         match = {
