@@ -157,7 +157,7 @@ def get_scoreboard(group_data):
 	teams = f.get_fantasy_teams(league_data)
 	scoreboard = f.get_scoreboard(league_data, teams)
 	msg_type = 'reply'
-	s = ""
+	s = "Current Scoreboard:\n"
 	if scoreboard:
 		for matchup in scoreboard:
 			logging.warn(matchup)
