@@ -162,6 +162,7 @@ def get_scoreboard(group_data):
 		for matchup in scoreboard:
 			logging.warn(matchup)
 			s += matchup['team_0_owner']+": "+matchup['team_0_score']+"  /  "+matchup['team_1_owner']+": "+matchup['team_1_score']+'\n'
+	return s, msg_type
 	#Save the data to DB if it's a Tuesday and not yet done
 
 
