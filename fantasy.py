@@ -139,24 +139,22 @@ def get_transaction_list(data, past_trans_total):
     return trans_list
 
 def get_scoreboard(league_data, teams):
-    scoreboard = {}
+    scoreboard = []
     matchups = league_data['scoreboard']['fantasy_content']['league'][1]['scoreboard']["0"]['matchups']
-
-    for m in matchups:
-        logging.warn(m['matchup'][0])
-        logging.warn(m['matchup'][0]['teams']["0"])
-        logging.warn(m['matchup'][0]['teams']["0"]['team'][0][1])
+    logging.warn(matchups)
+    for m in matchups.keys():
+        logging.warn(matchups[m]['matchup']['0'])
         match = {
-            'team_0_id': m['matchup'][0]['teams']["0"]['team'][0][1]['team_id'],
-            'team_0_score': m['matchup'][0]['teams'][0]['team'][1]['team_points']['total'],
-            'team_1_id': m['matchup'][0]['teams']["1"]['team'][0][1]['team_id'],
-            'team_1_score': m['matchup'][0]['teams'][1]['team'][1]['team_points']['total'],
-        }
+                'team_0_id': matchups[m]['matchup']['0']['teams']['0']['team'][0][1]['team_id'],
+                'team_0_score': matchups[m]['matchup']['0']['teams']['0']['team'][1]['team_points']['total'],
+                'team_1_id': matchups[m]['matchup']['0']['teams']['1']['team'][0][1]['team_id'],
+                'team_1_score': matchups[m]['matchup']['0']['teams']['1']['team'][1]['team_points']['total'],
+            }
         for t in teams:
-            if t['team_id'] == match['team_0_id']:
-                match['team_0_owner'] = t['owner']
-            elif t['team_id'] == match['team_1_id']:
-                match['team_1_owner'] = t['owner']
+            if t == match['team_0_id']:
+                match['team_0_owner'] = teams[t]
+            elif t == match['team_1_id']:
+                match['team_1_owner'] = teams[t]
         scoreboard.append(match)
 
     return scoreboard
