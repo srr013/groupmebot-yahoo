@@ -187,27 +187,27 @@ def check_msg_for_command(message, group_data):
 	msg_type = 'reply'
 	if message:
 		insult_type = ''
-		if any("--stop", "\u2014stop") in message['text'].lower():
+		if [s for s in ['--stop', '\u2014stop'] if(s in message['text'].lower())]:
 			msg = 'Stopping GroupMe Bot messaging service'
 			toggle_group_messaging_status(group_data, val=0)
-		elif "--start" in message['text'].lower():
+		elif [s for s in ['--start', '\u2014start'] if(s in message['text'].lower())]:
 			msg = 'Starting GroupMe Bot messaging service'
 			toggle_group_messaging_status(group_data, val=1)
-		elif "--status" in message['text'].lower():
+		elif [s for s in ['--status', '\u2014status'] if(s in message['text'].lower())]:
 			s = 'On' if int(group_data['messaging_status']) else 'Off'
 			msg = 'GroupMe Bot messaging status is: ' + s
-		elif "--help" in message['text'].lower():
+		elif [s for s in ['--help', '\u2014help'] if(s in message['text'].lower())]:
 			msg = help_text
-		elif "--delete-messages" in message['text'].lower():
+		elif [s for s in ['--delete-messages', '\u2014delete-messages'] if(s in message['text'].lower())]:
 			logging.warn("Deleting all messages from group %s" % (str(group_data['groupme_group_id'])))
 			delete_messages(delete_messages(group_data['groupme_group_id']), retain=0)
-		elif "--transactions" in message['text'].lower():
+		elif [s for s in ['--transactions', '\u2014transactions'] if(s in message['text'].lower())]:
 			msg = get_transaction_msg(group_data)
 			if not msg:
 				msg = 'No new transactions' #if someone requests transactions they should get a specific message back instead of defaulting to standard response stream
-		elif '--scoreboard' in message['text'].lower():
+		elif [s for s in ['--scoreboard', '--score', '\u2014scoreboard', '\u2014score'] if(s in message['text'].lower())]:
 			msg, msg_type = get_scoreboard(group_data)
-		elif "--insult" in message['text'].lower():
+		elif [s for s in ['--insult', '\u2014insult'] if(s in message['text'].lower())]:
 			if '-response' in message['text'].lower():
 				insult_type = 'response'
 			elif '-self-aware' in message['text'].lower():
