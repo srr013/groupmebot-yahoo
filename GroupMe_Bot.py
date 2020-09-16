@@ -123,7 +123,7 @@ def save_league_data(group_data, league_data):
 	data = json.dumps(league_data)
 	data.strip("'")
 	query = "UPDATE groupme_yahoo SET league_data = %s WHERE index = %s;"
-	values = (data, str(group_data['groupme_group_id']))
+	values = (league_data, str(group_data['groupme_group_id']))
 	db.execute_table_action(query, values)
 
 def get_league_data(group_data):
@@ -338,7 +338,8 @@ def get_trigger_messages(group_data, active_triggers):
 		trigger['status'] = [day, period]
 		if trigger['type'] == 'transactions':
 			transaction_msg = get_transaction_msg(group_data)
-			league_data = get_league_data(group_data)
+			oauth = yahoo_login()
+			league_data = f.get_league_data(oauth)
 			new_trans_total = f.get_transaction_total(league_data)
 			if transaction_msg and new_trans_total:
 				set_new_transaction_total(new_trans_total, group_data)
