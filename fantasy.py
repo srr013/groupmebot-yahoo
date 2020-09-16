@@ -143,10 +143,10 @@ def get_scoreboard(league_data, teams):
     matchups = league_data['scoreboard']['fantasy_content']['league'][1]['scoreboard']["0"]['matchups']
     for m in matchups:
         match = {
-            'team_0_id': m['matchup']['0']['teams'][0]['team'][0][1]['team_id'],
-            'team_0_score': m['matchup']['0']['teams'][0]['team'][1]['team_points']['total'],
-            'team_1_id': m['matchup']['0']['teams'][1]['team'][0][1]['team_id'],
-            'team_1_score': m['matchup']['0']['teams'][1]['team'][1]['team_points']['total'],
+            'team_0_id': m['matchup'][0]['teams']["0"]['team'][0][1]['team_id'],
+            'team_0_score': m['matchup'][0]['teams'][0]['team'][1]['team_points']['total'],
+            'team_1_id': m['matchup'][0]['teams']["1"]['team'][0][1]['team_id'],
+            'team_1_score': m['matchup'][0]['teams'][1]['team'][1]['team_points']['total'],
         }
         for t in teams:
             if t['team_id'] == match['team_0_id']:
