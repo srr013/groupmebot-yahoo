@@ -187,7 +187,7 @@ def check_msg_for_command(message, group_data):
 	msg_type = 'reply'
 	if message:
 		insult_type = ''
-		if "--stop" in message['text'].lower():
+		if any("--stop", "\u2014stop") in message['text'].lower():
 			msg = 'Stopping GroupMe Bot messaging service'
 			toggle_group_messaging_status(group_data, val=0)
 		elif "--start" in message['text'].lower():
