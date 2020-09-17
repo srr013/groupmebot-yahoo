@@ -47,6 +47,8 @@ def webhook():
 				logging.warn("Processing user message")
 				# logging.info(group_data)
 				if not msg_ready:
+					msg_ready, msg, msg_type = GroupMe_Bot.long_post(message, group_data)
+				if not msg_ready:
 					msg_ready, msg, msg_type = GroupMe_Bot.talking_to_self(group_data)
 				if not msg_ready:
 					msg_ready, msg, msg_type = GroupMe_Bot.talking_to_bot(message, group_data)

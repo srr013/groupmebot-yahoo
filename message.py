@@ -88,6 +88,12 @@ def get_message(user, insult_type):
 		#set to linux filesystem (Heroku)
 		msg = "static/memes/" + insults.meme_files[random.randint(0, len(insults.meme_files)-1)]
 		msg_type = 'image'
+	elif insult_type == 'tldr':
+		msg = long_post()
+	elif insult_type == 'talking-self':
+		msg = insults.talking_to_self[random.randint(0,len(insults.talking_to_self)-1)]
+	elif insult_type == 'talking-bot':
+		msg = talking_to_bot()
 	else:
 		msg_type = 'mention'
 		m = insults.insults[random.randint(0,len(insults.insults)-1)]
@@ -139,6 +145,9 @@ def talking_to_self(messages, lim=4):
 
 def talking_to_bot():
 	return insults.mentions[random.randint(0,len(insults.mentions)-1)]
+
+def long_post():
+	return insults.tldr[random.randint(0,len(insults.tldr)-1)]
 
 # Checks whether the message sender is a bot
 def sender_is_bot(message):

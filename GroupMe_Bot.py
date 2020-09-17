@@ -182,6 +182,14 @@ def check_msg_for_command(message, group_data):
 	--start : restart GroupMe messaging \n
 	--status : return the messaging status of the bot \n
 	--transactions: show fantasy league transactions \n
+	--insult: return an insult. Append the following types for a specific insult\n
+		-self-aware
+		-response
+		-encourage
+		-image
+		-tldr
+		-talking-self
+		-talking-bot
 	"""
 	msg = ''
 	msg_type = 'reply'
@@ -216,6 +224,12 @@ def check_msg_for_command(message, group_data):
 				insult_type = 'encouragement'
 			elif '-image' in message['text'].lower():
 				insult_type = 'image'
+			elif '-talking-self' in message['text'].lower():
+				insult_type = 'talking-self'
+			elif '-talking-bot' in message['text'].lower():
+				insult_type = 'talking-bot'
+			elif '-tldr' in message['text'].lower():
+				insult_type = 'tldr'			
 			ready, msg, msg_type = insult(message, group_data, insult_type=insult_type)
 		if msg:
 			ready = True
@@ -245,6 +259,15 @@ def talking_to_bot(message, group_data):
 		ready = True
 		logging.info("Responding to comment to bot")
 		msg =  m.talking_to_bot()
+	return ready, msg, msg_type
+
+def long_post(message, group_data):
+	msg_type = 'reply'
+	ready = False
+	msg = ''
+	if message['text'].count(' ') > 100:
+		msg = m.long_post()
+		ready = True
 	return ready, msg, msg_type
 
 def insult(message, group_data, insult_type=''):
